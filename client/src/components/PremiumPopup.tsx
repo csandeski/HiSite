@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Zap, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 interface PremiumPopupProps {
   open: boolean;
@@ -10,14 +11,12 @@ interface PremiumPopupProps {
 
 export default function PremiumPopup({ open, onOpenChange }: PremiumPopupProps) {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const handleUnlockPremium = () => {
-    toast({
-      title: "Premium",
-      description: "Em breve você poderá desbloquear o Premium!",
-      duration: 3000,
-    });
     onOpenChange(false);
+    // Navegar para perfil com parâmetro para destacar o card premium
+    setLocation("/perfil?highlight=premium");
   };
 
   const handleContinueFree = () => {

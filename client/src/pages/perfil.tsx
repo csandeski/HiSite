@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -40,6 +40,28 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showFAQModal, setShowFAQModal] = useState(false);
   const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [highlightPremium, setHighlightPremium] = useState(false);
+  
+  // Check for highlight parameter in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('highlight') === 'premium') {
+      setHighlightPremium(true);
+      // Scroll to the premium card after a short delay
+      setTimeout(() => {
+        const premiumCard = document.getElementById('premium-upgrade-card');
+        if (premiumCard) {
+          premiumCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      // Remove highlight after animation
+      setTimeout(() => {
+        setHighlightPremium(false);
+        // Clean URL without reloading
+        window.history.replaceState({}, document.title, '/perfil');
+      }, 3000);
+    }
+  }, []);
   
   // Get initials from name
   const getInitials = (name: string) => {
@@ -139,7 +161,12 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
         </div>
 
         {/* Premium Banner - Destacado */}
-        <Card className="p-4 mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-0 shadow-xl">
+        <Card 
+          id="premium-upgrade-card"
+          className={`p-4 mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-0 shadow-xl transition-all duration-500 ${
+            highlightPremium ? 'ring-4 ring-purple-400 ring-offset-4 scale-105 animate-pulse' : ''
+          }`}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 text-white">
               <Crown className="w-7 h-7" />
