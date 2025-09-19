@@ -71,7 +71,7 @@ export default function Dashboard() {
 
     const interval = setInterval(() => {
       setSessionPoints((prev) => prev + 1);
-    }, 5000); // Incrementa a cada 5 segundos
+    }, 1500); // Incrementa a cada 1,5 segundos
 
     return () => clearInterval(interval);
   }, [playingRadioId]);
