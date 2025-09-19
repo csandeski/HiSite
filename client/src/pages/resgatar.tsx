@@ -36,7 +36,7 @@ interface ResgatarProps {
   sessionPoints: number;
   setSessionPoints: (points: number | ((prev: number) => number)) => void;
   balance: number;
-  setBalance: (balance: number) => void;
+  setBalance: (balance: number | ((prev: number) => number)) => void;
 }
 
 export default function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
@@ -87,7 +87,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const confirmExchange = () => {
     if (selectedExchange) {
       // Deduct points and add to balance
-      setSessionPoints(prev => prev - selectedExchange.points);
+      setSessionPoints((prev: number) => prev - selectedExchange.points);
       setBalance(prev => prev + selectedExchange.value);
       setShowConfirmationModal(false);
       setSelectedExchange(null);
@@ -356,46 +356,76 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
       {/* Insufficient Balance Modal */}
       <Dialog open={showInsufficientModal} onOpenChange={setShowInsufficientModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full bg-white rounded-2xl mx-auto">
           <DialogHeader>
-            <div className="flex flex-col items-center text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
+            <div className="flex flex-col items-center text-center space-y-4 pt-2">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center shadow-lg">
                 <AlertCircle className="w-10 h-10 text-orange-500" />
               </div>
-              <DialogTitle className="text-xl font-bold">Saldo Insuficiente</DialogTitle>
+              <div>
+                <DialogTitle className="text-2xl font-bold text-gray-900 mb-2">Saldo Insuficiente</DialogTitle>
+                <p className="text-sm text-gray-600">Você precisa de mais saldo para realizar o saque</p>
+              </div>
             </div>
           </DialogHeader>
           
           <div className="space-y-4 pt-4">
-            <div className="text-center space-y-2">
-              <p className="text-gray-700">
-                <span className="font-semibold">Saque mínimo:</span> R$ {minimumWithdrawal.toFixed(2)}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-semibold">Seu saldo atual:</span> R$ {balance.toFixed(2)}
-              </p>
-              <p className="text-red-600 font-semibold">
-                <span>Faltam:</span> R$ {(minimumWithdrawal - balance).toFixed(2)}
-              </p>
+            {/* Balance Info Card */}
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Saque mínimo:</span>
+                  <span className="text-base font-semibold text-gray-900">R$ {minimumWithdrawal.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Seu saldo atual:</span>
+                  <span className="text-base font-semibold text-gray-900">R$ {balance.toFixed(2)}</span>
+                </div>
+                <div className="border-t pt-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-red-600">Faltam:</span>
+                    <span className="text-lg font-bold text-red-600">R$ {(minimumWithdrawal - balance).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-green-800 text-center text-sm">
-                Continue ouvindo suas rádios favoritas para acumular mais saldo!
-              </p>
+            {/* Progress to Goal */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-gray-600">
+                <span>Progresso</span>
+                <span className="font-medium">{Math.round((balance / minimumWithdrawal) * 100)}%</span>
+              </div>
+              <Progress value={(balance / minimumWithdrawal) * 100} className="h-2" />
             </div>
             
+            {/* Tip Card */}
+            <div className="bg-gradient-to-br from-green-50 to-teal-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-4 h-4 text-green-600" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-green-900">Continue ganhando!</p>
+                  <p className="text-xs text-green-800">
+                    Ouça suas rádios favoritas para acumular mais saldo. Com apenas mais {Math.ceil((minimumWithdrawal - balance) / 0.075)} pontos você atinge o mínimo!
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
             <div className="flex gap-3 pt-2">
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 py-5 border-gray-300 hover:bg-gray-50"
                 onClick={() => setShowInsufficientModal(false)}
                 data-testid="button-close-modal"
               >
                 Fechar
               </Button>
               <Button
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                className="flex-1 py-5 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold"
                 onClick={handleContinueListening}
                 data-testid="button-continue-listening"
               >
