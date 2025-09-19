@@ -194,49 +194,62 @@ export default function Dashboard({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {radio.id === 1 && (
-                        <img 
-                          src={jovemPanLogo} 
-                          alt="Jovem Pan Sports" 
-                          className="w-8 h-8 object-contain"
-                        />
-                      )}
-                      {radio.id === 2 && (
-                        <img 
-                          src={serraMarLogo} 
-                          alt="Serramar FM" 
-                          className="w-8 h-8 object-contain"
-                        />
-                      )}
-                      {radio.id === 3 && (
-                        <img 
-                          src={hitsFmLogo} 
-                          alt="Rádio Hits FM" 
-                          className="w-8 h-8 object-contain"
-                        />
-                      )}
-                      {radio.id === 4 && (
-                        <img 
-                          src={antena1Logo} 
-                          alt="Antena 1" 
-                          className="w-8 h-8 object-contain"
-                        />
-                      )}
-                      {radio.id === 5 && (
-                        <img 
-                          src={fm89Logo} 
-                          alt="89 FM" 
-                          className="w-8 h-8 object-contain"
-                        />
-                      )}
-                      {radio.id === 6 && (
-                        <img 
-                          src={kissFmLogo} 
-                          alt="Kiss FM" 
-                          className="w-8 h-8 object-contain"
-                        />
-                      )}
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="flex flex-col items-center">
+                        <div className={playingRadioId === radio.id && isPlaying ? "animate-pulse-scale" : ""}>
+                          {radio.id === 1 && (
+                            <img 
+                              src={jovemPanLogo} 
+                              alt="Jovem Pan Sports" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 2 && (
+                            <img 
+                              src={serraMarLogo} 
+                              alt="Serramar FM" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 3 && (
+                            <img 
+                              src={hitsFmLogo} 
+                              alt="Rádio Hits FM" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 4 && (
+                            <img 
+                              src={antena1Logo} 
+                              alt="Antena 1" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 5 && (
+                            <img 
+                              src={fm89Logo} 
+                              alt="89 FM" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 6 && (
+                            <img 
+                              src={kissFmLogo} 
+                              alt="Kiss FM" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                        </div>
+                        {playingRadioId === radio.id && isPlaying && (
+                          <div className="sound-wave mt-1">
+                            <span className="bar"></span>
+                            <span className="bar"></span>
+                            <span className="bar"></span>
+                            <span className="bar"></span>
+                            <span className="bar"></span>
+                          </div>
+                        )}
+                      </div>
                       <h3 className={`font-semibold text-base ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
                         {radio.name}
                       </h3>

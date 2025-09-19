@@ -15,6 +15,64 @@
   animation: scaleUpDown 1.5s ease-in-out infinite;
 }
 
+@keyframes pulse-scale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 2s ease-in-out infinite;
+}
+
+@keyframes soundWave {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.sound-wave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 20px;
+}
+
+.sound-wave .bar {
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to top, #023E73, #0366b8);
+  border-radius: 2px;
+  animation: soundWave 0.8s ease-in-out infinite;
+}
+
+.sound-wave .bar:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.sound-wave .bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.sound-wave .bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.sound-wave .bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.sound-wave .bar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
 :root {
   --background: hsl(0, 0%, 98%);
   --foreground: hsl(220, 10%, 15%);
