@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, Download, Coins, TrendingUp, Clock, ArrowRight, Star, Settings } from "lucide-react";
+import { Wallet, Download, Coins, TrendingUp, Clock, ArrowRight, Star, Settings, AlertCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 
 interface ResgatarProps {
@@ -15,6 +18,24 @@ interface ResgatarProps {
 }
 
 export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
+  const [showInsufficientModal, setShowInsufficientModal] = useState(false);
+  const [, setLocation] = useLocation();
+  const minimumWithdrawal = 150;
+
+  const handleWithdraw = () => {
+    if (balance < minimumWithdrawal) {
+      setShowInsufficientModal(true);
+    } else {
+      // Process withdrawal or show success message
+      // For now, just show a success alert
+      alert('Saque processado com sucesso!');
+    }
+  };
+
+  const handleContinueListening = () => {
+    setShowInsufficientModal(false);
+    setLocation('/dashboard');
+  };
 
   const exchangeOptions = [
     {
@@ -103,7 +124,7 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white/90 text-sm mb-1">Saldo da sua carteira</p>
-                <h2 className="text-3xl font-bold">R$ 0,00</h2>
+                <h2 className="text-3xl font-bold">R$ {balance.toFixed(2)}</h2>
               </div>
               <div className="bg-white/20 p-3 rounded-full">
                 <Wallet className="w-6 h-6 text-white" />
@@ -115,6 +136,7 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
           <Button 
             className="w-full bg-green-500 hover:bg-green-600 text-white py-6 text-base font-semibold mb-6"
             data-testid="button-withdraw"
+            onClick={handleWithdraw}
           >
             <Download className="w-5 h-5 mr-2" />
             Realizar Saque
@@ -216,6 +238,58 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
           </div>
         </div>
       </main>
+
+      {/* Insufficient Balance Modal */}
+      <Dialog open={showInsufficientModal} onOpenChange={setShowInsufficientModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
+                <AlertCircle className="w-10 h-10 text-orange-500" style={{ color: '#f59e0b' }} />
+              </div>
+              <DialogTitle className="text-xl font-bold">Saldo Insuficiente</DialogTitle>
+            </div>
+          </DialogHeader>
+          
+          <div className="space-y-4 pt-4">
+            <div className="text-center space-y-2">
+              <p className="text-gray-700">
+                <span className="font-semibold">Saque mínimo:</span> R$ {minimumWithdrawal.toFixed(2)}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">Seu saldo atual:</span> R$ {balance.toFixed(2)}
+              </p>
+              <p className="text-red-600 font-semibold">
+                <span>Faltam:</span> R$ {(minimumWithdrawal - balance).toFixed(2)}
+              </p>
+            </div>
+            
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p className="text-green-800 text-center text-sm">
+                Continue ouvindo suas rádios favoritas para acumular mais saldo!
+              </p>
+            </div>
+            
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowInsufficientModal(false)}
+                data-testid="button-close-modal"
+              >
+                Fechar
+              </Button>
+              <Button
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                onClick={handleContinueListening}
+                data-testid="button-continue-listening"
+              >
+                Continuar Ouvindo
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
