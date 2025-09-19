@@ -230,28 +230,6 @@ export default function Dashboard() {
       </main>
 
 
-      {/* Card de Pontos flutuante quando tocando */}
-      {playingRadio && (
-        <div className="fixed top-20 left-4 right-4 z-30 max-w-sm mx-auto">
-          <Card className="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-3 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-white/90">Pontos desta sessão</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-bold">+{sessionPoints}</span>
-                  <span className="text-sm opacity-90">pts</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <TrendingUp className="w-4 h-4 mb-1" />
-                <p className="text-xs text-white/80">
-                  Ganhando ao vivo • {playingRadio.name}
-                </p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
 
       {/* Bottom Navigation with Player */}
       <div className="fixed bottom-0 left-0 right-0 bg-white z-20">
