@@ -221,14 +221,15 @@ function App() {
   };
 
   // Memoized wrapper components to prevent re-creation on every render
+  // Not including sessionPoints in dependencies to avoid re-creation when points update
   const Dashboard = useMemo(
     () => () => <DashboardComp {...playerProps} />,
-    [playingRadioId, isPlaying, volume, sessionPoints, balance, showPremiumPopup]
+    [playingRadioId, isPlaying, volume, balance, showPremiumPopup]
   );
   
   const ResgatarWrapper = useMemo(
     () => () => <Resgatar {...playerProps} />,
-    [playingRadioId, isPlaying, volume, sessionPoints, balance, showPremiumPopup]
+    [playingRadioId, isPlaying, volume, balance, showPremiumPopup]
   );
 
   return (

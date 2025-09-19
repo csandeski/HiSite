@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +39,7 @@ interface ResgatarProps {
   setBalance: (balance: number) => void;
 }
 
-export default function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
+const Resgatar = memo(function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -489,4 +489,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       </Dialog>
     </div>
   );
-}
+});
+
+export default Resgatar;
