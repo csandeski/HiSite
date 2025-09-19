@@ -188,7 +188,7 @@ export default function Dashboard({
                       }}
                     >
                       {playingRadioId === radio.id && isPlaying ? (
-                        <Pause className="w-4 h-4" />
+                        <Pause className="w-4 h-4 animate-scale" />
                       ) : (
                         <Play className="w-4 h-4 ml-0.5" />
                       )}
