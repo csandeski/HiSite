@@ -1,96 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Radio, Gift, User, Volume2, Pause, Plus, Music } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Pause, Plus } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
-import { useState, useEffect } from "react";
+import { radios } from "../App";
 
-// Lista de rádios
-const radios = [
-  {
-    id: 1,
-    name: "Jovem Pan Sports",
-    description: "Futebol e debates",
-    pointsPerMin: 50,
-    isPremium: false,
-  },
-  {
-    id: 2,
-    name: "Serramar FM",
-    description: "Esportes e música",
-    pointsPerMin: 45,
-    isPremium: false,
-  },
-  {
-    id: 3,
-    name: "Rádio Hits FM",
-    description: "Hits e esportes",
-    pointsPerMin: 60,
-    isPremium: false,
-  },
-  {
-    id: 4,
-    name: "Antena 1",
-    description: "Pop nacional",
-    pointsPerMin: 85,
-    isPremium: true,
-  },
-  {
-    id: 5,
-    name: "89 FM",
-    description: "Rock clássico",
-    pointsPerMin: 90,
-    isPremium: true,
-  },
-  {
-    id: 6,
-    name: "Kiss FM",
-    description: "Hits atuais",
-    pointsPerMin: 95,
-    isPremium: true,
-  },
-  {
-    id: 7,
-    name: "CBN",
-    description: "Notícias 24h",
-    pointsPerMin: 100,
-    isPremium: true,
-  },
-  {
-    id: 8,
-    name: "BandNews FM",
-    description: "Jornalismo",
-    pointsPerMin: 105,
-    isPremium: true,
-  },
-  {
-    id: 9,
-    name: "Rádio Globo",
-    description: "Variedades",
-    pointsPerMin: 110,
-    isPremium: true,
-  },
-  {
-    id: 10,
-    name: "Mix FM",
-    description: "Pop internacional",
-    pointsPerMin: 115,
-    isPremium: true,
-  },
-  {
-    id: 11,
-    name: "Transamérica",
-    description: "Hits e clássicos",
-    pointsPerMin: 120,
-    isPremium: true,
-  },
-];
+interface DashboardProps {
+  playingRadioId: number | null;
+  setPlayingRadioId: (id: number | null) => void;
+  volume: number;
+  setVolume: (volume: number) => void;
+  sessionPoints: number;
+  setSessionPoints: (points: number | ((prev: number) => number)) => void;
+  balance: number;
+  setBalance: (balance: number) => void;
+}
 
-export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState("radio");
-  const [sessionPoints, setSessionPoints] = useState(0);
-  const [balance, setBalance] = useState(0);
-  const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
-  const [volume, setVolume] = useState(50);
+export default function Dashboard({
+  playingRadioId,
+  setPlayingRadioId,
+  sessionPoints,
+  balance
+}: DashboardProps) {
 
   const handleRadioPlay = (radioId: number, isPremium: boolean) => {
     if (isPremium) {
@@ -106,17 +36,6 @@ export default function Dashboard() {
       setPlayingRadioId(radioId);
     }
   };
-
-  // Efeito para incrementar pontos enquanto toca
-  useEffect(() => {
-    if (playingRadioId === null) return;
-
-    const interval = setInterval(() => {
-      setSessionPoints((prev) => prev + 1);
-    }, 1500); // Incrementa a cada 1,5 segundos
-
-    return () => clearInterval(interval);
-  }, [playingRadioId]);
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 
@@ -272,126 +191,6 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
-
-
-
-      {/* Bottom Navigation with Player */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white z-20">
-        {/* Player integrado */}
-        {playingRadio && (
-          <div className="border-t border-gray-200">
-            <div className="px-4 py-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="bg-primary/10 p-2.5 rounded-lg">
-                    <Radio className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-sm text-gray-900">{playingRadio.name}</h4>
-                      {playingRadio && playingRadioId !== null && (
-                        <div className="flex items-center gap-1 bg-red-500/10 px-2 py-0.5 rounded-full">
-                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-                          <span className="text-[10px] font-bold text-red-500">AO VIVO</span>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500">{playingRadio.description}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Volume2 className="w-4 h-4 text-gray-500" />
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={volume}
-                    onChange={(e) => setVolume(Number(e.target.value))}
-                    className="w-16 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    data-testid="volume-slider"
-                    style={{
-                      background: `linear-gradient(to right, #023E73 0%, #023E73 ${volume}%, #e5e7eb ${volume}%, #e5e7eb 100%)`
-                    }}
-                  />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-primary text-white w-9 h-9 rounded-full hover:bg-primary/90"
-                    onClick={() => setPlayingRadioId(null)}
-                    data-testid="pause-player"
-                  >
-                    <Pause className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Navigation */}
-        <nav className="border-t shadow-lg">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-around py-3">
-            <div className="relative flex flex-col items-center gap-1">
-              {activeTab === "radio" && (
-                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full"></div>
-              )}
-              <Button
-                variant="ghost"
-                className={`flex flex-col items-center gap-1 py-2 px-4 min-w-0 h-auto rounded-xl ${
-                  activeTab === "radio"
-                    ? "bg-green-100 text-green-700"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-                onClick={() => setActiveTab("radio")}
-                data-testid="tab-radio"
-              >
-                <Radio className="w-5 h-5" />
-                <span className="text-xs font-medium">Rádio</span>
-              </Button>
-            </div>
-
-            <div className="relative flex flex-col items-center gap-1">
-              {activeTab === "resgatar" && (
-                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full"></div>
-              )}
-              <Button
-                variant="ghost"
-                className={`flex flex-col items-center gap-1 py-2 px-4 min-w-0 h-auto rounded-xl ${
-                  activeTab === "resgatar"
-                    ? "bg-green-100 text-green-700"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-                onClick={() => setActiveTab("resgatar")}
-                data-testid="tab-resgatar"
-              >
-                <Gift className="w-5 h-5" />
-                <span className="text-xs font-medium">Resgatar</span>
-              </Button>
-            </div>
-
-            <div className="relative flex flex-col items-center gap-1">
-              {activeTab === "perfil" && (
-                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full"></div>
-              )}
-              <Button
-                variant="ghost"
-                className={`flex flex-col items-center gap-1 py-2 px-4 min-w-0 h-auto rounded-xl ${
-                  activeTab === "perfil"
-                    ? "bg-green-100 text-green-700"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-                onClick={() => setActiveTab("perfil")}
-                data-testid="tab-perfil"
-              >
-                <User className="w-5 h-5" />
-                <span className="text-xs font-medium">Perfil</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-        </nav>
-      </div>
     </div>
   );
 }
