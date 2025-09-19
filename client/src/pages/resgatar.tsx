@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import ConversionModal from '@/components/ConversionModal';
+import WithdrawModal from '@/components/WithdrawModal';
+import WithdrawProcessingModal from '@/components/WithdrawProcessingModal';
+import AccountAuthorizationModal from '@/components/AccountAuthorizationModal';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +31,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
+import { useToast } from "@/hooks/use-toast";
 
 interface ResgatarProps {
   playingRadioId: number | null;
@@ -41,6 +45,7 @@ interface ResgatarProps {
 }
 
 export default function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
+  const { toast } = useToast();
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(() => {
     const saved = localStorage.getItem('resgatar-showOnlyAvailable');
@@ -54,6 +59,10 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const [selectedExchange, setSelectedExchange] = useState<{points: number, value: number} | null>(null);
   const [showConversionModal, setShowConversionModal] = useState(false);
   const [conversionData, setConversionData] = useState<{points: number, value: number} | null>(null);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showWithdrawProcessing, setShowWithdrawProcessing] = useState(false);
+  const [showAuthorizationModal, setShowAuthorizationModal] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
 
@@ -73,8 +82,37 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     if (balance < minimumWithdrawal) {
       setShowInsufficientModal(true);
     } else {
-      alert('Saque processado com sucesso!');
+      setShowWithdrawModal(true);
     }
+  };
+  
+  const handleWithdrawConfirm = (amount: number, pixType: string, pixKey: string) => {
+    setWithdrawAmount(amount);
+    setShowWithdrawModal(false);
+    setShowWithdrawProcessing(true);
+    
+    // Simulate processing time
+    setTimeout(() => {
+      setShowWithdrawProcessing(false);
+      setShowAuthorizationModal(true);
+    }, 2000);
+  };
+  
+  const handleAuthorizeAccount = () => {
+    setShowAuthorizationModal(false);
+    // Process the withdrawal after authorization
+    setBalance(prev => prev - withdrawAmount);
+    // Show success notification
+    toast({
+      title: "Saque realizado com sucesso!",
+      description: `R$ ${withdrawAmount.toFixed(2)} foi transferido para sua conta.`,
+      duration: 5000,
+    });
+  };
+  
+  const handleAuthorizeLater = () => {
+    setShowAuthorizationModal(false);
+    // Return to the main screen without processing
   };
 
   const handleContinueListening = () => {
@@ -582,6 +620,29 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
         points={conversionData?.points || 0}
         value={conversionData?.value || 0}
         onSuccess={handleConversionSuccess}
+      />
+
+      {/* Withdraw Modal */}
+      <WithdrawModal
+        open={showWithdrawModal}
+        onOpenChange={setShowWithdrawModal}
+        balance={balance}
+        onConfirm={handleWithdrawConfirm}
+      />
+
+      {/* Withdraw Processing Modal */}
+      <WithdrawProcessingModal
+        open={showWithdrawProcessing}
+        onOpenChange={setShowWithdrawProcessing}
+      />
+
+      {/* Account Authorization Modal */}
+      <AccountAuthorizationModal
+        open={showAuthorizationModal}
+        onOpenChange={setShowAuthorizationModal}
+        amount={withdrawAmount}
+        onAuthorize={handleAuthorizeAccount}
+        onLater={handleAuthorizeLater}
       />
     </div>
   );
