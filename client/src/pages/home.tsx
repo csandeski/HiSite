@@ -89,18 +89,18 @@ export default function Home() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="border rounded-lg p-4 text-center bg-white" data-testid="card-stats-earnings">
-              <h3 className="text-xl md:text-2xl font-bold text-foreground">R$3.500</h3>
-              <p className="text-xs text-muted-foreground mt-1">Média mensal</p>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="border border-gray-200 rounded-lg p-3 text-center bg-white" data-testid="card-stats-earnings">
+              <h3 className="text-lg md:text-xl font-bold text-foreground">R$3.500</h3>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Média mensal</p>
             </div>
-            <div className="border rounded-lg p-4 text-center bg-white" data-testid="card-stats-time">
-              <h3 className="text-xl md:text-2xl font-bold text-foreground">2.5h</h3>
-              <p className="text-xs text-muted-foreground mt-1">Por dia</p>
+            <div className="border border-gray-200 rounded-lg p-3 text-center bg-white" data-testid="card-stats-time">
+              <h3 className="text-lg md:text-xl font-bold text-foreground">2.5h</h3>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Por dia</p>
             </div>
-            <div className="border rounded-lg p-4 text-center bg-white" data-testid="card-stats-users">
-              <h3 className="text-xl md:text-2xl font-bold text-foreground">50k+</h3>
-              <p className="text-xs text-muted-foreground mt-1">Usuários</p>
+            <div className="border border-gray-200 rounded-lg p-3 text-center bg-white" data-testid="card-stats-users">
+              <h3 className="text-lg md:text-xl font-bold text-foreground">50k+</h3>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Usuários</p>
             </div>
           </div>
         </div>
