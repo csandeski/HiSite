@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Radio, Gift, User } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Radio, Gift, User, Headphones, Star } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import { useState } from "react";
 
@@ -131,34 +131,53 @@ export default function Dashboard() {
             {radios.map((radio) => (
               <Card
                 key={radio.id}
-                className={`p-4 ${
-                  radio.isPremium ? "opacity-75 bg-gray-50" : "bg-white hover:shadow-md"
-                } transition-all duration-200 cursor-pointer`}
+                className={`p-4 border-2 ${
+                  radio.isPremium 
+                    ? "bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 hover:border-yellow-300" 
+                    : "bg-white hover:shadow-lg hover:border-primary/30 border-gray-100"
+                } transition-all duration-300 cursor-pointer group`}
                 data-testid={`radio-card-${radio.id}`}
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-base md:text-lg text-gray-900">
-                        {radio.name}
-                      </h3>
-                      {radio.isPremium && (
-                        <Lock 
-                          className="w-4 h-4 text-yellow-600" 
-                          data-testid={`premium-lock-${radio.id}`}
-                        />
-                      )}
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className={`p-2.5 rounded-lg ${
+                      radio.isPremium 
+                        ? "bg-gradient-to-br from-yellow-200 to-amber-200" 
+                        : "bg-gradient-to-br from-blue-100 to-primary/20"
+                    }`}>
+                      <Headphones className={`w-5 h-5 ${
+                        radio.isPremium ? "text-yellow-700" : "text-primary"
+                      }`} />
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {radio.description}
-                    </p>
-                    <span 
-                      className="text-green-600 font-semibold text-sm"
-                      data-testid={`points-per-min-${radio.id}`}
-                    >
-                      +{radio.pointsPerMin} pontos/min
-                    </span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-base md:text-lg text-gray-900">
+                          {radio.name}
+                        </h3>
+                        {radio.isPremium && (
+                          <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
+                            <Star className="w-3 h-3" />
+                            Premium
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500 mb-2">
+                        {radio.description}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span 
+                          className={`font-bold text-sm px-2 py-1 rounded-md ${
+                            radio.isPremium 
+                              ? "bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700" 
+                              : "bg-gradient-to-r from-green-50 to-emerald-50 text-green-700"
+                          }`}
+                          data-testid={`points-per-min-${radio.id}`}
+                        >
+                          +{radio.pointsPerMin} pts/min
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   
                   <Button
@@ -166,9 +185,9 @@ export default function Dashboard() {
                     variant={radio.isPremium ? "ghost" : "default"}
                     className={`${
                       radio.isPremium 
-                        ? "bg-gray-200 text-gray-400" 
-                        : "bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90"
-                    } w-10 h-10 md:w-12 md:h-12 rounded-full`}
+                        ? "bg-gradient-to-br from-gray-200 to-gray-300 text-gray-500 hover:from-gray-300 hover:to-gray-400" 
+                        : "bg-gradient-to-r from-primary to-blue-500 text-white hover:shadow-lg hover:scale-105"
+                    } w-12 h-12 md:w-14 md:h-14 rounded-full transition-all duration-300 shadow-md`}
                     data-testid={`play-button-${radio.id}`}
                     aria-label={`Play ${radio.name}`}
                     onClick={(e) => {
@@ -177,9 +196,9 @@ export default function Dashboard() {
                     }}
                   >
                     {radio.isPremium ? (
-                      <Lock className="w-4 h-4 md:w-5 md:h-5" />
+                      <Lock className="w-5 h-5 md:w-6 md:h-6" />
                     ) : (
-                      <Play className="w-4 h-4 md:w-5 md:h-5" />
+                      <Play className="w-5 h-5 md:w-6 md:h-6 ml-0.5" />
                     )}
                   </Button>
                 </div>
