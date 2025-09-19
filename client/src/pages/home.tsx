@@ -21,10 +21,6 @@ const registerSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
-  confirmPassword: z.string().min(6, "Confirmação de senha é obrigatória"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Senhas não coincidem",
-  path: ["confirmPassword"],
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -34,7 +30,6 @@ export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -50,7 +45,6 @@ export default function Home() {
       name: "",
       email: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
@@ -533,9 +527,6 @@ export default function Home() {
             <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
               Criar Conta
             </DialogTitle>
-            <DialogDescription className="text-center text-muted-foreground mt-2">
-              Crie sua conta e comece a ganhar dinheiro hoje
-            </DialogDescription>
           </DialogHeader>
           <div className="px-6 pb-6">
             <Form {...registerForm}>
@@ -613,42 +604,6 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={registerForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Confirmar senha</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            placeholder="Confirme sua senha"
-                            type={showConfirmPassword ? "text" : "password"}
-                            className="w-full h-12 px-4 pr-12 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
-                            data-testid="input-register-confirm-password"
-                            {...field}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            data-testid="button-toggle-confirm-password"
-                            aria-label={showConfirmPassword ? "Ocultar confirmação de senha" : "Mostrar confirmação de senha"}
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="h-4 w-4 text-gray-500" />
-                            ) : (
-                              <Eye className="h-4 w-4 text-gray-500" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <Button
                   type="submit"
                   className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
@@ -658,22 +613,6 @@ export default function Home() {
                 </Button>
               </form>
             </Form>
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Já tem uma conta?{" "}
-                <Button
-                  variant="link"
-                  className="text-primary hover:text-blue-600 p-0 h-auto font-medium"
-                  data-testid="link-switch-to-login"
-                  onClick={() => {
-                    setRegisterOpen(false);
-                    setLoginOpen(true);
-                  }}
-                >
-                  Fazer login
-                </Button>
-              </p>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
