@@ -115,9 +115,9 @@ export default function Dashboard({
             
             {/* Live earning indicator inside the card */}
             {playingRadio && isPlaying && (
-              <div className="bg-white/10 rounded-lg px-3 py-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm text-white/90">
+              <div className="bg-white/10 rounded-lg px-2.5 py-1.5 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-white/90">
                   Ganhando pontos ao vivo • {playingRadio.name}
                 </span>
               </div>
