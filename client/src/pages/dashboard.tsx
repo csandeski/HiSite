@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2 } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import { radios } from "../App";
 
@@ -87,9 +87,10 @@ export default function Dashboard({
       <main className="flex-1 pb-32">
         <div className="container mx-auto px-4 py-6 max-w-2xl">
           {/* Welcome Message */}
-          <p className="text-sm text-gray-600 mb-3">
-            Seja bem-vindo, Usuário
-          </p>
+          <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-3">
+            <User className="w-4 h-4" />
+            <span>Seja bem-vindo, Usuário</span>
+          </div>
           
           {/* Session Points Card */}
           <Card 
