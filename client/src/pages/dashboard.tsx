@@ -155,73 +155,84 @@ export default function Dashboard() {
                 key={radio.id}
                 className={`p-4 border ${
                   radio.isPremium 
-                    ? "bg-gray-50/50 border-gray-200" 
+                    ? "bg-gray-50/30 border-gray-100" 
                     : playingRadioId === radio.id
                       ? "bg-white border-primary shadow-md"
                       : "bg-white hover:shadow-md border-gray-200"
-                } transition-all duration-200 cursor-pointer`}
+                } transition-all duration-200 ${radio.isPremium ? "" : "cursor-pointer"}`}
                 data-testid={`radio-card-${radio.id}`}
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
-                    <div className={`p-2 rounded-full ${
-                      playingRadioId === radio.id
-                        ? "bg-primary/10"
-                        : "bg-gray-50"
-                    }`}>
-                      <Headphones className={`w-5 h-5 ${
-                        playingRadioId === radio.id ? "text-primary" : "text-gray-500"
-                      }`} />
-                    </div>
+                    {!radio.isPremium && (
+                      <div className={`p-2 rounded-full ${
+                        playingRadioId === radio.id
+                          ? "bg-primary/10"
+                          : "bg-gray-50"
+                      }`}>
+                        <Headphones className={`w-5 h-5 ${
+                          playingRadioId === radio.id ? "text-primary" : "text-gray-500"
+                        }`} />
+                      </div>
+                    )}
+                    {radio.isPremium && (
+                      <div className="p-2">
+                        <Lock className="w-5 h-5 text-gray-400" />
+                      </div>
+                    )}
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className={`font-semibold ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
                         {radio.name}
                       </h3>
-                      <p className="text-sm text-gray-500 mt-0.5">
+                      <p className={`text-sm mt-0.5 ${radio.isPremium ? "text-gray-400" : "text-gray-500"}`}>
                         {radio.description}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <span 
-                          className="text-green-600 text-sm font-medium"
+                          className={`text-sm font-medium ${radio.isPremium ? "text-gray-400" : "text-green-600"}`}
                           data-testid={`points-per-min-${radio.id}`}
                         >
-                          +{radio.pointsPerMin} pts/min
+                          +{radio.pointsPerMin} pontos/min
                         </span>
                         {radio.isPremium && (
-                          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">
-                            Premium
+                          <span className="text-xs text-gray-400">
+                            • Premium
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
                   
-                  <Button
-                    size="icon"
-                    variant={radio.isPremium ? "ghost" : "default"}
-                    className={`${
-                      radio.isPremium 
-                        ? "bg-gray-100 text-gray-400" 
-                        : playingRadioId === radio.id
+                  {!radio.isPremium && (
+                    <Button
+                      size="icon"
+                      variant="default"
+                      className={`${
+                        playingRadioId === radio.id
                           ? "bg-primary text-white"
                           : "bg-primary text-white hover:bg-primary/90"
-                    } w-10 h-10 rounded-full transition-all duration-200`}
-                    data-testid={`play-button-${radio.id}`}
-                    aria-label={`Play ${radio.name}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRadioPlay(radio.id, radio.isPremium);
-                    }}
-                  >
-                    {radio.isPremium ? (
-                      <Lock className="w-4 h-4" />
-                    ) : playingRadioId === radio.id ? (
-                      <Pause className="w-4 h-4" />
-                    ) : (
-                      <Play className="w-4 h-4 ml-0.5" />
-                    )}
-                  </Button>
+                      } w-10 h-10 rounded-full transition-all duration-200`}
+                      data-testid={`play-button-${radio.id}`}
+                      aria-label={`Play ${radio.name}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRadioPlay(radio.id, radio.isPremium);
+                      }}
+                    >
+                      {playingRadioId === radio.id ? (
+                        <Pause className="w-4 h-4" />
+                      ) : (
+                        <Play className="w-4 h-4 ml-0.5" />
+                      )}
+                    </Button>
+                  )}
+                  
+                  {radio.isPremium && (
+                    <div className="p-2 rounded-full bg-gray-100">
+                      <Lock className="w-5 h-5 text-gray-400" />
+                    </div>
+                  )}
                 </div>
               </Card>
             ))}
