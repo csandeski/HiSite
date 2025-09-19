@@ -127,10 +127,14 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
   const confirmExchange = () => {
     if (selectedExchange) {
-      // Show conversion modal
-      setConversionData(selectedExchange);
+      // Store conversion data before opening modal
+      const dataToConvert = { points: selectedExchange.points, value: selectedExchange.value };
+      setConversionData(dataToConvert);
       setShowConfirmationModal(false);
-      setShowConversionModal(true);
+      // Small delay to ensure state is updated
+      setTimeout(() => {
+        setShowConversionModal(true);
+      }, 100);
     }
   };
   
@@ -599,8 +603,8 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       <ConversionModal
         open={showConversionModal}
         onOpenChange={setShowConversionModal}
-        points={conversionData?.points || 0}
-        value={conversionData?.value || 0}
+        points={conversionData?.points || selectedExchange?.points || 0}
+        value={conversionData?.value || selectedExchange?.value || 0}
         onSuccess={handleConversionSuccess}
       />
 
