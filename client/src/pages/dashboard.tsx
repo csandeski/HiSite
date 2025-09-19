@@ -15,6 +15,8 @@ interface DashboardProps {
   setSessionPoints: (points: number | ((prev: number) => number)) => void;
   balance: number;
   setBalance: (balance: number) => void;
+  userName?: string;
+  setUserName?: (name: string) => void;
 }
 
 export default function Dashboard({
@@ -23,7 +25,8 @@ export default function Dashboard({
   isPlaying,
   setIsPlaying,
   sessionPoints,
-  balance
+  balance,
+  userName
 }: DashboardProps) {
 
   const handleRadioPlay = (radioId: number, isPremium: boolean) => {
@@ -89,7 +92,7 @@ export default function Dashboard({
           {/* Welcome Message */}
           <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-3">
             <User className="w-4 h-4" />
-            <span>Seja bem-vindo, Usuário</span>
+            <span>Seja bem-vindo, {userName || 'Usuário'}</span>
           </div>
           
           {/* Session Points Card */}

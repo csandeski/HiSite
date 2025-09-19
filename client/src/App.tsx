@@ -131,6 +131,9 @@ function App() {
   const [showPremiumPopup, setShowPremiumPopup] = useState(false);
   const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [userName, setUserName] = useState(() => {
+    return localStorage.getItem('userName') || '';
+  });
 
   // Sync active tab with current route
   useEffect(() => {
@@ -217,7 +220,9 @@ function App() {
     balance,
     setBalance,
     showPremiumPopup,
-    setShowPremiumPopup: handlePremiumPopupClose
+    setShowPremiumPopup: handlePremiumPopupClose,
+    userName,
+    setUserName
   };
 
   return (
@@ -240,7 +245,9 @@ function App() {
           <Toaster />
           <div className="min-h-screen flex flex-col">
             <Switch>
-              <Route path="/" component={Home} />
+              <Route path="/">
+                <Home setUserName={setUserName} />
+              </Route>
               <Route path="/dashboard">
                 <DashboardComp {...playerProps} />
               </Route>

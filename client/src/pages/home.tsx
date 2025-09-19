@@ -27,7 +27,11 @@ const registerSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function Home() {
+interface HomeProps {
+  setUserName?: (name: string) => void;
+}
+
+export default function Home({ setUserName }: HomeProps) {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -65,6 +69,12 @@ export default function Home() {
 
   const onLoginSubmit = (data: LoginFormValues) => {
     // Here you would typically make an API call to authenticate
+    // For now, save email as username
+    const name = data.email.split('@')[0]; // Extract name from email
+    localStorage.setItem('userName', name);
+    if (setUserName) {
+      setUserName(name);
+    }
     setLoginOpen(false);
     loginForm.reset();
     // Redirect to dashboard after successful login
@@ -73,6 +83,11 @@ export default function Home() {
 
   const onRegisterSubmit = (data: RegisterFormValues) => {
     // Here you would typically make an API call to create account
+    // Save user name
+    localStorage.setItem('userName', data.name);
+    if (setUserName) {
+      setUserName(data.name);
+    }
     setRegisterOpen(false);
     registerForm.reset();
     // Redirect to dashboard after successful registration
