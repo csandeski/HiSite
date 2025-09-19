@@ -101,7 +101,7 @@ export default function Home({ setUserName }: HomeProps) {
         <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <img src={logoUrl} alt="RádioPlay" className="max-h-8 md:max-h-10 w-auto object-contain" data-testid="logo-image" />
+              <img src={logoUrl} alt="RádioPlay" className="max-h-7 md:max-h-9 w-auto object-contain" data-testid="logo-image" />
             </div>
             <div className="flex items-center gap-2">
               <Button 

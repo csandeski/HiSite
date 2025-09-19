@@ -65,7 +65,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <img src={logoUrl} alt="RádioPlay" className="h-8 object-contain" />
+              <img src={logoUrl} alt="RádioPlay" className="h-7 object-contain" />
             </div>
             
             {/* Settings Icon */}
