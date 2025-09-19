@@ -207,34 +207,31 @@ function App() {
             {/* Global Player - Above bottom navigation */}
             {playingRadio && (
               <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 z-30">
-                <div className="px-4 py-3">
+                <div className="px-4 py-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="bg-primary/10 p-2.5 rounded-lg">
-                        <Radio className="w-5 h-5 text-primary" />
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="bg-primary/10 p-1.5 rounded">
+                        <Radio className="w-4 h-4 text-primary" />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h4 className="font-semibold text-sm text-gray-900">{playingRadio.name}</h4>
+                          <h4 className="font-medium text-xs text-gray-900 truncate">{playingRadio.name}</h4>
                           {isPlaying && (
-                            <div className="flex items-center gap-1 bg-red-500/10 px-2 py-0.5 rounded-full">
-                              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-                              <span className="text-[10px] font-bold text-red-500">AO VIVO</span>
-                            </div>
+                            <span className="text-[10px] font-medium text-red-500 whitespace-nowrap">AO VIVO</span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500">{playingRadio.description}</p>
+                        <p className="text-[10px] text-gray-500 truncate">{playingRadio.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Volume2 className="w-4 h-4 text-gray-500" />
+                      <Volume2 className="w-3.5 h-3.5 text-gray-500" />
                       <input
                         type="range"
                         min="0"
                         max="100"
                         value={volume}
                         onChange={(e) => setVolume(Number(e.target.value))}
-                        className="w-16 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        className="w-14 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                         data-testid="volume-slider"
                         style={{
                           background: `linear-gradient(to right, #023E73 0%, #023E73 ${volume}%, #e5e7eb ${volume}%, #e5e7eb 100%)`
@@ -243,14 +240,14 @@ function App() {
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="bg-primary text-white w-9 h-9 rounded-full hover:bg-primary/90"
+                        className="bg-primary text-white w-8 h-8 rounded-full hover:bg-primary/90"
                         onClick={() => setIsPlaying(!isPlaying)}
                         data-testid="pause-player"
                       >
                         {isPlaying ? (
-                          <Pause className="w-4 h-4" />
+                          <Pause className="w-3.5 h-3.5" />
                         ) : (
-                          <Play className="w-4 h-4" />
+                          <Play className="w-3.5 h-3.5" />
                         )}
                       </Button>
                     </div>
