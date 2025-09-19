@@ -5,6 +5,7 @@ import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import { radios } from "../App";
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -30,6 +31,7 @@ export default function Dashboard({
   balance,
   userName
 }: DashboardProps) {
+  const [, setLocation] = useLocation();
   // Estado para rastrear ouvintes por rádio
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
     const initial: { [key: number]: number } = {};
@@ -112,6 +114,7 @@ export default function Dashboard({
                 className="w-9 h-9"
                 data-testid="settings-button"
                 aria-label="Configurações"
+                onClick={() => setLocation('/perfil')}
               >
                 <Settings className="w-5 h-5 text-gray-600" />
               </Button>
