@@ -182,7 +182,7 @@ export default function Dashboard({
                       ? "bg-gradient-to-br from-white to-blue-50/30 border-primary border-l-primary shadow-lg"
                       : playingRadioId === radio.id && !isPlaying
                       ? "bg-white border-primary/50 border-l-primary/50 shadow-md"
-                      : "bg-white hover:shadow-lg hover:border-gray-300 border-gray-200 border-l-blue-500/70"
+                      : "bg-white hover:shadow-lg hover:border-gray-300 border-gray-200 border-l-gray-300"
                 } transition-all duration-200 ${radio.isPremium ? "" : "cursor-pointer hover:scale-[1.01]"}`}
                 data-testid={`radio-card-${radio.id}`}
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
