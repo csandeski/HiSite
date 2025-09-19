@@ -16,6 +16,12 @@ import {
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
+  
+  const handleButtonClick = (action: string) => {
+    // Show a toast or alert for now since auth pages don't exist yet
+    console.log(`Button clicked: ${action}`);
+    // In a real app, this would navigate to login/signup pages
+  };
 
   useEffect(() => {
     setIsVisible(true);
@@ -59,12 +65,14 @@ export default function Home() {
                 variant="ghost" 
                 className="text-muted-foreground hover:text-foreground"
                 data-testid="button-login"
+                onClick={() => handleButtonClick('login')}
               >
                 Entrar
               </Button>
               <Button 
                 className="bg-gradient-cta text-white hover:opacity-90 transition-opacity"
                 data-testid="button-register"
+                onClick={() => handleButtonClick('register')}
               >
                 Cadastrar
               </Button>
@@ -106,6 +114,7 @@ export default function Home() {
               size="lg"
               className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-6 text-lg flex items-center gap-2"
               data-testid="button-start-earning"
+              onClick={() => handleButtonClick('start-earning')}
             >
               <PlayCircle className="w-5 h-5" />
               Começar a Ganhar Agora
@@ -115,13 +124,14 @@ export default function Home() {
               variant="outline"
               className="border-white text-white hover:bg-white/10 font-semibold px-8 py-6 text-lg"
               data-testid="button-already-account"
+              onClick={() => handleButtonClick('already-account')}
             >
               Já tenho conta
             </Button>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-4 md:gap-8 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8 max-w-3xl mx-auto">
             <Card className="stat-card" data-testid="card-stats-earnings">
               <h3 className="text-2xl md:text-3xl font-bold text-foreground">R$3.500</h3>
               <p className="text-sm text-muted-foreground mt-1">Média mensal</p>
@@ -266,6 +276,7 @@ export default function Home() {
             size="lg"
             className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-6 text-lg"
             data-testid="button-create-account"
+            onClick={() => handleButtonClick('create-account')}
           >
             Criar Conta Grátis
             <ChevronRight className="w-5 h-5 ml-2" />
