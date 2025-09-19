@@ -47,11 +47,24 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8 max-w-lg">
           {/* Success Badge */}
           <div className="flex justify-center mb-6">
-            <div className="bg-green-100 text-green-700 rounded-full px-4 py-2 inline-flex items-center gap-2 text-xs sm:text-sm whitespace-nowrap">
-              <TrendingUp className="w-4 h-4 flex-shrink-0" />
-              <span data-testid="text-user-count" className="whitespace-nowrap">
-                Mais de 50.000 usuários já estão ganhando
-              </span>
+            <div className="relative animate-float">
+              <div className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 rounded-full px-4 py-2 inline-flex items-center gap-2 text-xs sm:text-sm whitespace-nowrap transition-all hover:scale-110 cursor-pointer shadow-lg hover:shadow-xl animate-[glow_2s_ease-in-out_infinite]">
+                <div className="relative">
+                  <TrendingUp className="w-4 h-4 flex-shrink-0 animate-bounce" />
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+                <span data-testid="text-user-count" className="whitespace-nowrap font-medium">
+                  Mais de 50.000 usuários já estão ganhando
+                </span>
+                <div className="absolute -right-1 top-0 flex space-x-1">
+                  <span className="flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                </div>
+              </div>
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-[shimmer_2s_infinite]" style={{ pointerEvents: 'none' }}></div>
             </div>
           </div>
 
