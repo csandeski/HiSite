@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import { radios } from "../App";
+import { useState, useEffect } from 'react';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -29,6 +30,38 @@ export default function Dashboard({
   balance,
   userName
 }: DashboardProps) {
+  // Estado para rastrear ouvintes por rádio
+  const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
+    const initial: { [key: number]: number } = {};
+    radios.forEach(radio => {
+      // Gerar números iniciais baseados na popularidade da rádio
+      const base = radio.isPremium ? 2000 : 800;
+      const variance = radio.isPremium ? 1500 : 500;
+      initial[radio.id] = base + Math.floor(Math.random() * variance);
+    });
+    return initial;
+  });
+
+  // Atualizar ouvintes periodicamente
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setListeners(prev => {
+        const updated = { ...prev };
+        radios.forEach(radio => {
+          // Variação aleatória de -50 a +50 ouvintes
+          const change = Math.floor(Math.random() * 101) - 50;
+          const newValue = updated[radio.id] + change;
+          // Manter dentro de limites razoáveis
+          const min = radio.isPremium ? 1500 : 500;
+          const max = radio.isPremium ? 5000 : 2000;
+          updated[radio.id] = Math.max(min, Math.min(max, newValue));
+        });
+        return updated;
+      });
+    }, 3000); // Atualiza a cada 3 segundos
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleRadioPlay = (radioId: number, isPremium: boolean) => {
     if (isPremium) {
@@ -139,21 +172,21 @@ export default function Dashboard({
             {radios.map((radio) => (
               <Card
                 key={radio.id}
-                className={`p-4 border border-l-4 ${
+                className={`p-4 border border-l-4 relative overflow-hidden ${
                   radio.isPremium 
-                    ? "bg-gray-50/30 border-gray-100 border-l-gray-300" 
+                    ? "bg-gradient-to-br from-gray-50 to-gray-100/50 border-gray-200 border-l-gray-400" 
                     : playingRadioId === radio.id && isPlaying
-                      ? "bg-white border-primary border-l-primary shadow-md"
+                      ? "bg-gradient-to-br from-white to-blue-50/30 border-primary border-l-primary shadow-lg"
                       : playingRadioId === radio.id && !isPlaying
-                      ? "bg-white border-primary/50 border-l-primary/50 shadow-sm"
-                      : "bg-white hover:shadow-md border-gray-200 border-l-gray-400"
-                } transition-all duration-200 ${radio.isPremium ? "" : "cursor-pointer"}`}
+                      ? "bg-white border-primary/50 border-l-primary/50 shadow-md"
+                      : "bg-white hover:shadow-lg hover:border-gray-300 border-gray-200 border-l-blue-500/70"
+                } transition-all duration-200 ${radio.isPremium ? "" : "cursor-pointer hover:scale-[1.01]"}`}
                 data-testid={`radio-card-${radio.id}`}
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-1">
                       {radio.id === 1 && (
                         <img 
                           src={jovemPanLogo} 
@@ -161,23 +194,32 @@ export default function Dashboard({
                           className="w-8 h-8 object-contain"
                         />
                       )}
-                      <h3 className={`font-semibold ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
+                      <h3 className={`font-semibold text-base ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
                         {radio.name}
                       </h3>
                     </div>
-                    <p className={`text-sm mt-0.5 ${radio.isPremium ? "text-gray-400" : "text-gray-500"}`}>
+                    <p className={`text-sm ${radio.isPremium ? "text-gray-400" : "text-gray-600"}`}>
                       {radio.description}
                     </p>
-                    <div className="flex items-center gap-1 mt-2">
+                    
+                    {/* Contador de ouvintes */}
+                    <div className="flex items-center gap-1.5 mt-2 mb-2">
+                      <Users className={`w-3.5 h-3.5 ${radio.isPremium ? "text-gray-400" : "text-blue-500"}`} />
+                      <span className={`text-xs ${radio.isPremium ? "text-gray-400" : "text-gray-700"}`}>
+                        {listeners[radio.id]?.toLocaleString('pt-BR')} pessoas ouvindo agora
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1">
                       <Plus className={`w-4 h-4 ${radio.isPremium ? "text-gray-400" : "text-green-600"}`} />
                       <span 
-                        className={`text-sm font-medium ${radio.isPremium ? "text-gray-400" : "text-green-600"}`}
+                        className={`text-sm font-semibold ${radio.isPremium ? "text-gray-400" : "text-green-600"}`}
                         data-testid={`points-per-min-${radio.id}`}
                       >
                         {radio.pointsPerMin} pontos/min
                       </span>
                       {radio.isPremium && (
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-400 ml-1">
                           • Premium
                         </span>
                       )}
