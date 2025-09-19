@@ -17,6 +17,7 @@ import jovemPanLogo from '@assets/channels4_profile-removebg-preview_17583138440
 import serraMarLogo from '@/assets/serra-mar-logo.png';
 import hitsFmLogo from '@/assets/hits-fm-logo.png';
 import antena1Logo from '@/assets/antena-1-logo.png';
+import fm89Logo from '@/assets/89fm-logo.png';
 
 // Lista de rádios (compartilhada)
 export const radios = [
@@ -299,6 +300,12 @@ function App() {
                           <img 
                             src={antena1Logo} 
                             alt="Antena 1" 
+                            className="w-4 h-4 object-contain"
+                          />
+                        ) : playingRadio.id === 5 ? (
+                          <img 
+                            src={fm89Logo} 
+                            alt="89 FM" 
                             className="w-4 h-4 object-contain"
                           />
                         ) : (

@@ -6,6 +6,7 @@ import jovemPanLogo from '@assets/channels4_profile-removebg-preview_17583138440
 import serraMarLogo from '@/assets/serra-mar-logo.png';
 import hitsFmLogo from '@/assets/hits-fm-logo.png';
 import antena1Logo from '@/assets/antena-1-logo.png';
+import fm89Logo from '@/assets/89fm-logo.png';
 import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
@@ -218,6 +219,13 @@ export default function Dashboard({
                         <img 
                           src={antena1Logo} 
                           alt="Antena 1" 
+                          className="w-8 h-8 object-contain"
+                        />
+                      )}
+                      {radio.id === 5 && (
+                        <img 
+                          src={fm89Logo} 
+                          alt="89 FM" 
                           className="w-8 h-8 object-contain"
                         />
                       )}
