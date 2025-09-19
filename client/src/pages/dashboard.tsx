@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
+import serraMarLogo from '@/assets/serra-mar-logo.png';
 import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
@@ -194,6 +195,13 @@ export default function Dashboard({
                         <img 
                           src={jovemPanLogo} 
                           alt="Jovem Pan Sports" 
+                          className="w-8 h-8 object-contain"
+                        />
+                      )}
+                      {radio.id === 2 && (
+                        <img 
+                          src={serraMarLogo} 
+                          alt="Serramar FM" 
                           className="w-8 h-8 object-contain"
                         />
                       )}
