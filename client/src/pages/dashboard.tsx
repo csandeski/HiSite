@@ -84,7 +84,7 @@ export default function Dashboard({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 pb-20">
+      <main className="flex-1 pb-32">
         <div className="container mx-auto px-4 py-6 max-w-2xl">
           {/* Welcome Message */}
           <p className="text-sm text-gray-600 mb-3">

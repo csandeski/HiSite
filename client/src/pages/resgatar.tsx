@@ -136,7 +136,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main className="flex-1 overflow-y-auto pb-32">
         <div className="container mx-auto px-4 py-4 max-w-4xl">
           
           {/* Compact Stats Section */}
