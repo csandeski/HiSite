@@ -41,6 +41,48 @@ const radios = [
     pointsPerMin: 90,
     isPremium: true,
   },
+  {
+    id: 6,
+    name: "Kiss FM",
+    description: "Hits atuais",
+    pointsPerMin: 95,
+    isPremium: true,
+  },
+  {
+    id: 7,
+    name: "CBN",
+    description: "Notícias 24h",
+    pointsPerMin: 100,
+    isPremium: true,
+  },
+  {
+    id: 8,
+    name: "BandNews FM",
+    description: "Jornalismo",
+    pointsPerMin: 105,
+    isPremium: true,
+  },
+  {
+    id: 9,
+    name: "Rádio Globo",
+    description: "Variedades",
+    pointsPerMin: 110,
+    isPremium: true,
+  },
+  {
+    id: 10,
+    name: "Mix FM",
+    description: "Pop internacional",
+    pointsPerMin: 115,
+    isPremium: true,
+  },
+  {
+    id: 11,
+    name: "Transamérica",
+    description: "Hits e clássicos",
+    pointsPerMin: 120,
+    isPremium: true,
+  },
 ];
 
 export default function Dashboard() {
