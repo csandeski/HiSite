@@ -11,6 +11,7 @@ import { useState, useEffect, createContext, useContext, useRef, useMemo } from 
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, Pause, Play, Gift, User } from "lucide-react";
 import PremiumPopup from "@/components/PremiumPopup";
+import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 
 // Lista de rádios (compartilhada)
 export const radios = [
@@ -264,7 +265,15 @@ function App() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-1">
                       <div className="bg-primary/10 p-1.5 rounded">
-                        <Radio className="w-4 h-4 text-primary" />
+                        {playingRadio.id === 1 ? (
+                          <img 
+                            src={jovemPanLogo} 
+                            alt="Jovem Pan Sports" 
+                            className="w-4 h-4 object-contain"
+                          />
+                        ) : (
+                          <Radio className="w-4 h-4 text-primary" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
