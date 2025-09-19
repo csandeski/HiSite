@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Radio, Gift, User, Headphones, Star, Volume2, Pause } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Radio, Gift, User, Volume2, Pause, Plus, Music } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import { useState, useEffect } from "react";
 
@@ -164,43 +164,26 @@ export default function Dashboard() {
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1">
-                    {!radio.isPremium && (
-                      <div className={`p-2 rounded-full ${
-                        playingRadioId === radio.id
-                          ? "bg-primary/10"
-                          : "bg-gray-50"
-                      }`}>
-                        <Headphones className={`w-5 h-5 ${
-                          playingRadioId === radio.id ? "text-primary" : "text-gray-500"
-                        }`} />
-                      </div>
-                    )}
-                    {radio.isPremium && (
-                      <div className="p-2">
-                        <Lock className="w-5 h-5 text-gray-400" />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <h3 className={`font-semibold ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
-                        {radio.name}
-                      </h3>
-                      <p className={`text-sm mt-0.5 ${radio.isPremium ? "text-gray-400" : "text-gray-500"}`}>
-                        {radio.description}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span 
-                          className={`text-sm font-medium ${radio.isPremium ? "text-gray-400" : "text-green-600"}`}
-                          data-testid={`points-per-min-${radio.id}`}
-                        >
-                          +{radio.pointsPerMin} pontos/min
+                  <div className="flex-1">
+                    <h3 className={`font-semibold ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
+                      {radio.name}
+                    </h3>
+                    <p className={`text-sm mt-0.5 ${radio.isPremium ? "text-gray-400" : "text-gray-500"}`}>
+                      {radio.description}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      <Plus className={`w-4 h-4 ${radio.isPremium ? "text-gray-400" : "text-green-600"}`} />
+                      <span 
+                        className={`text-sm font-medium ${radio.isPremium ? "text-gray-400" : "text-green-600"}`}
+                        data-testid={`points-per-min-${radio.id}`}
+                      >
+                        {radio.pointsPerMin} pontos/min
+                      </span>
+                      {radio.isPremium && (
+                        <span className="text-xs text-gray-400">
+                          • Premium
                         </span>
-                        {radio.isPremium && (
-                          <span className="text-xs text-gray-400">
-                            • Premium
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
                   
@@ -229,9 +212,7 @@ export default function Dashboard() {
                   )}
                   
                   {radio.isPremium && (
-                    <div className="p-2 rounded-full bg-gray-100">
-                      <Lock className="w-5 h-5 text-gray-400" />
-                    </div>
+                    <Lock className="w-6 h-6 text-gray-400" />
                   )}
                 </div>
               </Card>
@@ -251,7 +232,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
                   <div className="bg-primary/10 p-2.5 rounded-lg">
-                    <Headphones className="w-5 h-5 text-primary" />
+                    <Music className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm text-gray-900">{playingRadio.name}</h4>
