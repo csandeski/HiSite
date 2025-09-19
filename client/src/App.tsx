@@ -52,7 +52,7 @@ export const radios = [
     description: "Pop nacional",
     pointsPerMin: 85,
     isPremium: true,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://antenaone.crossradio.com.br/stream/2",
   },
   {
     id: 5,
@@ -60,7 +60,7 @@ export const radios = [
     description: "Rock clássico",
     pointsPerMin: 90,
     isPremium: true,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://stream.zeno.fm/wtdli9kausatv",
   },
   {
     id: 6,
@@ -68,7 +68,7 @@ export const radios = [
     description: "Hits atuais",
     pointsPerMin: 95,
     isPremium: true,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_KISSFM_ADP.m3u8?dist=onlineradiobox",
   },
   {
     id: 7,
@@ -100,7 +100,7 @@ export const radios = [
     description: "Pop internacional",
     pointsPerMin: 115,
     isPremium: true,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://playerservices.streamtheworld.com/api/livestream-redirect/MIXFM_SAOPAULOAAC.aac?dist=onlineradiobox",
   },
   {
     id: 11,
@@ -108,7 +108,7 @@ export const radios = [
     description: "Hits e clássicos",
     pointsPerMin: 120,
     isPremium: true,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac?dist=onlineradiobox",
   },
 ];
 
