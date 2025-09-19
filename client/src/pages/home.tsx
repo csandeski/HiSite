@@ -1,11 +1,85 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign, Clock, Users, Star, Banknote, Coins, Timer } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign, Clock, Users, Star, Banknote, Coins, Timer, Eye, EyeOff, X } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+// Login form schema
+const loginSchema = z.object({
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+});
+
+// Register form schema
+const registerSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  confirmPassword: z.string().min(6, "Confirmação de senha é obrigatória"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Senhas não coincidem",
+  path: ["confirmPassword"],
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function Home() {
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const loginForm = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const registerForm = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
   const handleButtonClick = (action: string) => {
     console.log(`Button clicked: ${action}`);
+    switch (action) {
+      case 'login':
+      case 'already-account':
+        setLoginOpen(true);
+        break;
+      case 'register':
+      case 'start-earning':
+        setRegisterOpen(true);
+        break;
+    }
+  };
+
+  const onLoginSubmit = (data: LoginFormValues) => {
+    console.log('Login data:', data);
+    // Here you would typically make an API call to authenticate
+    setLoginOpen(false);
+    loginForm.reset();
+  };
+
+  const onRegisterSubmit = (data: RegisterFormValues) => {
+    console.log('Register data:', data);
+    // Here you would typically make an API call to create account
+    setRegisterOpen(false);
+    registerForm.reset();
   };
 
   return (
@@ -326,13 +400,283 @@ export default function Home() {
             <Button 
               size="lg"
               className="bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
-              onClick={() => console.log('start-now')}
+              onClick={() => handleButtonClick('start-earning')}
+              data-testid="button-start-earning-bottom"
             >
               Começar Agora Mesmo
             </Button>
           </div>
         </div>
       </section>
+
+      {/* Login Modal */}
+      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+        <DialogContent className="sm:max-w-md w-[95%] sm:w-full mx-auto bg-white rounded-2xl border-0 shadow-2xl p-0">
+          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none z-10" aria-label="Fechar modal de login" data-testid="button-close-login">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Fechar</span>
+          </DialogClose>
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+              Entrar
+            </DialogTitle>
+            <DialogDescription className="text-center text-muted-foreground mt-2">
+              Acesse sua conta e continue ganhando dinheiro
+            </DialogDescription>
+          </DialogHeader>
+          <div className="px-6 pb-6">
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Digite seu email"
+                          type="email"
+                          className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
+                          data-testid="input-login-email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Senha</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder="Digite sua senha"
+                            type={showPassword ? "text" : "password"}
+                            className="w-full h-12 px-4 pr-12 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
+                            data-testid="input-login-password"
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                            data-testid="button-toggle-login-password"
+                            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4 text-gray-500" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-gray-500" />
+                            )}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="text-sm text-primary hover:text-blue-600 p-0 h-auto font-normal"
+                    data-testid="link-forgot-password"
+                    onClick={() => console.log('Forgot password clicked')}
+                  >
+                    Esqueceu sua senha?
+                  </Button>
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  data-testid="button-submit-login"
+                >
+                  Entrar
+                </Button>
+              </form>
+            </Form>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Ainda não tem conta?{" "}
+                <Button
+                  variant="link"
+                  className="text-primary hover:text-blue-600 p-0 h-auto font-medium"
+                  data-testid="link-switch-to-register"
+                  onClick={() => {
+                    setLoginOpen(false);
+                    setRegisterOpen(true);
+                  }}
+                >
+                  Cadastrar-se
+                </Button>
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Register Modal */}
+      <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
+        <DialogContent className="sm:max-w-md w-[95%] sm:w-full mx-auto bg-white rounded-2xl border-0 shadow-2xl p-0">
+          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none z-10" aria-label="Fechar modal de cadastro" data-testid="button-close-register">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Fechar</span>
+          </DialogClose>
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+              Criar Conta
+            </DialogTitle>
+            <DialogDescription className="text-center text-muted-foreground mt-2">
+              Crie sua conta e comece a ganhar dinheiro hoje
+            </DialogDescription>
+          </DialogHeader>
+          <div className="px-6 pb-6">
+            <Form {...registerForm}>
+              <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                <FormField
+                  control={registerForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Nome completo</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Digite seu nome completo"
+                          className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
+                          data-testid="input-register-name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Digite seu email"
+                          type="email"
+                          className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
+                          data-testid="input-register-email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Senha</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder="Digite sua senha"
+                            type={showPassword ? "text" : "password"}
+                            className="w-full h-12 px-4 pr-12 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
+                            data-testid="input-register-password"
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                            data-testid="button-toggle-register-password"
+                            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4 text-gray-500" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-gray-500" />
+                            )}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Confirmar senha</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder="Confirme sua senha"
+                            type={showConfirmPassword ? "text" : "password"}
+                            className="w-full h-12 px-4 pr-12 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
+                            data-testid="input-register-confirm-password"
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            data-testid="button-toggle-confirm-password"
+                            aria-label={showConfirmPassword ? "Ocultar confirmação de senha" : "Mostrar confirmação de senha"}
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4 text-gray-500" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-gray-500" />
+                            )}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  data-testid="button-submit-register"
+                >
+                  Criar Conta
+                </Button>
+              </form>
+            </Form>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Já tem uma conta?{" "}
+                <Button
+                  variant="link"
+                  className="text-primary hover:text-blue-600 p-0 h-auto font-medium"
+                  data-testid="link-switch-to-login"
+                  onClick={() => {
+                    setRegisterOpen(false);
+                    setLoginOpen(true);
+                  }}
+                >
+                  Fazer login
+                </Button>
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
