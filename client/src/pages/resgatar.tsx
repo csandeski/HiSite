@@ -477,7 +477,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-green-900">Continue ganhando!</p>
                   <p className="text-xs text-green-800">
-                    Ouça suas rádios favoritas para acumular mais saldo. Com apenas mais {Math.ceil((minimumWithdrawal - balance) / 0.075)} pontos você atinge o mínimo!
+                    Ouça suas rádios favoritas para acumular mais saldo. Com apenas mais {Math.ceil((minimumWithdrawal - balance) / 0.125)} pontos você atinge o mínimo!
                   </p>
                 </div>
               </div>
