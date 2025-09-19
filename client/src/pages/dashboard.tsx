@@ -175,9 +175,9 @@ export default function Dashboard({
                       size="icon"
                       variant="default"
                       className={`${
-                        playingRadioId === radio.id
-                          ? "bg-primary text-white"
-                          : "bg-primary text-white hover:bg-primary/90"
+                        playingRadioId === radio.id && isPlaying
+                          ? "bg-primary text-white hover:bg-primary/90"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                       } w-10 h-10 rounded-full transition-all duration-200`}
                       data-testid={`play-button-${radio.id}`}
                       aria-label={`Play ${radio.name}`}
