@@ -263,8 +263,8 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             </div>
           </div>
 
-          {/* Exchange Options Grid - Redesenhado */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          {/* Exchange Options Grid - Compacto */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
             {filteredOptions.map((option, index) => {
               const percentage = Math.min((sessionPoints / option.points) * 100, 100);
               const missingPoints = Math.max(option.points - sessionPoints, 0);
@@ -273,110 +273,92 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
               return (
                 <Card 
                   key={index}
-                  className={`relative overflow-hidden transition-all ${
+                  className={`p-4 border transition-all ${
                     hasEnoughPoints 
-                      ? 'shadow-lg hover:shadow-xl hover:scale-[1.02]' 
-                      : 'opacity-75'
+                      ? 'border-gray-200 hover:border-gray-300 hover:shadow-md bg-white' 
+                      : 'border-gray-100 bg-gray-50/50'
                   }`}
                   data-testid={`exchange-option-${option.points}`}
                 >
-                  {/* Background Pattern */}
-                  <div className="absolute inset-0 opacity-5">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary to-blue-600"></div>
+                  {/* Header - Points and Value */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <Coins className={`w-4 h-4 ${hasEnoughPoints ? 'text-gray-600' : 'text-gray-400'}`} />
+                        <span className="text-base font-semibold text-gray-900">
+                          {option.points} pontos
+                        </span>
+                      </div>
+                      {option.badge && (
+                        <Badge 
+                          variant="secondary" 
+                          className="text-[9px] mt-1 bg-amber-100 text-amber-700 border-amber-200 px-1.5 py-0"
+                        >
+                          {option.badge}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-gray-500">Você recebe</p>
+                      <p className="text-lg font-bold text-green-600">
+                        R$ {option.value.toFixed(2)}
+                      </p>
+                    </div>
                   </div>
                   
-                  {/* Content */}
-                  <div className="relative p-5">
-                    {/* Header with Badge */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Coins className={`w-5 h-5 ${hasEnoughPoints ? 'text-primary' : 'text-gray-400'}`} />
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {option.points} pontos
-                          </h3>
-                        </div>
-                        {option.badge && (
-                          <Badge 
-                            variant="secondary" 
-                            className="text-[10px] bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-200 font-medium px-2 py-0.5"
-                          >
-                            {option.badge}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500">Você recebe</p>
-                        <p className="text-2xl font-bold text-green-600">
-                          R$ {option.value.toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Conversion Rate */}
-                    <div className="bg-gray-50 rounded-lg px-3 py-2 mb-4">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-600">Taxa de conversão</span>
-                        <span className="font-semibold text-gray-900">{option.conversionRate}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Progress Section */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-600">
-                          {hasEnoughPoints ? 'Disponível para troca' : `Progresso: ${Math.round(percentage)}%`}
-                        </span>
-                        {!hasEnoughPoints && (
-                          <span className="font-medium text-gray-700">
-                            Faltam {missingPoints} pts
-                          </span>
-                        )}
-                      </div>
-                      <div className="relative">
-                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div 
-                            className={`h-2 rounded-full transition-all ${
-                              hasEnoughPoints 
-                                ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
-                                : 'bg-gradient-to-r from-gray-300 to-gray-400'
-                            }`}
-                            style={{width: `${percentage}%`}}
-                          ></div>
-                        </div>
-                        {hasEnoughPoints && (
-                          <div className="absolute -right-1 -top-1">
-                            <CheckCircle className="w-4 h-4 text-green-500 bg-white rounded-full" />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Action Button */}
-                    <Button
-                      variant={hasEnoughPoints ? "default" : "secondary"}
-                      className={`w-full font-semibold transition-all ${
-                        hasEnoughPoints 
-                          ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white shadow-md py-5' 
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed py-5'
-                      }`}
-                      disabled={!hasEnoughPoints}
-                      onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
-                      data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
-                    >
-                      {hasEnoughPoints ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2" />
-                          Converter em Dinheiro
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="w-4 h-4 mr-2" />
-                          Bloqueado
-                        </>
-                      )}
-                    </Button>
+                  {/* Conversion Rate */}
+                  <div className="text-xs text-gray-600 mb-3">
+                    Taxa de conversão: <span className="font-medium text-gray-900">{option.conversionRate}</span>
                   </div>
+                  
+                  {/* Progress Section */}
+                  <div className="space-y-1.5 mb-3">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-gray-500">
+                        Progresso: {Math.round(percentage)}%
+                      </span>
+                      {!hasEnoughPoints && (
+                        <span className="text-gray-600">
+                          Faltam {missingPoints} pts
+                        </span>
+                      )}
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                      <div 
+                        className={`h-1.5 rounded-full transition-all ${
+                          hasEnoughPoints 
+                            ? 'bg-green-500' 
+                            : 'bg-gray-300'
+                        }`}
+                        style={{width: `${percentage}%`}}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Action Button */}
+                  <Button
+                    variant={hasEnoughPoints ? "default" : "ghost"}
+                    className={`w-full h-9 font-medium transition-all text-sm ${
+                      hasEnoughPoints 
+                        ? 'bg-primary hover:bg-primary/90 text-white' 
+                        : 'bg-transparent text-gray-400 cursor-not-allowed border border-gray-200'
+                    }`}
+                    disabled={!hasEnoughPoints}
+                    onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
+                    data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
+                  >
+                    {hasEnoughPoints ? (
+                      <>
+                        <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
+                        Converter
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-3.5 h-3.5 mr-1.5" />
+                        Bloqueado
+                      </>
+                    )}
+                  </Button>
                 </Card>
               );
             })}
