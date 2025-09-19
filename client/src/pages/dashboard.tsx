@@ -125,37 +125,37 @@ export default function Dashboard() {
           </p>
           
           {/* Session Points Card */}
-          <div className="mb-5">
-            <Card 
-              className="bg-gradient-to-r from-primary to-blue-500 text-white p-5 border-0"
-              data-testid="session-points-card"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-white/90 text-sm mb-1">
-                    Pontos desta sessão
-                  </p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold">
-                      +{sessionPoints}
-                    </span>
-                    <span className="text-base opacity-90">pts</span>
-                  </div>
-                </div>
-                <div className="bg-white/20 p-2.5 rounded-full">
-                  <TrendingUp className="w-6 h-6 text-white" />
+          <Card 
+            className="bg-gradient-to-r from-primary to-blue-500 text-white p-5 mb-5 border-0"
+            data-testid="session-points-card"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-white/90 text-sm mb-1">
+                  Pontos desta sessão
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold">
+                    +{sessionPoints}
+                  </span>
+                  <span className="text-base opacity-90">pts</span>
                 </div>
               </div>
-            </Card>
+              <div className="bg-white/20 p-2.5 rounded-full">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+            </div>
             
-            {/* Live earning indicator */}
+            {/* Live earning indicator inside the card */}
             {playingRadio && (
-              <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-b-xl -mt-1 text-sm font-medium flex items-center gap-2">
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                Ganhando pontos ao vivo • {playingRadio.name}
+              <div className="bg-white/10 rounded-lg px-3 py-2 flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm text-white/90">
+                  Ganhando pontos ao vivo • {playingRadio.name}
+                </span>
               </div>
             )}
-          </div>
+          </Card>
 
           {/* Radio List */}
           <div className="space-y-3">
