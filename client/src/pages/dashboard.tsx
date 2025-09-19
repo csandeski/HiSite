@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Radio, Gift, User, Headphones, Star } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Radio, Gift, User, Headphones, Star, Volume2, Pause } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Lista de rádios
 const radios = [
@@ -47,16 +47,36 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("radio");
   const [sessionPoints, setSessionPoints] = useState(0);
   const [balance, setBalance] = useState(0);
+  const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
+  const [volume, setVolume] = useState(50);
 
   const handleRadioPlay = (radioId: number, isPremium: boolean) => {
     if (isPremium) {
-      console.log(`Premium radio clicked: ${radioId}`);
-      // Aqui você pode mostrar um modal ou alerta sobre ser premium
+      // Rádio premium não pode tocar
+      return;
+    }
+    
+    if (playingRadioId === radioId) {
+      // Pausar se já está tocando
+      setPlayingRadioId(null);
     } else {
-      console.log(`Radio started: ${radioId}`);
-      // Lógica para iniciar a rádio
+      // Tocar nova rádio
+      setPlayingRadioId(radioId);
     }
   };
+
+  // Efeito para incrementar pontos enquanto toca
+  useEffect(() => {
+    if (playingRadioId === null) return;
+
+    const interval = setInterval(() => {
+      setSessionPoints((prev) => prev + 1);
+    }, 1000); // Incrementa a cada segundo
+
+    return () => clearInterval(interval);
+  }, [playingRadioId]);
+
+  const playingRadio = radios.find(r => r.id === playingRadioId);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -134,7 +154,9 @@ export default function Dashboard() {
                 className={`p-4 border-2 ${
                   radio.isPremium 
                     ? "bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 hover:border-yellow-300" 
-                    : "bg-white hover:shadow-lg hover:border-primary/30 border-gray-100"
+                    : playingRadioId === radio.id
+                      ? "bg-gradient-to-br from-blue-50 to-primary/10 border-primary shadow-lg"
+                      : "bg-white hover:shadow-lg hover:border-primary/30 border-gray-100"
                 } transition-all duration-300 cursor-pointer group`}
                 data-testid={`radio-card-${radio.id}`}
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
@@ -197,6 +219,8 @@ export default function Dashboard() {
                   >
                     {radio.isPremium ? (
                       <Lock className="w-5 h-5 md:w-6 md:h-6" />
+                    ) : playingRadioId === radio.id ? (
+                      <Pause className="w-5 h-5 md:w-6 md:h-6" />
                     ) : (
                       <Play className="w-5 h-5 md:w-6 md:h-6 ml-0.5" />
                     )}
@@ -207,6 +231,69 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {/* Player Flutuante */}
+      {playingRadio && (
+        <div className="fixed bottom-16 left-0 right-0 z-30 px-4 pb-2">
+          <Card className="bg-gradient-to-r from-primary to-blue-500 text-white p-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  <Headphones className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-sm">{playingRadio.name}</h4>
+                  <p className="text-xs text-white/80">{playingRadio.description}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Volume2 className="w-5 h-5" />
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={volume}
+                  onChange={(e) => setVolume(Number(e.target.value))}
+                  className="w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer"
+                  data-testid="volume-slider"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full"
+                  onClick={() => setPlayingRadioId(null)}
+                  data-testid="pause-player"
+                >
+                  <Pause className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Card de Pontos flutuante quando tocando */}
+      {playingRadio && (
+        <div className="fixed top-20 left-4 right-4 z-30 max-w-sm mx-auto">
+          <Card className="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-3 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-white/90">Pontos desta sessão</p>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold">+{sessionPoints}</span>
+                  <span className="text-sm opacity-90">pts</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <TrendingUp className="w-5 h-5 mb-1" />
+                <p className="text-xs text-white/80">
+                  Ganhando pontos ao vivo • {playingRadio.name}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-20">
