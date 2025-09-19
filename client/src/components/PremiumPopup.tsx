@@ -47,12 +47,12 @@ export default function PremiumPopup({ open, onOpenChange }: PremiumPopupProps) 
 
           {/* Title */}
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-            Ganhe até 10x mais rápido!
+            Ganhe até 3x mais rápido!
           </h2>
 
           {/* Description */}
           <p className="text-gray-600 text-sm leading-relaxed px-2 sm:px-4">
-            Você já viu funcionando. Agora imagine multiplicar seus ganhos por 10x e ter acesso a todas as estações de rádios!
+            Você já viu funcionando. Agora imagine multiplicar seus ganhos por 3x e ter acesso a todas as estações de rádios!
           </p>
 
           {/* Buttons */}

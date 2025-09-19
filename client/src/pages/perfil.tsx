@@ -174,7 +174,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
               <Crown className="w-7 h-7" />
               <div>
                 <h3 className="font-bold text-base">Upgrade Premium</h3>
-                <p className="text-xs opacity-90">10x mais pontos</p>
+                <p className="text-xs opacity-90">3x mais pontos</p>
               </div>
             </div>
             <Button
@@ -513,7 +513,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                   Vale a pena o Premium?
                 </h3>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  Definitivamente! Com 10x mais pontos e rádios exclusivas, você recupera o investimento 
+                  Definitivamente! Com 3x mais pontos e rádios exclusivas, você recupera o investimento 
                   rapidamente.
                 </p>
               </div>
@@ -539,7 +539,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                 <Crown className="w-8 h-8 text-white" />
               </div>
               <DialogTitle className="text-xl font-bold text-gray-900">Upgrade Premium</DialogTitle>
-              <p className="text-gray-600 text-xs">Multiplique seus ganhos por 10x</p>
+              <p className="text-gray-600 text-xs">Multiplique seus ganhos por 3x</p>
             </div>
           </DialogHeader>
           
@@ -562,7 +562,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                 <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-2.5 h-2.5 text-white" />
                 </div>
-                <span className="text-xs text-gray-700">Ganhe 10x mais pontos por minuto</span>
+                <span className="text-xs text-gray-700">Ganhe 3x mais pontos por minuto</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
