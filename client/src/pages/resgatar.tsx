@@ -78,7 +78,7 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col overflow-y-auto">
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3">
@@ -116,8 +116,8 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 pb-20">
-        <div className="container mx-auto px-4 py-6 max-w-2xl">
+      <main className="flex-1 overflow-y-auto">
+        <div className="container mx-auto px-4 py-6 pb-10 max-w-2xl">
           
           {/* Saldo Card */}
           <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white p-5 mb-4 border-0">
