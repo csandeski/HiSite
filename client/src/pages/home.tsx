@@ -16,7 +16,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <Zap className="w-6 h-6 text-primary" />
               <span className="text-xl font-bold text-foreground" data-testid="logo-text">
-                RadioEarn
+                RádioPlay
               </span>
             </div>
             <div className="flex items-center gap-2">
