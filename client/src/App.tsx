@@ -12,6 +12,7 @@ import { useState, useEffect, createContext, useContext, useRef, useMemo } from 
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, Pause, Play, Gift, User } from "lucide-react";
 import PremiumPopup from "@/components/PremiumPopup";
+import PushNotification from "@/components/PushNotification";
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 
 // Lista de rádios (compartilhada)
@@ -253,12 +254,15 @@ function App() {
               </Route>
               <Route path="/dashboard">
                 <DashboardComp {...playerProps} />
+                <PushNotification />
               </Route>
               <Route path="/resgatar">
                 <Resgatar {...playerProps} />
+                <PushNotification />
               </Route>
               <Route path="/perfil">
                 <Perfil userName={userName} sessionPoints={sessionPoints} balance={balance} />
+                <PushNotification />
               </Route>
               <Route component={NotFound} />
             </Switch>
