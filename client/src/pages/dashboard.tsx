@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Pause, Plus, Music } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2 } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import { radios } from "../App";
 
@@ -108,9 +108,9 @@ export default function Dashboard({
                   <span className="text-base opacity-90">pts</span>
                 </div>
               </div>
-              <div className={`bg-white/20 p-2.5 rounded-full ${playingRadio && isPlaying ? 'animate-bounce' : ''}`}>
+              <div className={`bg-white/20 p-2.5 rounded-full ${playingRadio && isPlaying ? 'animate-scale' : ''}`}>
                 {playingRadio && isPlaying ? (
-                  <Music className="w-6 h-6 text-white" />
+                  <Volume2 className="w-6 h-6 text-white" />
                 ) : (
                   <TrendingUp className="w-6 h-6 text-white" />
                 )}

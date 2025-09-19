@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes scaleUpDown {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-scale {
+  animation: scaleUpDown 1.5s ease-in-out infinite;
+}
+
 :root {
   --background: hsl(0, 0%, 98%);
   --foreground: hsl(220, 10%, 15%);
