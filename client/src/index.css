@@ -224,13 +224,13 @@ input[type="range"] {
 }
 
 input[type="range"]::-webkit-slider-track {
-  background: rgba(255, 255, 255, 0.3);
+  background: #e5e7eb;
   height: 4px;
   border-radius: 2px;
 }
 
 input[type="range"]::-moz-range-track {
-  background: rgba(255, 255, 255, 0.3);
+  background: #e5e7eb;
   height: 4px;
   border-radius: 2px;
 }

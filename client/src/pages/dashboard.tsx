@@ -229,45 +229,6 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* Player Flutuante */}
-      {playingRadio && (
-        <div className="fixed bottom-16 left-0 right-0 z-30 px-4 pb-2">
-          <Card className="bg-gradient-to-r from-primary to-blue-500 text-white p-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 flex-1">
-                <div className="bg-white/20 p-2 rounded-lg">
-                  <Headphones className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm">{playingRadio.name}</h4>
-                  <p className="text-xs text-white/80">{playingRadio.description}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Volume2 className="w-5 h-5" />
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={volume}
-                  onChange={(e) => setVolume(Number(e.target.value))}
-                  className="w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer"
-                  data-testid="volume-slider"
-                />
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full"
-                  onClick={() => setPlayingRadioId(null)}
-                  data-testid="pause-player"
-                >
-                  <Pause className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
 
       {/* Card de Pontos flutuante quando tocando */}
       {playingRadio && (
@@ -292,54 +253,115 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-20">
+      {/* Bottom Navigation with Player */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white z-20">
+        {/* Player integrado */}
+        {playingRadio && (
+          <div className="border-t border-gray-200">
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="bg-primary/10 p-2.5 rounded-lg">
+                    <Headphones className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm text-gray-900">{playingRadio.name}</h4>
+                    <p className="text-xs text-gray-500">{playingRadio.description}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Volume2 className="w-4 h-4 text-gray-500" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={volume}
+                    onChange={(e) => setVolume(Number(e.target.value))}
+                    className="w-16 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    data-testid="volume-slider"
+                    style={{
+                      background: `linear-gradient(to right, #023E73 0%, #023E73 ${volume}%, #e5e7eb ${volume}%, #e5e7eb 100%)`
+                    }}
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="bg-primary text-white w-9 h-9 rounded-full hover:bg-primary/90"
+                    onClick={() => setPlayingRadioId(null)}
+                    data-testid="pause-player"
+                  >
+                    <Pause className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Navigation */}
+        <nav className="border-t shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-around py-3">
-            <Button
-              variant="ghost"
-              className={`flex flex-col items-center gap-1 py-3 px-4 min-w-0 h-auto ${
-                activeTab === "radio"
-                  ? "text-primary"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-              onClick={() => setActiveTab("radio")}
-              data-testid="tab-radio"
-            >
-              <Radio className="w-6 h-6" />
-              <span className="text-sm font-medium">Rádio</span>
-            </Button>
+            <div className="relative flex flex-col items-center gap-1">
+              {activeTab === "radio" && (
+                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full"></div>
+              )}
+              <Button
+                variant="ghost"
+                className={`flex flex-col items-center gap-1 py-2 px-4 min-w-0 h-auto rounded-xl ${
+                  activeTab === "radio"
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+                onClick={() => setActiveTab("radio")}
+                data-testid="tab-radio"
+              >
+                <Radio className="w-5 h-5" />
+                <span className="text-xs font-medium">Rádio</span>
+              </Button>
+            </div>
 
-            <Button
-              variant="ghost"
-              className={`flex flex-col items-center gap-1 py-3 px-4 min-w-0 h-auto ${
-                activeTab === "resgatar"
-                  ? "text-primary"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-              onClick={() => setActiveTab("resgatar")}
-              data-testid="tab-resgatar"
-            >
-              <Gift className="w-6 h-6" />
-              <span className="text-sm font-medium">Resgatar</span>
-            </Button>
+            <div className="relative flex flex-col items-center gap-1">
+              {activeTab === "resgatar" && (
+                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full"></div>
+              )}
+              <Button
+                variant="ghost"
+                className={`flex flex-col items-center gap-1 py-2 px-4 min-w-0 h-auto rounded-xl ${
+                  activeTab === "resgatar"
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+                onClick={() => setActiveTab("resgatar")}
+                data-testid="tab-resgatar"
+              >
+                <Gift className="w-5 h-5" />
+                <span className="text-xs font-medium">Resgatar</span>
+              </Button>
+            </div>
 
-            <Button
-              variant="ghost"
-              className={`flex flex-col items-center gap-1 py-3 px-4 min-w-0 h-auto ${
-                activeTab === "perfil"
-                  ? "text-primary"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-              onClick={() => setActiveTab("perfil")}
-              data-testid="tab-perfil"
-            >
-              <User className="w-6 h-6" />
-              <span className="text-sm font-medium">Perfil</span>
-            </Button>
+            <div className="relative flex flex-col items-center gap-1">
+              {activeTab === "perfil" && (
+                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full"></div>
+              )}
+              <Button
+                variant="ghost"
+                className={`flex flex-col items-center gap-1 py-2 px-4 min-w-0 h-auto rounded-xl ${
+                  activeTab === "perfil"
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+                onClick={() => setActiveTab("perfil")}
+                data-testid="tab-perfil"
+              >
+                <User className="w-5 h-5" />
+                <span className="text-xs font-medium">Perfil</span>
+              </Button>
+            </div>
           </div>
         </div>
-      </nav>
+        </nav>
+      </div>
     </div>
   );
 }
