@@ -353,7 +353,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
       {/* Insufficient Balance Modal */}
       <Dialog open={showInsufficientModal} onOpenChange={setShowInsufficientModal}>
-        <DialogContent className="w-[calc(100%-1rem)] max-w-md bg-white rounded-2xl mx-2 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex flex-col items-center text-center space-y-4 pt-2">
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center shadow-lg">
@@ -435,18 +435,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
       {/* Confirmation Modal */}
       <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
-        <DialogContent className="w-[calc(100%-1rem)] max-w-md p-0 mx-2 rounded-2xl max-h-[90vh] overflow-y-auto">
-          {/* Close button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 top-2 z-10 rounded-full w-8 h-8 hover:bg-gray-100"
-            onClick={() => setShowConfirmationModal(false)}
-            data-testid="close-conversion-modal"
-          >
-            <AlertCircle className="w-4 h-4 sr-only" />
-            <span className="sr-only">Fechar</span>
-          </Button>
+        <DialogContent className="w-[90%] max-w-md p-0 rounded-2xl max-h-[90vh] overflow-y-auto">
 
           <div className="p-4 space-y-4">
             {/* Header with Icon */}

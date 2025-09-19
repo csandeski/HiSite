@@ -252,22 +252,12 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Edit Profile Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-        <DialogContent className="w-[calc(100%-1rem)] max-w-md bg-white rounded-2xl mx-2 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Editar Perfil
-              </DialogTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-1 hover:bg-gray-100"
-                onClick={() => setShowEditModal(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+            <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Editar Perfil
+            </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 pt-4">
@@ -389,22 +379,12 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Withdrawal History Modal */}
       <Dialog open={showHistoryModal} onOpenChange={setShowHistoryModal}>
-        <DialogContent className="w-[calc(100%-1rem)] max-w-md bg-white rounded-2xl mx-2 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <History className="w-5 h-5" />
-                Histórico de Saques
-              </DialogTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-1 hover:bg-gray-100"
-                onClick={() => setShowHistoryModal(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+            <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <History className="w-5 h-5" />
+              Histórico de Saques
+            </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 pt-4">
@@ -438,22 +418,12 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* FAQ Modal */}
       <Dialog open={showFAQModal} onOpenChange={setShowFAQModal}>
-        <DialogContent className="w-[calc(100%-1rem)] max-w-md bg-white rounded-2xl mx-2 max-h-[85vh] overflow-y-auto">
+        <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <HelpCircle className="w-5 h-5" />
-                Perguntas Frequentes
-              </DialogTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-auto p-1 hover:bg-gray-100"
-                onClick={() => setShowFAQModal(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+            <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <HelpCircle className="w-5 h-5" />
+              Perguntas Frequentes
+            </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 pt-4">
@@ -533,7 +503,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Premium Upgrade Modal */}
       <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
-        <DialogContent className="w-[calc(100%-1rem)] max-w-sm bg-white rounded-2xl mx-2 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex flex-col items-center text-center space-y-2">
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
