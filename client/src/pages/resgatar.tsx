@@ -159,38 +159,32 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       <main className="flex-1 overflow-y-auto pb-32">
         <div className="container mx-auto px-4 py-4 max-w-4xl">
           
-          {/* Compact Stats Section */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <Card className="p-4 border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Saldo disponível</p>
-                  <p className="text-lg font-bold text-green-600" data-testid="balance-stat">
-                    R$ {balance.toFixed(2)}
-                  </p>
-                </div>
-                <Wallet className="w-5 h-5 text-green-600" />
+          {/* Stats Section - Padronizado */}
+          <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6 shadow-sm">
+            <div className="grid grid-cols-2 divide-x divide-gray-100">
+              <div className="px-4 text-center">
+                <Wallet className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                <h3 className="text-xl font-bold text-gray-900" data-testid="balance-stat">
+                  R$ {balance.toFixed(2)}
+                </h3>
+                <p className="text-sm text-gray-500">Saldo disponível</p>
               </div>
-            </Card>
-            
-            <Card className="p-4 border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Pontos acumulados</p>
-                  <p className="text-lg font-bold text-primary" data-testid="points-stat">
-                    {sessionPoints} pts
-                  </p>
-                </div>
-                <Coins className="w-5 h-5 text-primary" />
+              
+              <div className="px-4 text-center">
+                <Coins className="w-6 h-6 text-primary mx-auto mb-2" />
+                <h3 className="text-xl font-bold text-gray-900" data-testid="points-stat">
+                  {sessionPoints}
+                </h3>
+                <p className="text-sm text-gray-500">Pontos acumulados</p>
               </div>
-            </Card>
+            </div>
           </div>
 
-          {/* Withdrawal Button */}
+          {/* Withdrawal Button - Destacado */}
           <div className="mb-6">
             <Button 
               variant="default"
-              className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold"
+              className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-base shadow-lg"
               data-testid="button-withdraw"
               onClick={handleWithdraw}
             >
@@ -201,19 +195,19 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
           {/* Title and Filter */}
           <div className="mb-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Escolha um valor para resgatar
             </h2>
             
-            {/* Filter Toggle */}
-            <div className="flex items-center space-x-2 mb-4">
+            {/* Filter Toggle - Estilizado */}
+            <div className="bg-gray-50 rounded-lg p-3 flex items-center space-x-3">
               <Switch
                 id="filter-available"
                 checked={showOnlyAvailable}
                 onCheckedChange={handleShowOnlyAvailableChange}
                 data-testid="filter-toggle"
               />
-              <Label htmlFor="filter-available" className="text-sm text-gray-600">
+              <Label htmlFor="filter-available" className="text-sm font-medium text-gray-700 cursor-pointer">
                 Mostrar apenas disponíveis
               </Label>
             </div>
@@ -230,10 +224,10 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
               return (
                 <Card 
                   key={index}
-                  className={`p-3 sm:p-4 transition-all ${
+                  className={`p-4 transition-all ${
                     hasEnoughPoints 
-                      ? 'border-primary shadow-md hover:shadow-lg' 
-                      : 'border-gray-200 opacity-50'
+                      ? 'border-2 border-primary shadow-lg hover:shadow-xl bg-gradient-to-br from-white to-blue-50/30' 
+                      : 'border border-gray-200 opacity-60'
                   }`}
                   data-testid={`exchange-option-${option.points}`}
                 >
@@ -241,33 +235,33 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                   {option.badge && (
                     <Badge 
                       variant="default" 
-                      className="mb-2 text-xs bg-primary/10 text-primary border-0"
+                      className="mb-3 text-sm bg-gradient-to-r from-primary/20 to-blue-500/20 text-primary border border-primary/30 font-semibold px-3 py-1"
                     >
                       {option.badge}
                     </Badge>
                   )}
                   
                   {/* Points and Value */}
-                  <div className="space-y-1 mb-3">
-                    <div className="text-lg font-bold text-gray-900">
+                  <div className="space-y-2 mb-4">
+                    <div className="text-xl font-bold text-gray-900">
                       {option.points} pontos
                     </div>
-                    <div className="text-base font-semibold text-green-600">
+                    <div className="text-lg font-semibold text-green-600">
                       R$ {option.value.toFixed(2)}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-sm text-gray-500">
                       {option.conversionRate}
                     </div>
                   </div>
                   
                   {/* Progress Bar */}
-                  <div className="mb-3">
+                  <div className="mb-4">
                     <Progress 
                       value={percentage} 
-                      className="h-2"
+                      className="h-2.5"
                     />
                     {!hasEnoughPoints && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-sm text-gray-500 mt-1.5">
                         Faltam {missingPoints} pts ({missingPercentage}%)
                       </p>
                     )}
@@ -275,21 +269,20 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                   
                   {/* Action Button */}
                   <Button
-                    size="sm"
                     variant={hasEnoughPoints ? "default" : "outline"}
-                    className={hasEnoughPoints ? "w-full bg-primary hover:bg-primary/90" : "w-full"}
+                    className={hasEnoughPoints ? "w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white font-semibold py-5" : "w-full py-5"}
                     disabled={!hasEnoughPoints}
                     onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
                     data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
                   >
                     {hasEnoughPoints ? (
                       <>
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Trocar
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Trocar Agora
                       </>
                     ) : (
                       <>
-                        <Clock className="w-3 h-3 mr-1" />
+                        <Clock className="w-4 h-4 mr-2" />
                         Indisponível
                       </>
                     )}
@@ -299,24 +292,28 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             })}
           </div>
 
-          {/* Info Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            <Card className="p-3 bg-blue-50/50 border-blue-200">
-              <div className="flex items-start gap-2">
-                <PiggyBank className="w-4 h-4 text-blue-600 mt-0.5" />
+          {/* Info Cards - Melhorados */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <PiggyBank className="w-5 h-5 text-blue-600" />
+                </div>
                 <div>
-                  <p className="text-xs font-semibold text-blue-900">Saque mínimo</p>
-                  <p className="text-sm text-blue-700">R$ 150,00</p>
+                  <p className="text-sm font-semibold text-blue-900">Saque mínimo</p>
+                  <p className="text-base font-bold text-blue-700">R$ 150,00</p>
                 </div>
               </div>
             </Card>
             
-            <Card className="p-3 bg-green-50/50 border-green-200">
-              <div className="flex items-start gap-2">
-                <Clock className="w-4 h-4 text-green-600 mt-0.5" />
+            <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-green-600" />
+                </div>
                 <div>
-                  <p className="text-xs font-semibold text-green-900">Prazo PIX</p>
-                  <p className="text-sm text-green-700">Imediato</p>
+                  <p className="text-sm font-semibold text-green-900">Prazo PIX</p>
+                  <p className="text-base font-bold text-green-700">Imediato</p>
                 </div>
               </div>
             </Card>

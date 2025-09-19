@@ -97,43 +97,43 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
             
             {/* User Info */}
             <div className="flex-1">
-              <h1 className="text-lg font-bold text-gray-900">
+              <h1 className="text-xl font-bold text-gray-900">
                 {userName || 'Usuário'}
               </h1>
-              <p className="text-xs text-gray-600">
+              <p className="text-sm text-gray-600">
                 Membro desde {memberSince}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <div className="px-2 py-0.5 bg-green-100 rounded-full">
-                  <span className="text-[10px] font-medium text-green-700">Ativo</span>
+                <div className="px-2.5 py-1 bg-green-100 rounded-full">
+                  <span className="text-xs font-medium text-green-700">Ativo</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Compact Stats Row */}
-        <div className="bg-white rounded-xl border border-gray-100 p-3 mb-4 shadow-sm">
+        {/* Stats Row */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4 shadow-sm">
           <div className="grid grid-cols-3 divide-x divide-gray-100">
             {/* Points */}
-            <div className="px-2 text-center">
-              <Trophy className="w-4 h-4 text-yellow-500 mx-auto mb-1" />
-              <h3 className="text-base font-bold text-gray-900">{sessionPoints}</h3>
-              <p className="text-[9px] text-gray-500">Pontos</p>
+            <div className="px-3 text-center">
+              <Trophy className="w-5 h-5 text-yellow-500 mx-auto mb-1.5" />
+              <h3 className="text-lg font-bold text-gray-900">{sessionPoints}</h3>
+              <p className="text-xs text-gray-500">Pontos</p>
             </div>
             
             {/* Balance */}
-            <div className="px-2 text-center">
-              <Wallet className="w-4 h-4 text-green-500 mx-auto mb-1" />
-              <h3 className="text-base font-bold text-gray-900">R$ {balance.toFixed(2)}</h3>
-              <p className="text-[9px] text-gray-500">Saldo</p>
+            <div className="px-3 text-center">
+              <Wallet className="w-5 h-5 text-green-500 mx-auto mb-1.5" />
+              <h3 className="text-lg font-bold text-gray-900">R$ {balance.toFixed(2)}</h3>
+              <p className="text-xs text-gray-500">Saldo</p>
             </div>
             
             {/* Listening Time */}
-            <div className="px-2 text-center">
-              <Clock className="w-4 h-4 text-blue-500 mx-auto mb-1" />
-              <h3 className="text-base font-bold text-gray-900">3.2h</h3>
-              <p className="text-[9px] text-gray-500">Hoje</p>
+            <div className="px-3 text-center">
+              <Clock className="w-5 h-5 text-blue-500 mx-auto mb-1.5" />
+              <h3 className="text-lg font-bold text-gray-900">3.2h</h3>
+              <p className="text-xs text-gray-500">Hoje</p>
             </div>
           </div>
         </div>
@@ -162,42 +162,42 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
         {/* Quick Actions Grid */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           <Card 
-            className="p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+            className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
             onClick={() => setShowEditModal(true)}
           >
             <div className="flex flex-col items-center gap-2">
-              <Edit className="w-5 h-5 text-blue-500" />
-              <span className="text-xs font-medium text-gray-700">Editar Perfil</span>
+              <Edit className="w-6 h-6 text-blue-500" />
+              <span className="text-sm font-medium text-gray-700">Editar Perfil</span>
             </div>
           </Card>
           
           <Card 
-            className="p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+            className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
             onClick={() => setShowHistoryModal(true)}
           >
             <div className="flex flex-col items-center gap-2">
-              <History className="w-5 h-5 text-green-500" />
-              <span className="text-xs font-medium text-gray-700">Histórico</span>
+              <History className="w-6 h-6 text-green-500" />
+              <span className="text-sm font-medium text-gray-700">Histórico</span>
             </div>
           </Card>
           
           <Card 
-            className="p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+            className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
             onClick={() => setShowFAQModal(true)}
           >
             <div className="flex flex-col items-center gap-2">
-              <HelpCircle className="w-5 h-5 text-purple-500" />
-              <span className="text-xs font-medium text-gray-700">Ajuda</span>
+              <HelpCircle className="w-6 h-6 text-purple-500" />
+              <span className="text-sm font-medium text-gray-700">Ajuda</span>
             </div>
           </Card>
           
           <Card 
-            className="p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer bg-red-50"
+            className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer bg-red-50"
             onClick={handleLogout}
           >
             <div className="flex flex-col items-center gap-2">
-              <LogOut className="w-5 h-5 text-red-500" />
-              <span className="text-xs font-medium text-red-600">Sair</span>
+              <LogOut className="w-6 h-6 text-red-500" />
+              <span className="text-sm font-medium text-red-600">Sair</span>
             </div>
           </Card>
         </div>
@@ -206,42 +206,42 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
         <Card className="p-3 border border-gray-100 mb-4">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-purple-600" />
-              <h3 className="font-semibold text-sm text-gray-900">Conquistas</h3>
+              <Award className="w-5 h-5 text-purple-600" />
+              <h3 className="font-semibold text-base text-gray-900">Conquistas</h3>
             </div>
-            <span className="text-[10px] text-gray-500">2 de 10</span>
+            <span className="text-xs text-gray-500">2 de 10</span>
           </div>
           
           {/* Achievement badges */}
-          <div className="flex gap-1.5 mb-2.5">
-            <div className="flex-1 bg-yellow-50 rounded-md py-1.5 px-2 border border-yellow-200">
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-xs">🎧</span>
-                <span className="text-[9px] font-medium text-gray-700">Iniciante</span>
+          <div className="flex gap-2 mb-3">
+            <div className="flex-1 bg-yellow-50 rounded-lg py-2 px-2.5 border border-yellow-200">
+              <div className="flex items-center justify-center gap-1.5">
+                <span className="text-sm">🎧</span>
+                <span className="text-xs font-medium text-gray-700">Iniciante</span>
               </div>
             </div>
-            <div className="flex-1 bg-green-50 rounded-md py-1.5 px-2 border border-green-200">
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-xs">💰</span>
-                <span className="text-[9px] font-medium text-gray-700">100 Pts</span>
+            <div className="flex-1 bg-green-50 rounded-lg py-2 px-2.5 border border-green-200">
+              <div className="flex items-center justify-center gap-1.5">
+                <span className="text-sm">💰</span>
+                <span className="text-xs font-medium text-gray-700">100 Pts</span>
               </div>
             </div>
-            <div className="flex-1 bg-gray-50 rounded-md py-1.5 px-2 border border-gray-200 opacity-40">
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-xs">🏆</span>
-                <span className="text-[9px] font-medium text-gray-400">1K Pts</span>
+            <div className="flex-1 bg-gray-50 rounded-lg py-2 px-2.5 border border-gray-200 opacity-40">
+              <div className="flex items-center justify-center gap-1.5">
+                <span className="text-sm">🏆</span>
+                <span className="text-xs font-medium text-gray-400">1K Pts</span>
               </div>
             </div>
           </div>
           
           {/* Progress */}
-          <div className="bg-gray-50 rounded-md p-2">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[9px] font-medium text-gray-600">Próxima conquista</span>
-              <span className="text-[9px] font-bold text-purple-600">900 pts</span>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-medium text-gray-600">Próxima conquista</span>
+              <span className="text-xs font-bold text-purple-600">900 pts</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-1.5">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-1.5 rounded-full transition-all" style={{width: '10%'}}></div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all" style={{width: '10%'}}></div>
             </div>
           </div>
         </Card>
