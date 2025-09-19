@@ -15,7 +15,9 @@ import {
   HelpCircle,
   Award,
   Check,
-  ShieldCheck
+  ShieldCheck,
+  Clock,
+  TrendingUp
 } from "lucide-react";
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
@@ -38,39 +40,13 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
-  // Get member since date (using current month/year for demo)
-  const memberSince = "Setembro 2025";
+  // Get member since date
+  const memberSince = "Set 2025";
 
   const handleLogout = () => {
-    // Clear user data
     localStorage.removeItem('userName');
-    // Redirect to home
     setLocation('/');
   };
-
-  const configOptions = [
-    {
-      icon: Edit,
-      label: "Editar Perfil",
-      onClick: () => console.log("Edit profile")
-    },
-    {
-      icon: History,
-      label: "Histórico de Saques",
-      onClick: () => console.log("Withdrawal history")
-    },
-    {
-      icon: HelpCircle,
-      label: "Perguntas Frequentes",
-      onClick: () => console.log("FAQ")
-    },
-    {
-      icon: LogOut,
-      label: "Sair da Conta",
-      onClick: handleLogout,
-      danger: true
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-20">
@@ -97,63 +73,76 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-6 max-w-lg">
-        {/* Profile Info */}
-        <div className="flex flex-col items-center mb-8">
-          {/* Avatar */}
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center mb-4">
-            {userName ? (
-              <span className="text-white text-3xl font-bold">{getInitials(userName)}</span>
-            ) : (
-              <User className="w-12 h-12 text-white" />
-            )}
+      <main className="flex-1 container mx-auto px-4 py-4 max-w-lg">
+        {/* Compact Profile Header */}
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 mb-4">
+          <div className="flex items-center gap-4">
+            {/* Avatar */}
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg">
+              {userName ? (
+                <span className="text-white text-xl font-bold">{getInitials(userName)}</span>
+              ) : (
+                <User className="w-8 h-8 text-white" />
+              )}
+            </div>
+            
+            {/* User Info */}
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-gray-900">
+                {userName || 'Usuário'}
+              </h1>
+              <p className="text-xs text-gray-600">
+                Membro desde {memberSince}
+              </p>
+              <div className="flex items-center gap-1 mt-1">
+                <div className="px-2 py-0.5 bg-green-100 rounded-full">
+                  <span className="text-[10px] font-medium text-green-700">Ativo</span>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          {/* Name and Member Since */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            {userName || 'Usuário'}
-          </h1>
-          <p className="text-sm text-gray-500">
-            Membro desde {memberSince}
-          </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {/* Points Card */}
-          <Card className="p-4 border border-gray-200">
-            <div className="flex flex-col items-center">
-              <Trophy className="w-8 h-8 text-yellow-500 mb-2" />
-              <h3 className="text-2xl font-bold text-gray-900">{sessionPoints}</h3>
-              <p className="text-xs text-gray-500">Pontos Totais</p>
+        {/* Compact Stats Row */}
+        <div className="bg-white rounded-xl border border-gray-100 p-3 mb-4 shadow-sm">
+          <div className="grid grid-cols-3 divide-x divide-gray-100">
+            {/* Points */}
+            <div className="px-2 text-center">
+              <Trophy className="w-4 h-4 text-yellow-500 mx-auto mb-1" />
+              <h3 className="text-base font-bold text-gray-900">{sessionPoints}</h3>
+              <p className="text-[9px] text-gray-500">Pontos</p>
             </div>
-          </Card>
-
-          {/* Balance Card */}
-          <Card className="p-4 border border-gray-200">
-            <div className="flex flex-col items-center">
-              <Wallet className="w-8 h-8 text-green-500 mb-2" />
-              <h3 className="text-2xl font-bold text-gray-900">
-                R$ {balance.toFixed(2)}
-              </h3>
-              <p className="text-xs text-gray-500">Saldo Atual</p>
+            
+            {/* Balance */}
+            <div className="px-2 text-center">
+              <Wallet className="w-4 h-4 text-green-500 mx-auto mb-1" />
+              <h3 className="text-base font-bold text-gray-900">R$ {balance.toFixed(2)}</h3>
+              <p className="text-[9px] text-gray-500">Saldo</p>
             </div>
-          </Card>
+            
+            {/* Listening Time */}
+            <div className="px-2 text-center">
+              <Clock className="w-4 h-4 text-blue-500 mx-auto mb-1" />
+              <h3 className="text-base font-bold text-gray-900">3.2h</h3>
+              <p className="text-[9px] text-gray-500">Hoje</p>
+            </div>
+          </div>
         </div>
 
-        {/* Premium Upgrade Banner */}
-        <Card className="p-5 mb-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-0">
+        {/* Compact Premium Banner */}
+        <Card className="p-3.5 mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-0 shadow-lg">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 text-white">
-              <Crown className="w-8 h-8" />
+            <div className="flex items-center gap-2.5 text-white">
+              <Crown className="w-6 h-6" />
               <div>
-                <h3 className="font-bold text-base">Upgrade Premium</h3>
-                <p className="text-sm opacity-90">Ganhe 10x mais pontos</p>
+                <h3 className="font-bold text-sm">Premium</h3>
+                <p className="text-[11px] opacity-90">10x mais pontos</p>
               </div>
             </div>
             <Button
+              size="sm"
               variant="secondary"
-              className="bg-white text-gray-900 hover:bg-gray-100 font-semibold px-4 py-2 h-auto"
+              className="bg-white text-gray-900 hover:bg-gray-100 font-semibold text-xs px-3 py-1.5 h-auto"
               data-testid="button-activate-premium"
               onClick={() => setShowPremiumModal(true)}
             >
@@ -162,54 +151,89 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           </div>
         </Card>
 
-        {/* Configuration Options */}
-        <Card className="p-4 border border-gray-200">
-          <h2 className="font-bold text-gray-900 mb-4">Configurações</h2>
-          <div className="space-y-1">
-            {configOptions.map((option, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                className={`w-full justify-between px-3 py-3 h-auto hover:bg-gray-50 ${
-                  option.danger ? 'text-red-600 hover:text-red-700' : 'text-gray-700'
-                }`}
-                onClick={option.onClick}
-                data-testid={`button-${option.label.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                <div className="flex items-center gap-3">
-                  <option.icon className="w-5 h-5" />
-                  <span className="font-medium">{option.label}</span>
-                </div>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            ))}
-          </div>
-        </Card>
+        {/* Quick Actions Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <Card 
+            className="p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+            onClick={() => console.log("Edit profile")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Edit className="w-5 h-5 text-blue-500" />
+              <span className="text-xs font-medium text-gray-700">Editar Perfil</span>
+            </div>
+          </Card>
+          
+          <Card 
+            className="p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+            onClick={() => console.log("Withdrawal history")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <History className="w-5 h-5 text-green-500" />
+              <span className="text-xs font-medium text-gray-700">Histórico</span>
+            </div>
+          </Card>
+          
+          <Card 
+            className="p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+            onClick={() => console.log("FAQ")}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-purple-500" />
+              <span className="text-xs font-medium text-gray-700">Ajuda</span>
+            </div>
+          </Card>
+          
+          <Card 
+            className="p-3 border border-gray-100 hover:shadow-md transition-all cursor-pointer bg-red-50"
+            onClick={handleLogout}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <LogOut className="w-5 h-5 text-red-500" />
+              <span className="text-xs font-medium text-red-600">Sair</span>
+            </div>
+          </Card>
+        </div>
 
-        {/* Achievement Section */}
-        <Card className="p-4 mt-6 border border-gray-200 bg-gradient-to-br from-blue-50 to-purple-50">
-          <div className="flex items-center gap-3 mb-3">
-            <Award className="w-6 h-6 text-purple-600" />
-            <h3 className="font-bold text-gray-900">Conquistas</h3>
+        {/* Compact Achievements & Stats */}
+        <Card className="p-3 border border-gray-100">
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4 text-purple-600" />
+              <h3 className="font-semibold text-sm text-gray-900">Conquistas</h3>
+            </div>
+            <span className="text-[10px] text-gray-500">2 de 10</span>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="flex flex-col items-center p-2">
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-1">
-                <span className="text-xl">🎧</span>
+          
+          {/* Achievement badges */}
+          <div className="flex gap-1.5 mb-2.5">
+            <div className="flex-1 bg-yellow-50 rounded-md py-1.5 px-2 border border-yellow-200">
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-xs">🎧</span>
+                <span className="text-[9px] font-medium text-gray-700">Iniciante</span>
               </div>
-              <span className="text-[10px] text-gray-600 text-center">Primeira Rádio</span>
             </div>
-            <div className="flex flex-col items-center p-2">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-1">
-                <span className="text-xl">💰</span>
+            <div className="flex-1 bg-green-50 rounded-md py-1.5 px-2 border border-green-200">
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-xs">💰</span>
+                <span className="text-[9px] font-medium text-gray-700">100 Pts</span>
               </div>
-              <span className="text-[10px] text-gray-600 text-center">100 Pontos</span>
             </div>
-            <div className="flex flex-col items-center p-2 opacity-40">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1">
-                <span className="text-xl">🏆</span>
+            <div className="flex-1 bg-gray-50 rounded-md py-1.5 px-2 border border-gray-200 opacity-40">
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-xs">🏆</span>
+                <span className="text-[9px] font-medium text-gray-400">1K Pts</span>
               </div>
-              <span className="text-[10px] text-gray-600 text-center">1000 Pontos</span>
+            </div>
+          </div>
+          
+          {/* Progress */}
+          <div className="bg-gray-50 rounded-md p-2">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[9px] font-medium text-gray-600">Próxima conquista</span>
+              <span className="text-[9px] font-bold text-purple-600">900 pts</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1.5">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-1.5 rounded-full transition-all" style={{width: '10%'}}></div>
             </div>
           </div>
         </Card>
