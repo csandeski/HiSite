@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
 import DashboardComp from "@/pages/dashboard";
 import Resgatar from "@/pages/resgatar";
+import Perfil from "@/pages/perfil";
 import NotFound from "@/pages/not-found";
 import { useState, useEffect, createContext, useContext, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -142,6 +143,8 @@ function App() {
       setActiveTab("radio");
     } else if (location === "/resgatar") {
       setActiveTab("resgatar");
+    } else if (location === "/perfil") {
+      setActiveTab("perfil");
     }
   }, [location]);
 
@@ -204,8 +207,7 @@ function App() {
     } else if (tab === "resgatar") {
       setLocation("/resgatar");
     } else if (tab === "perfil") {
-      // For now, stay on the same page
-      // setLocation("/perfil");
+      setLocation("/perfil");
     }
   };
 
@@ -254,6 +256,9 @@ function App() {
               </Route>
               <Route path="/resgatar">
                 <Resgatar {...playerProps} />
+              </Route>
+              <Route path="/perfil">
+                <Perfil userName={userName} sessionPoints={sessionPoints} balance={balance} />
               </Route>
               <Route component={NotFound} />
             </Switch>
@@ -319,7 +324,7 @@ function App() {
             )}
 
             {/* Global Bottom Navigation */}
-            {(location === "/dashboard" || location === "/resgatar") && (
+            {(location === "/dashboard" || location === "/resgatar" || location === "/perfil") && (
               <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-20">
                 <div className="container mx-auto px-4">
                   <div className="flex items-center justify-around py-3">
