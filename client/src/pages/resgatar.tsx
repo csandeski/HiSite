@@ -19,7 +19,9 @@ import {
   Settings,
   CheckCircle,
   Clock,
-  PiggyBank
+  PiggyBank,
+  Link2,
+  ArrowRight
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
@@ -36,9 +38,11 @@ interface ResgatarProps {
   setBalance: (balance: number) => void;
 }
 
-export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
+export default function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [selectedExchange, setSelectedExchange] = useState<{points: number, value: number} | null>(null);
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
 
@@ -53,6 +57,21 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
   const handleContinueListening = () => {
     setShowInsufficientModal(false);
     setLocation('/dashboard');
+  };
+
+  const handleExchange = (points: number, value: number) => {
+    setSelectedExchange({ points, value });
+    setShowConfirmationModal(true);
+  };
+
+  const confirmExchange = () => {
+    if (selectedExchange) {
+      // Deduct points and add to balance
+      setSessionPoints(prev => prev - selectedExchange.points);
+      setBalance(prev => prev + selectedExchange.value);
+      setShowConfirmationModal(false);
+      setSelectedExchange(null);
+    }
   };
 
   const exchangeOptions = [
@@ -227,6 +246,7 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
                     variant={hasEnoughPoints ? "default" : "outline"}
                     className={hasEnoughPoints ? "w-full bg-primary hover:bg-primary/90" : "w-full"}
                     disabled={!hasEnoughPoints}
+                    onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
                     data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
                   >
                     {hasEnoughPoints ? (
@@ -359,6 +379,66 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
                 data-testid="button-continue-listening"
               >
                 Continuar Ouvindo
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Modal */}
+      <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center">
+                <Link2 className="w-8 h-8 text-white" />
+              </div>
+              <DialogTitle className="text-xl font-bold">Confirmar Conversão</DialogTitle>
+            </div>
+          </DialogHeader>
+          
+          <div className="space-y-4 pt-2">
+            <p className="text-center text-gray-700">
+              Você está prestes a converter seus pontos em dinheiro real!
+            </p>
+
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Pontos a converter:</span>
+                <span className="font-bold text-gray-900">{selectedExchange?.points} pts</span>
+              </div>
+              <div className="flex justify-center">
+                <ArrowRight className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Valor em dinheiro:</span>
+                <span className="font-bold text-green-600 text-lg">R$ {selectedExchange?.value.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start gap-2">
+              <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm">
+                <span className="font-semibold text-yellow-800">Atenção:</span>
+                <span className="text-yellow-700"> Esta ação não pode ser desfeita. Os pontos serão removidos da sua conta e o valor será adicionado à sua carteira.</span>
+              </div>
+            </div>
+            
+            <div className="flex gap-3 pt-2">
+              <Button
+                className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+                onClick={confirmExchange}
+                data-testid="button-confirm-exchange"
+              >
+                Confirmar Conversão
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowConfirmationModal(false)}
+                data-testid="button-cancel-exchange"
+              >
+                Cancelar
               </Button>
             </div>
           </div>
