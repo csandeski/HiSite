@@ -87,7 +87,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
         <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 mb-4">
           <div className="flex items-center gap-4">
             {/* Avatar */}
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg">
               {userName ? (
                 <span className="text-white text-xl font-bold">{getInitials(userName)}</span>
               ) : (
@@ -138,20 +138,19 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           </div>
         </div>
 
-        {/* Compact Premium Banner */}
-        <Card className="p-3.5 mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-0 shadow-lg">
+        {/* Premium Banner - Destacado */}
+        <Card className="p-4 mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-0 shadow-xl">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 text-white">
-              <Crown className="w-6 h-6" />
+            <div className="flex items-center gap-3 text-white">
+              <Crown className="w-7 h-7" />
               <div>
-                <h3 className="font-bold text-sm">Premium</h3>
-                <p className="text-[11px] opacity-90">10x mais pontos</p>
+                <h3 className="font-bold text-base">Upgrade Premium</h3>
+                <p className="text-xs opacity-90">10x mais pontos</p>
               </div>
             </div>
             <Button
-              size="sm"
               variant="secondary"
-              className="bg-white text-gray-900 hover:bg-gray-100 font-semibold text-xs px-3 py-1.5 h-auto"
+              className="bg-white text-gray-900 hover:bg-gray-100 font-semibold text-sm px-4 py-2 h-auto shadow-md"
               data-testid="button-activate-premium"
               onClick={() => setShowPremiumModal(true)}
             >
@@ -274,7 +273,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           <div className="space-y-4 pt-4">
             {/* Avatar */}
             <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
                 {userName ? (
                   <span className="text-white text-2xl font-bold">{getInitials(userName)}</span>
                 ) : (
