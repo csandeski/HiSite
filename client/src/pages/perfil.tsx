@@ -252,7 +252,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Edit Profile Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="w-[calc(100%-1rem)] max-w-md bg-white rounded-2xl mx-2 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -389,7 +389,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Withdrawal History Modal */}
       <Dialog open={showHistoryModal} onOpenChange={setShowHistoryModal}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="w-[calc(100%-1rem)] max-w-md bg-white rounded-2xl mx-2 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -438,7 +438,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* FAQ Modal */}
       <Dialog open={showFAQModal} onOpenChange={setShowFAQModal}>
-        <DialogContent className="sm:max-w-md bg-white max-h-[80vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-1rem)] max-w-md bg-white rounded-2xl mx-2 max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -533,7 +533,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Premium Upgrade Modal */}
       <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
-        <DialogContent className="sm:max-w-sm w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full bg-white rounded-2xl mx-auto">
+        <DialogContent className="w-[calc(100%-1rem)] max-w-sm bg-white rounded-2xl mx-2 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex flex-col items-center text-center space-y-2">
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">

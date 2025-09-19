@@ -353,7 +353,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
       {/* Insufficient Balance Modal */}
       <Dialog open={showInsufficientModal} onOpenChange={setShowInsufficientModal}>
-        <DialogContent className="sm:max-w-md w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full bg-white rounded-2xl mx-auto">
+        <DialogContent className="w-[calc(100%-1rem)] max-w-md bg-white rounded-2xl mx-2 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex flex-col items-center text-center space-y-4 pt-2">
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center shadow-lg">
@@ -435,7 +435,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
       {/* Confirmation Modal */}
       <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
-        <DialogContent className="sm:max-w-md w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full p-0 overflow-hidden mx-auto rounded-lg">
+        <DialogContent className="w-[calc(100%-1rem)] max-w-md p-0 mx-2 rounded-2xl max-h-[90vh] overflow-y-auto">
           {/* Close button */}
           <Button
             variant="ghost"
@@ -448,13 +448,13 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             <span className="sr-only">Fechar</span>
           </Button>
 
-          <div className="p-4 sm:p-6 space-y-4">
+          <div className="p-4 space-y-4">
             {/* Header with Icon */}
             <div className="flex flex-col items-center text-center space-y-3">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-lg">
                 <RefreshCw className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900">
                 Confirmar Conversão
               </h2>
               <p className="text-sm text-gray-600">
@@ -505,16 +505,16 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             {/* Warning */}
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-              <div className="text-xs sm:text-sm">
+              <div className="text-xs">
                 <span className="font-semibold text-amber-800">Atenção:</span>
                 <span className="text-amber-700"> Esta ação não pode ser desfeita. Os pontos serão removidos da sua conta e o valor será adicionado à sua carteira.</span>
               </div>
             </div>
             
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <div className="flex flex-col gap-3 pt-2">
               <Button
-                className="flex-1 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold py-5 sm:py-6"
+                className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold py-5"
                 onClick={confirmExchange}
                 data-testid="button-confirm-exchange"
               >
@@ -523,7 +523,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 border-gray-300 hover:bg-gray-50 py-5 sm:py-6"
+                className="w-full border-gray-300 hover:bg-gray-50 py-5"
                 onClick={() => setShowConfirmationModal(false)}
                 data-testid="button-cancel-exchange"
               >
