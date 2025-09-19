@@ -126,11 +126,11 @@ export default function Home() {
             {/* Step 1 */}
             <div className="relative group" data-testid="step-1">
               <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-400 to-primary rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   1
                 </div>
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Headphones className="w-10 h-10 text-cyan-600" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Headphones className="w-10 h-10 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Escolha sua Rádio</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
@@ -152,11 +152,11 @@ export default function Home() {
             {/* Step 2 */}
             <div className="relative group" data-testid="step-2">
               <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-400 to-primary rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   2
                 </div>
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Radio className="w-10 h-10 text-cyan-600" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Radio className="w-10 h-10 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Ouça e Acumule</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
@@ -172,11 +172,11 @@ export default function Home() {
             {/* Step 3 */}
             <div className="relative group" data-testid="step-3">
               <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-400 to-primary rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   3
                 </div>
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <DollarSign className="w-10 h-10 text-cyan-600" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <DollarSign className="w-10 h-10 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Converta em Dinheiro</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
@@ -309,7 +309,7 @@ export default function Home() {
             <p className="text-muted-foreground mb-4">Junte-se a milhares de pessoas que já estão ganhando!</p>
             <Button 
               size="lg"
-              className="bg-gradient-to-r from-primary to-cyan-500 text-white hover:opacity-90 font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+              className="bg-gradient-to-r from-primary to-blue-600 text-white hover:opacity-90 font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
               onClick={() => console.log('start-now')}
             >
               Começar Agora Mesmo
