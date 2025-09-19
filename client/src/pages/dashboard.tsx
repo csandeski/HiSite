@@ -7,6 +7,8 @@ import { radios } from "../App";
 interface DashboardProps {
   playingRadioId: number | null;
   setPlayingRadioId: (id: number | null) => void;
+  isPlaying: boolean;
+  setIsPlaying: (playing: boolean) => void;
   volume: number;
   setVolume: (volume: number) => void;
   sessionPoints: number;
@@ -18,6 +20,8 @@ interface DashboardProps {
 export default function Dashboard({
   playingRadioId,
   setPlayingRadioId,
+  isPlaying,
+  setIsPlaying,
   sessionPoints,
   balance
 }: DashboardProps) {
@@ -29,11 +33,13 @@ export default function Dashboard({
     }
     
     if (playingRadioId === radioId) {
-      // Pausar se já está tocando
-      setPlayingRadioId(null);
+      // Se a rádio atual está tocando, pausar
+      // Se está pausada, retomar
+      setIsPlaying(!isPlaying);
     } else {
       // Tocar nova rádio
       setPlayingRadioId(radioId);
+      setIsPlaying(true);
     }
   };
 
@@ -108,7 +114,7 @@ export default function Dashboard({
             </div>
             
             {/* Live earning indicator inside the card */}
-            {playingRadio && (
+            {playingRadio && isPlaying && (
               <div className="bg-white/10 rounded-lg px-3 py-2 flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span className="text-sm text-white/90">
@@ -127,8 +133,10 @@ export default function Dashboard({
                 className={`p-4 border ${
                   radio.isPremium 
                     ? "bg-gray-50/30 border-gray-100" 
-                    : playingRadioId === radio.id
+                    : playingRadioId === radio.id && isPlaying
                       ? "bg-white border-primary shadow-md"
+                      : playingRadioId === radio.id && !isPlaying
+                      ? "bg-white border-primary/50 shadow-sm"
                       : "bg-white hover:shadow-md border-gray-200"
                 } transition-all duration-200 ${radio.isPremium ? "" : "cursor-pointer"}`}
                 data-testid={`radio-card-${radio.id}`}
@@ -174,7 +182,7 @@ export default function Dashboard({
                         handleRadioPlay(radio.id, radio.isPremium);
                       }}
                     >
-                      {playingRadioId === radio.id ? (
+                      {playingRadioId === radio.id && isPlaying ? (
                         <Pause className="w-4 h-4" />
                       ) : (
                         <Play className="w-4 h-4 ml-0.5" />

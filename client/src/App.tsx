@@ -9,7 +9,7 @@ import Resgatar from "@/pages/resgatar";
 import NotFound from "@/pages/not-found";
 import { useState, useEffect, createContext, useContext } from "react";
 import { Button } from "@/components/ui/button";
-import { Radio, Volume2, Pause, Gift, User } from "lucide-react";
+import { Radio, Volume2, Pause, Play, Gift, User } from "lucide-react";
 
 // Lista de rádios (compartilhada)
 export const radios = [
@@ -96,6 +96,8 @@ export const radios = [
 interface PlayerContextType {
   playingRadioId: number | null;
   setPlayingRadioId: (id: number | null) => void;
+  isPlaying: boolean;
+  setIsPlaying: (playing: boolean) => void;
   volume: number;
   setVolume: (volume: number) => void;
   sessionPoints: number;
@@ -118,6 +120,7 @@ export const usePlayer = () => {
 
 function App() {
   const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
   const [sessionPoints, setSessionPoints] = useState(22); // Starting with 22 points as shown in the design
   const [balance, setBalance] = useState(0);
@@ -135,14 +138,14 @@ function App() {
 
   // Efeito para incrementar pontos enquanto toca
   useEffect(() => {
-    if (playingRadioId === null) return;
+    if (!isPlaying || playingRadioId === null) return;
 
     const interval = setInterval(() => {
       setSessionPoints((prev) => prev + 1);
     }, 1500); // Incrementa a cada 1,5 segundos
 
     return () => clearInterval(interval);
-  }, [playingRadioId]);
+  }, [isPlaying, playingRadioId]);
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 
@@ -161,6 +164,8 @@ function App() {
   const playerProps = {
     playingRadioId,
     setPlayingRadioId,
+    isPlaying,
+    setIsPlaying,
     volume,
     setVolume,
     sessionPoints,
@@ -179,6 +184,8 @@ function App() {
         <PlayerContext.Provider value={{
           playingRadioId,
           setPlayingRadioId,
+          isPlaying,
+          setIsPlaying,
           volume,
           setVolume,
           sessionPoints,
@@ -209,10 +216,12 @@ function App() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-semibold text-sm text-gray-900">{playingRadio.name}</h4>
-                          <div className="flex items-center gap-1 bg-red-500/10 px-2 py-0.5 rounded-full">
-                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-                            <span className="text-[10px] font-bold text-red-500">AO VIVO</span>
-                          </div>
+                          {isPlaying && (
+                            <div className="flex items-center gap-1 bg-red-500/10 px-2 py-0.5 rounded-full">
+                              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+                              <span className="text-[10px] font-bold text-red-500">AO VIVO</span>
+                            </div>
+                          )}
                         </div>
                         <p className="text-xs text-gray-500">{playingRadio.description}</p>
                       </div>
@@ -235,10 +244,14 @@ function App() {
                         size="icon"
                         variant="ghost"
                         className="bg-primary text-white w-9 h-9 rounded-full hover:bg-primary/90"
-                        onClick={() => setPlayingRadioId(null)}
+                        onClick={() => setIsPlaying(!isPlaying)}
                         data-testid="pause-player"
                       >
-                        <Pause className="w-4 h-4" />
+                        {isPlaying ? (
+                          <Pause className="w-4 h-4" />
+                        ) : (
+                          <Play className="w-4 h-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
