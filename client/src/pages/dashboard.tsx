@@ -138,14 +138,14 @@ export default function Dashboard({
             {radios.map((radio) => (
               <Card
                 key={radio.id}
-                className={`p-4 border ${
+                className={`p-4 border border-l-4 ${
                   radio.isPremium 
-                    ? "bg-gray-50/30 border-gray-100" 
+                    ? "bg-gray-50/30 border-gray-100 border-l-gray-300" 
                     : playingRadioId === radio.id && isPlaying
-                      ? "bg-white border-primary shadow-md"
+                      ? "bg-white border-primary border-l-primary shadow-md"
                       : playingRadioId === radio.id && !isPlaying
-                      ? "bg-white border-primary/50 shadow-sm"
-                      : "bg-white hover:shadow-md border-gray-200"
+                      ? "bg-white border-primary/50 border-l-primary/50 shadow-sm"
+                      : "bg-white hover:shadow-md border-gray-200 border-l-green-500"
                 } transition-all duration-200 ${radio.isPremium ? "" : "cursor-pointer"}`}
                 data-testid={`radio-card-${radio.id}`}
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
