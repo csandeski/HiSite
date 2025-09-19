@@ -80,7 +80,7 @@ export default function PushNotification() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 400, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 right-4 z-50 w-[calc(100%-2rem)] max-w-[320px] md:bottom-24 md:right-6"
+            className="fixed bottom-36 right-4 left-4 z-[100] mx-auto max-w-[400px] md:bottom-40"
             data-testid="push-notification"
           >
             <div
