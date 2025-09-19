@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign, Clock, Users, Star, Banknote } from "lucide-react";
+import { TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign, Clock, Users, Star, Banknote, Coins, Timer } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 
 export default function Home() {
@@ -92,17 +92,35 @@ export default function Home() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-3 gap-2">
-            <div className="border border-gray-200 rounded-lg p-3 text-center bg-white" data-testid="card-stats-earnings">
-              <h3 className="text-lg md:text-xl font-bold text-foreground">R$3.500</h3>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Média mensal</p>
+            <div className="relative bg-gradient-to-br from-white to-gray-50 border border-gray-100 rounded-xl p-3 text-center shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 group overflow-hidden" data-testid="card-stats-earnings">
+              <div className="absolute top-1 right-1">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                  <Coins className="w-3 h-3 text-white" />
+                </div>
+              </div>
+              <h3 className="text-lg md:text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">R$3.500</h3>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 font-medium">Média mensal</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-green-50/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
             </div>
-            <div className="border border-gray-200 rounded-lg p-3 text-center bg-white" data-testid="card-stats-time">
-              <h3 className="text-lg md:text-xl font-bold text-foreground">2.5h</h3>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Por dia</p>
+            <div className="relative bg-gradient-to-br from-white to-gray-50 border border-gray-100 rounded-xl p-3 text-center shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 group overflow-hidden" data-testid="card-stats-time">
+              <div className="absolute top-1 right-1">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                  <Timer className="w-3 h-3 text-white" />
+                </div>
+              </div>
+              <h3 className="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">2.5h</h3>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 font-medium">Por dia</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-50/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
             </div>
-            <div className="border border-gray-200 rounded-lg p-3 text-center bg-white" data-testid="card-stats-users">
-              <h3 className="text-lg md:text-xl font-bold text-foreground">50k+</h3>
-              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">Usuários</p>
+            <div className="relative bg-gradient-to-br from-white to-gray-50 border border-gray-100 rounded-xl p-3 text-center shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 group overflow-hidden" data-testid="card-stats-users">
+              <div className="absolute top-1 right-1">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                  <Users className="w-3 h-3 text-white" />
+                </div>
+              </div>
+              <h3 className="text-lg md:text-xl font-bold bg-gradient-to-r from-purple-600 to-purple-500 bg-clip-text text-transparent">50k+</h3>
+              <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 font-medium">Usuários</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-50/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
             </div>
           </div>
         </div>
