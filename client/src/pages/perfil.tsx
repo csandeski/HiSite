@@ -534,56 +534,56 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Premium Upgrade Modal */}
       <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="sm:max-w-sm w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full bg-white rounded-2xl mx-auto">
           <DialogHeader>
-            <div className="flex flex-col items-center text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Crown className="w-9 h-9 text-white" />
+            <div className="flex flex-col items-center text-center space-y-2">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <Crown className="w-8 h-8 text-white" />
               </div>
-              <DialogTitle className="text-2xl font-bold text-gray-900">Upgrade Premium</DialogTitle>
-              <p className="text-gray-600 text-sm">Multiplique seus ganhos por 10x</p>
+              <DialogTitle className="text-xl font-bold text-gray-900">Upgrade Premium</DialogTitle>
+              <p className="text-gray-600 text-xs">Multiplique seus ganhos por 10x</p>
             </div>
           </DialogHeader>
           
-          <div className="space-y-4 pt-2">
+          <div className="space-y-3 pt-1">
             {/* Price Box */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3">
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-1">
+                <div className="text-2xl font-bold text-purple-600">
                   R$ 27,00
                 </div>
-                <p className="text-xs text-purple-600">
+                <p className="text-[10px] text-purple-600">
                   Pagamento único • Acesso vitalício
                 </p>
               </div>
             </div>
             
             {/* Benefits List */}
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3 h-3 text-white" />
+            <div className="space-y-2">
+              <div className="flex items-start gap-2.5">
+                <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-2.5 h-2.5 text-white" />
                 </div>
-                <span className="text-sm text-gray-700">Ganhe 10x mais pontos por minuto</span>
+                <span className="text-xs text-gray-700">Ganhe 10x mais pontos por minuto</span>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3 h-3 text-white" />
+              <div className="flex items-start gap-2.5">
+                <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-2.5 h-2.5 text-white" />
                 </div>
-                <span className="text-sm text-gray-700">Acesso a rádios exclusivas premium</span>
+                <span className="text-xs text-gray-700">Acesso a rádios exclusivas premium</span>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3 h-3 text-white" />
+              <div className="flex items-start gap-2.5">
+                <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-2.5 h-2.5 text-white" />
                 </div>
-                <span className="text-sm text-gray-700">Suporte prioritário 24/7</span>
+                <span className="text-xs text-gray-700">Suporte prioritário 24/7</span>
               </div>
             </div>
             
             {/* Action Buttons */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-2 pt-2">
               <Button
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 font-semibold py-6 text-base"
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 font-semibold py-5 text-sm"
                 onClick={() => {
                   // Handle premium activation
                   console.log('Activating premium...');
@@ -591,12 +591,12 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                 }}
                 data-testid="button-confirm-premium"
               >
-                <Crown className="w-5 h-5 mr-2" />
+                <Crown className="w-4 h-4 mr-2" />
                 Ativar Premium - R$ 27,00
               </Button>
               <Button
                 variant="ghost"
-                className="w-full text-gray-600 hover:text-gray-800"
+                className="w-full text-gray-600 hover:text-gray-800 text-sm py-4"
                 onClick={() => setShowPremiumModal(false)}
                 data-testid="button-continue-free"
               >
@@ -605,9 +605,9 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
             </div>
             
             {/* Security Note */}
-            <div className="flex items-center justify-center gap-2 pt-2">
-              <ShieldCheck className="w-4 h-4 text-gray-400" />
-              <span className="text-xs text-gray-500">Pagamento seguro • Garantia de 7 dias</span>
+            <div className="flex items-center justify-center gap-1.5 pt-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-gray-400" />
+              <span className="text-[10px] text-gray-500">Pagamento seguro • Garantia de 7 dias</span>
             </div>
           </div>
         </DialogContent>
