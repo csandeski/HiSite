@@ -98,7 +98,7 @@ export default function MessagePaymentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90%] max-w-sm p-0 mx-auto rounded-2xl max-h-[95vh] overflow-hidden">
+      <DialogContent className="w-[90%] sm:max-w-sm p-0 mx-auto rounded-2xl max-h-[90vh] overflow-hidden">
         {/* Close button */}
         <Button
           variant="ghost"
@@ -111,7 +111,7 @@ export default function MessagePaymentModal({
         </Button>
 
         {/* Scrollable content wrapper */}
-        <div className="max-h-[95vh] overflow-y-auto">
+        <div className="max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {/* Header with gradient */}
           <div className="bg-gradient-to-r from-green-500 to-green-600 px-4 py-3 sticky top-0 z-10">
             <div className="flex items-center gap-2.5 text-white">
@@ -204,21 +204,6 @@ export default function MessagePaymentModal({
               </div>
             </div>
 
-            {/* Instructions - Compact */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5">
-              <div className="flex items-start gap-2">
-                <Info className="w-3.5 h-3.5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="space-y-1">
-                  <p className="text-[11px] font-medium text-blue-900">Como pagar:</p>
-                  <ol className="text-[10px] text-blue-700 space-y-0.5 list-decimal list-inside">
-                    <li>Abra o app do seu banco</li>
-                    <li>Escolha pagar com Pix</li>
-                    <li>Escaneie o QR Code ou copie o código</li>
-                    <li>Confirme o pagamento</li>
-                  </ol>
-                </div>
-              </div>
-            </div>
 
             {/* Pix Code Copy Section - Compact */}
             <div className="bg-white border border-gray-200 rounded-lg p-2.5">
@@ -269,6 +254,16 @@ export default function MessagePaymentModal({
                 Após o pagamento, seu alô será enviado automaticamente
               </p>
             </div>
+
+            {/* Cancel Button */}
+            <Button
+              onClick={() => onOpenChange(false)}
+              variant="outline"
+              className="w-full py-3 border-gray-300 hover:bg-gray-50 text-gray-700 font-medium"
+              data-testid="cancel-payment-button"
+            >
+              Cancelar
+            </Button>
           </div>
         </div>
       </DialogContent>
