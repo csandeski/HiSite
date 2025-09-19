@@ -180,8 +180,8 @@ export default function Resgatar({ balance, sessionPoints }: ResgatarProps) {
                   key={index}
                   className={`p-3 sm:p-4 transition-all ${
                     hasEnoughPoints 
-                      ? 'border-primary shadow-sm' 
-                      : 'border-gray-200 opacity-90'
+                      ? 'border-primary shadow-md hover:shadow-lg' 
+                      : 'border-gray-200 opacity-50'
                   }`}
                   data-testid={`exchange-option-${option.points}`}
                 >
