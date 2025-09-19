@@ -45,9 +45,9 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8 max-w-lg">
           {/* Success Badge */}
           <div className="flex justify-center mb-6">
-            <div className="bg-green-100 text-green-700 rounded-full px-4 py-2 inline-flex items-center gap-2 text-sm">
-              <TrendingUp className="w-4 h-4" />
-              <span data-testid="text-user-count">
+            <div className="bg-green-100 text-green-700 rounded-full px-4 py-2 inline-flex items-center gap-2 text-xs sm:text-sm whitespace-nowrap">
+              <TrendingUp className="w-4 h-4 flex-shrink-0" />
+              <span data-testid="text-user-count" className="whitespace-nowrap">
                 Mais de 50.000 usuários já estão ganhando
               </span>
             </div>
