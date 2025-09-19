@@ -36,7 +36,7 @@ export const radios = [
     description: "Esportes e música",
     pointsPerMin: 45,
     isPremium: false,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://www.appradio.app:8105/live",
   },
   {
     id: 3,
@@ -44,7 +44,7 @@ export const radios = [
     description: "Hits e esportes",
     pointsPerMin: 60,
     isPremium: false,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://wz7.servidoresbrasil.com:8162/stream",
   },
   {
     id: 4,
