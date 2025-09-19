@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, TrendingUp, LogIn, UserPlus } from "lucide-react";
+import { Zap, TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign } from "lucide-react";
 
 export default function Home() {
   const handleButtonClick = (action: string) => {
@@ -107,6 +107,50 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      {/* Como Funciona Section */}
+      <section className="w-full py-12 bg-white">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10" data-testid="section-title-how">
+            Como Funciona
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Step 1 */}
+            <div className="bg-gray-50 rounded-xl p-6" data-testid="step-1">
+              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mx-auto mb-4">
+                <Headphones className="w-8 h-8 text-cyan-600" />
+              </div>
+              <h3 className="text-lg font-bold text-center mb-3">1. Escolha sua Rádio</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                Selecione entre centenas de rádios disponíveis: esportes, notícias, música e muito mais.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-gray-50 rounded-xl p-6" data-testid="step-2">
+              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mx-auto mb-4">
+                <Radio className="w-8 h-8 text-cyan-600" />
+              </div>
+              <h3 className="text-lg font-bold text-center mb-3">2. Ouça e Acumule</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                A cada minuto ouvindo, você ganha pontos automaticamente. Quanto mais ouve, mais ganha!
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-gray-50 rounded-xl p-6" data-testid="step-3">
+              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="w-8 h-8 text-cyan-600" />
+              </div>
+              <h3 className="text-lg font-bold text-center mb-3">3. Converta em Dinheiro</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                Troque seus pontos por dinheiro real via PIX. Saques a partir de R$ 10,00.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
