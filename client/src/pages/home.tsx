@@ -199,72 +199,121 @@ export default function Home() {
       </section>
 
       {/* Por que escolher Section */}
-      <section className="w-full py-16 bg-white">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" data-testid="section-title-why">
-            Por que escolher o RádioPlay?
-          </h2>
+      <section className="w-full py-20 bg-gradient-to-b from-white via-gray-50 to-white">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="section-title-why">
+              Por que escolher o RádioPlay?
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Descubra os benefícios que fazem do RádioPlay a melhor escolha para ganhar dinheiro ouvindo rádio
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {/* Ganhos Automáticos */}
-            <div className="flex gap-4 p-4 md:p-6" data-testid="benefit-automatic">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-100 flex items-center justify-center">
-                  <Clock className="w-6 h-6 md:w-7 md:h-7 text-green-600" />
+            <div className="group bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-green-200" data-testid="benefit-automatic">
+              <div className="flex gap-5">
+                <div className="flex-shrink-0">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Clock className="w-7 h-7 md:w-8 md:h-8 text-green-600" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="font-bold text-base md:text-lg mb-2">Ganhos Automáticos</h3>
-                <p className="text-sm text-muted-foreground">
-                  Seus pontos são creditados automaticamente enquanto você ouve suas rádios favoritas.
-                </p>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg md:text-xl mb-2 text-gray-900">Ganhos Automáticos</h3>
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                    Seus pontos são creditados automaticamente enquanto você ouve suas rádios favoritas. Sem complicações!
+                  </p>
+                  <div className="mt-4 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-600 font-medium">Funcionando 24/7</span>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Comunidade Ativa */}
-            <div className="flex gap-4 p-4 md:p-6" data-testid="benefit-community">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Users className="w-6 h-6 md:w-7 md:h-7 text-blue-600" />
+            <div className="group bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200" data-testid="benefit-community">
+              <div className="flex gap-5">
+                <div className="flex-shrink-0">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Users className="w-7 h-7 md:w-8 md:h-8 text-blue-600" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="font-bold text-base md:text-lg mb-2">Comunidade Ativa</h3>
-                <p className="text-sm text-muted-foreground">
-                  Mais de 50.000 usuários já fazem parte da nossa comunidade de ouvintes.
-                </p>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg md:text-xl mb-2 text-gray-900">Comunidade Ativa</h3>
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                    Mais de 50.000 usuários já fazem parte da nossa comunidade de ouvintes ativos e engajados.
+                  </p>
+                  <div className="mt-4 flex -space-x-2">
+                    <div className="w-7 h-7 bg-blue-200 rounded-full border-2 border-white"></div>
+                    <div className="w-7 h-7 bg-indigo-200 rounded-full border-2 border-white"></div>
+                    <div className="w-7 h-7 bg-purple-200 rounded-full border-2 border-white"></div>
+                    <div className="w-7 h-7 bg-pink-200 rounded-full border-2 border-white flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-gray-700">+50k</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Sistema de Conquistas */}
-            <div className="flex gap-4 p-4 md:p-6" data-testid="benefit-achievements">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Star className="w-6 h-6 md:w-7 md:h-7 text-purple-600" />
+            <div className="group bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-purple-200" data-testid="benefit-achievements">
+              <div className="flex gap-5">
+                <div className="flex-shrink-0">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Star className="w-7 h-7 md:w-8 md:h-8 text-purple-600" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="font-bold text-base md:text-lg mb-2">Sistema de Conquistas</h3>
-                <p className="text-sm text-muted-foreground">
-                  Desbloqueie conquistas e ganhe bônus extras conforme você progride.
-                </p>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg md:text-xl mb-2 text-gray-900">Sistema de Conquistas</h3>
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                    Desbloqueie conquistas e ganhe bônus extras conforme você progride em sua jornada.
+                  </p>
+                  <div className="mt-4 flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <Star className="w-4 h-4 text-gray-300" />
+                    <Star className="w-4 h-4 text-gray-300" />
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Saques Rápidos */}
-            <div className="flex gap-4 p-4 md:p-6" data-testid="benefit-withdrawals">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-100 flex items-center justify-center">
-                  <Banknote className="w-6 h-6 md:w-7 md:h-7 text-green-600" />
+            <div className="group bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-emerald-200" data-testid="benefit-withdrawals">
+              <div className="flex gap-5">
+                <div className="flex-shrink-0">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <Banknote className="w-7 h-7 md:w-8 md:h-8 text-emerald-600" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg md:text-xl mb-2 text-gray-900">Saques Rápidos</h3>
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                    Receba seus ganhos via PIX em até 24 horas após solicitar o saque. Simples e rápido!
+                  </p>
+                  <div className="mt-4 flex items-center gap-3">
+                    <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">PIX</span>
+                    <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">24h</span>
+                    <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">R$ 10+</span>
+                  </div>
                 </div>
               </div>
-              <div>
-                <h3 className="font-bold text-base md:text-lg mb-2">Saques Rápidos</h3>
-                <p className="text-sm text-muted-foreground">
-                  Receba seus ganhos via PIX em até 24 horas após solicitar o saque.
-                </p>
-              </div>
             </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-4">Junte-se a milhares de pessoas que já estão ganhando!</p>
+            <Button 
+              size="lg"
+              className="bg-gradient-to-r from-primary to-cyan-500 text-white hover:opacity-90 font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+              onClick={() => console.log('start-now')}
+            >
+              Começar Agora Mesmo
+            </Button>
           </div>
         </div>
       </section>
