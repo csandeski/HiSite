@@ -126,23 +126,23 @@ export default function Dashboard() {
           
           {/* Session Points Card */}
           <Card 
-            className="bg-gradient-to-r from-primary to-blue-500 text-white p-6 mb-6 border-0 shadow-lg"
+            className="bg-gradient-to-r from-primary to-blue-500 text-white p-5 mb-5 border-0"
             data-testid="session-points-card"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/90 text-sm md:text-base mb-1">
+                <p className="text-white/90 text-sm mb-1">
                   Pontos desta sessão
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl md:text-4xl font-bold">
+                  <span className="text-2xl font-bold">
                     +{sessionPoints}
                   </span>
-                  <span className="text-lg md:text-xl opacity-90">pts</span>
+                  <span className="text-base opacity-90">pts</span>
                 </div>
               </div>
-              <div className="bg-white/20 p-3 rounded-full">
-                <TrendingUp className="w-8 h-8 md:w-10 md:h-10 text-white" />
+              <div className="bg-white/20 p-2.5 rounded-full">
+                <TrendingUp className="w-6 h-6 text-white" />
               </div>
             </div>
           </Card>
@@ -153,53 +153,46 @@ export default function Dashboard() {
             {radios.map((radio) => (
               <Card
                 key={radio.id}
-                className={`p-4 border-2 ${
+                className={`p-4 border ${
                   radio.isPremium 
-                    ? "bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 hover:border-yellow-300" 
+                    ? "bg-gray-50/50 border-gray-200" 
                     : playingRadioId === radio.id
-                      ? "bg-gradient-to-br from-blue-50 to-primary/10 border-primary shadow-lg"
-                      : "bg-white hover:shadow-lg hover:border-primary/30 border-gray-100"
-                } transition-all duration-300 cursor-pointer group`}
+                      ? "bg-white border-primary shadow-md"
+                      : "bg-white hover:shadow-md border-gray-200"
+                } transition-all duration-200 cursor-pointer`}
                 data-testid={`radio-card-${radio.id}`}
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
-                    <div className={`p-2.5 rounded-lg ${
-                      radio.isPremium 
-                        ? "bg-gradient-to-br from-yellow-200 to-amber-200" 
-                        : "bg-gradient-to-br from-blue-100 to-primary/20"
+                    <div className={`p-2 rounded-full ${
+                      playingRadioId === radio.id
+                        ? "bg-primary/10"
+                        : "bg-gray-50"
                     }`}>
                       <Headphones className={`w-5 h-5 ${
-                        radio.isPremium ? "text-yellow-700" : "text-primary"
+                        playingRadioId === radio.id ? "text-primary" : "text-gray-500"
                       }`} />
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-base md:text-lg text-gray-900">
-                          {radio.name}
-                        </h3>
-                        {radio.isPremium && (
-                          <div className="flex items-center gap-1 bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
-                            <Star className="w-3 h-3" />
-                            Premium
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500 mb-2">
+                      <h3 className="font-semibold text-gray-900">
+                        {radio.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-0.5">
                         {radio.description}
                       </p>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 mt-2">
                         <span 
-                          className={`font-bold text-sm px-2 py-1 rounded-md ${
-                            radio.isPremium 
-                              ? "bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700" 
-                              : "bg-gradient-to-r from-green-50 to-emerald-50 text-green-700"
-                          }`}
+                          className="text-green-600 text-sm font-medium"
                           data-testid={`points-per-min-${radio.id}`}
                         >
                           +{radio.pointsPerMin} pts/min
                         </span>
+                        {radio.isPremium && (
+                          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">
+                            Premium
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -209,9 +202,11 @@ export default function Dashboard() {
                     variant={radio.isPremium ? "ghost" : "default"}
                     className={`${
                       radio.isPremium 
-                        ? "bg-gradient-to-br from-gray-200 to-gray-300 text-gray-500 hover:from-gray-300 hover:to-gray-400" 
-                        : "bg-gradient-to-r from-primary to-blue-500 text-white hover:shadow-lg hover:scale-105"
-                    } w-12 h-12 md:w-14 md:h-14 rounded-full transition-all duration-300 shadow-md`}
+                        ? "bg-gray-100 text-gray-400" 
+                        : playingRadioId === radio.id
+                          ? "bg-primary text-white"
+                          : "bg-primary text-white hover:bg-primary/90"
+                    } w-10 h-10 rounded-full transition-all duration-200`}
                     data-testid={`play-button-${radio.id}`}
                     aria-label={`Play ${radio.name}`}
                     onClick={(e) => {
@@ -220,11 +215,11 @@ export default function Dashboard() {
                     }}
                   >
                     {radio.isPremium ? (
-                      <Lock className="w-5 h-5 md:w-6 md:h-6" />
+                      <Lock className="w-4 h-4" />
                     ) : playingRadioId === radio.id ? (
-                      <Pause className="w-5 h-5 md:w-6 md:h-6" />
+                      <Pause className="w-4 h-4" />
                     ) : (
-                      <Play className="w-5 h-5 md:w-6 md:h-6 ml-0.5" />
+                      <Play className="w-4 h-4 ml-0.5" />
                     )}
                   </Button>
                 </div>
@@ -277,19 +272,19 @@ export default function Dashboard() {
       {/* Card de Pontos flutuante quando tocando */}
       {playingRadio && (
         <div className="fixed top-20 left-4 right-4 z-30 max-w-sm mx-auto">
-          <Card className="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-3 shadow-xl">
+          <Card className="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-3 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-white/90">Pontos desta sessão</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">+{sessionPoints}</span>
+                  <span className="text-xl font-bold">+{sessionPoints}</span>
                   <span className="text-sm opacity-90">pts</span>
                 </div>
               </div>
               <div className="text-right">
-                <TrendingUp className="w-5 h-5 mb-1" />
+                <TrendingUp className="w-4 h-4 mb-1" />
                 <p className="text-xs text-white/80">
-                  Ganhando pontos ao vivo • {playingRadio.name}
+                  Ganhando ao vivo • {playingRadio.name}
                 </p>
               </div>
             </div>
