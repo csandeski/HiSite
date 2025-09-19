@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useLocation } from "wouter";
 
 // Login form schema
 const loginSchema = z.object({
@@ -30,6 +31,7 @@ export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [, setLocation] = useLocation();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -49,7 +51,6 @@ export default function Home() {
   });
 
   const handleButtonClick = (action: string) => {
-    console.log(`Button clicked: ${action}`);
     switch (action) {
       case 'login':
       case 'already-account':
@@ -63,17 +64,19 @@ export default function Home() {
   };
 
   const onLoginSubmit = (data: LoginFormValues) => {
-    console.log('Login data:', data);
     // Here you would typically make an API call to authenticate
     setLoginOpen(false);
     loginForm.reset();
+    // Redirect to dashboard after successful login
+    setLocation('/dashboard');
   };
 
   const onRegisterSubmit = (data: RegisterFormValues) => {
-    console.log('Register data:', data);
     // Here you would typically make an API call to create account
     setRegisterOpen(false);
     registerForm.reset();
+    // Redirect to dashboard after successful registration
+    setLocation('/dashboard');
   };
 
   return (
