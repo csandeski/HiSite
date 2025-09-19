@@ -65,13 +65,16 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
               <img 
                 src={logoUrl} 
                 alt="RádioPlay" 
                 className="h-8 md:h-10 w-auto object-contain" 
                 data-testid="dashboard-logo"
               />
+              <span className="text-sm text-gray-600">
+                Seja bem-vindo, Usuário
+              </span>
             </div>
 
             {/* Balance and Settings */}
