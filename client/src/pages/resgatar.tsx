@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ConversionModal from '@/components/ConversionModal';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +52,8 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   });
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [selectedExchange, setSelectedExchange] = useState<{points: number, value: number} | null>(null);
+  const [showConversionModal, setShowConversionModal] = useState(false);
+  const [conversionData, setConversionData] = useState<{points: number, value: number} | null>(null);
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
 
@@ -86,11 +89,20 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
   const confirmExchange = () => {
     if (selectedExchange) {
-      // Deduct points and add to balance
-      setSessionPoints((prev: number) => prev - selectedExchange.points);
-      setBalance(prev => prev + selectedExchange.value);
+      // Show conversion modal
+      setConversionData(selectedExchange);
       setShowConfirmationModal(false);
+      setShowConversionModal(true);
+    }
+  };
+  
+  const handleConversionSuccess = () => {
+    if (conversionData) {
+      // Deduct points and add to balance
+      setSessionPoints((prev: number) => prev - conversionData.points);
+      setBalance(prev => prev + conversionData.value);
       setSelectedExchange(null);
+      setConversionData(null);
     }
   };
 
@@ -562,6 +574,15 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Conversion Processing Modal */}
+      <ConversionModal
+        open={showConversionModal}
+        onOpenChange={setShowConversionModal}
+        points={conversionData?.points || 0}
+        value={conversionData?.value || 0}
+        onSuccess={handleConversionSuccess}
+      />
     </div>
   );
 }
