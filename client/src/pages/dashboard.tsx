@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
+import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import { radios } from "../App";
 
 interface DashboardProps {
@@ -152,9 +153,18 @@ export default function Dashboard({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h3 className={`font-semibold ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
-                      {radio.name}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      {radio.id === 1 && (
+                        <img 
+                          src={jovemPanLogo} 
+                          alt="Jovem Pan Sports" 
+                          className="w-8 h-8 object-contain"
+                        />
+                      )}
+                      <h3 className={`font-semibold ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
+                        {radio.name}
+                      </h3>
+                    </div>
                     <p className={`text-sm mt-0.5 ${radio.isPremium ? "text-gray-400" : "text-gray-500"}`}>
                       {radio.description}
                     </p>
