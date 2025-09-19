@@ -213,80 +213,120 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             </div>
           </div>
 
-          {/* Exchange Options Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          {/* Exchange Options Grid - Redesenhado */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             {filteredOptions.map((option, index) => {
               const percentage = Math.min((sessionPoints / option.points) * 100, 100);
               const missingPoints = Math.max(option.points - sessionPoints, 0);
-              const missingPercentage = Math.round(((option.points - sessionPoints) / option.points) * 100);
               const hasEnoughPoints = sessionPoints >= option.points;
               
               return (
                 <Card 
                   key={index}
-                  className={`p-4 transition-all ${
+                  className={`relative overflow-hidden transition-all ${
                     hasEnoughPoints 
-                      ? 'border-2 border-primary shadow-lg hover:shadow-xl bg-gradient-to-br from-white to-blue-50/30' 
-                      : 'border border-gray-200 opacity-60'
+                      ? 'shadow-lg hover:shadow-xl hover:scale-[1.02]' 
+                      : 'opacity-75'
                   }`}
                   data-testid={`exchange-option-${option.points}`}
                 >
-                  {/* Badge */}
-                  {option.badge && (
-                    <Badge 
-                      variant="default" 
-                      className="mb-3 text-sm bg-gradient-to-r from-primary/20 to-blue-500/20 text-primary border border-primary/30 font-semibold px-3 py-1"
+                  {/* Background Pattern */}
+                  <div className="absolute inset-0 opacity-5">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary to-blue-600"></div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="relative p-5">
+                    {/* Header with Badge */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Coins className={`w-5 h-5 ${hasEnoughPoints ? 'text-primary' : 'text-gray-400'}`} />
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {option.points} pontos
+                          </h3>
+                        </div>
+                        {option.badge && (
+                          <Badge 
+                            variant="secondary" 
+                            className="text-[10px] bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-200 font-medium px-2 py-0.5"
+                          >
+                            {option.badge}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">Você recebe</p>
+                        <p className="text-2xl font-bold text-green-600">
+                          R$ {option.value.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Conversion Rate */}
+                    <div className="bg-gray-50 rounded-lg px-3 py-2 mb-4">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600">Taxa de conversão</span>
+                        <span className="font-semibold text-gray-900">{option.conversionRate}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Progress Section */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600">
+                          {hasEnoughPoints ? 'Disponível para troca' : `Progresso: ${Math.round(percentage)}%`}
+                        </span>
+                        {!hasEnoughPoints && (
+                          <span className="font-medium text-gray-700">
+                            Faltam {missingPoints} pts
+                          </span>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                          <div 
+                            className={`h-2 rounded-full transition-all ${
+                              hasEnoughPoints 
+                                ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
+                                : 'bg-gradient-to-r from-gray-300 to-gray-400'
+                            }`}
+                            style={{width: `${percentage}%`}}
+                          ></div>
+                        </div>
+                        {hasEnoughPoints && (
+                          <div className="absolute -right-1 -top-1">
+                            <CheckCircle className="w-4 h-4 text-green-500 bg-white rounded-full" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Action Button */}
+                    <Button
+                      variant={hasEnoughPoints ? "default" : "secondary"}
+                      className={`w-full font-semibold transition-all ${
+                        hasEnoughPoints 
+                          ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white shadow-md py-5' 
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed py-5'
+                      }`}
+                      disabled={!hasEnoughPoints}
+                      onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
+                      data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
                     >
-                      {option.badge}
-                    </Badge>
-                  )}
-                  
-                  {/* Points and Value */}
-                  <div className="space-y-2 mb-4">
-                    <div className="text-xl font-bold text-gray-900">
-                      {option.points} pontos
-                    </div>
-                    <div className="text-lg font-semibold text-green-600">
-                      R$ {option.value.toFixed(2)}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {option.conversionRate}
-                    </div>
+                      {hasEnoughPoints ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Converter em Dinheiro
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="w-4 h-4 mr-2" />
+                          Bloqueado
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="mb-4">
-                    <Progress 
-                      value={percentage} 
-                      className="h-2.5"
-                    />
-                    {!hasEnoughPoints && (
-                      <p className="text-sm text-gray-500 mt-1.5">
-                        Faltam {missingPoints} pts ({missingPercentage}%)
-                      </p>
-                    )}
-                  </div>
-                  
-                  {/* Action Button */}
-                  <Button
-                    variant={hasEnoughPoints ? "default" : "outline"}
-                    className={hasEnoughPoints ? "w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white font-semibold py-5" : "w-full py-5"}
-                    disabled={!hasEnoughPoints}
-                    onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
-                    data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
-                  >
-                    {hasEnoughPoints ? (
-                      <>
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Trocar Agora
-                      </>
-                    ) : (
-                      <>
-                        <Clock className="w-4 h-4 mr-2" />
-                        Indisponível
-                      </>
-                    )}
-                  </Button>
                 </Card>
               );
             })}
