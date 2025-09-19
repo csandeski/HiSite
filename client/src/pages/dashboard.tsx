@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User } from "lucide-react";
@@ -18,7 +17,7 @@ interface DashboardProps {
   setBalance: (balance: number) => void;
 }
 
-const Dashboard = memo(function Dashboard({
+export default function Dashboard({
   playingRadioId,
   setPlayingRadioId,
   isPlaying,
@@ -207,6 +206,4 @@ const Dashboard = memo(function Dashboard({
       </main>
     </div>
   );
-});
-
-export default Dashboard;
+}

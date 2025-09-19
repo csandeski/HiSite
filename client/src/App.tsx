@@ -220,18 +220,6 @@ function App() {
     setShowPremiumPopup: handlePremiumPopupClose
   };
 
-  // Memoized wrapper components to prevent re-creation on every render
-  // Not including sessionPoints in dependencies to avoid re-creation when points update
-  const Dashboard = useMemo(
-    () => () => <DashboardComp {...playerProps} />,
-    [playingRadioId, isPlaying, volume, balance, showPremiumPopup]
-  );
-  
-  const ResgatarWrapper = useMemo(
-    () => () => <Resgatar {...playerProps} />,
-    [playingRadioId, isPlaying, volume, balance, showPremiumPopup]
-  );
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -253,8 +241,12 @@ function App() {
           <div className="min-h-screen flex flex-col">
             <Switch>
               <Route path="/" component={Home} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/resgatar" component={ResgatarWrapper} />
+              <Route path="/dashboard">
+                <DashboardComp {...playerProps} />
+              </Route>
+              <Route path="/resgatar">
+                <Resgatar {...playerProps} />
+              </Route>
               <Route component={NotFound} />
             </Switch>
             

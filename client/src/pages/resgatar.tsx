@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,13 +39,32 @@ interface ResgatarProps {
   setBalance: (balance: number) => void;
 }
 
-const Resgatar = memo(function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
+export default function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
-  const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
+  const [showOnlyAvailable, setShowOnlyAvailable] = useState(() => {
+    const saved = localStorage.getItem('resgatar-showOnlyAvailable');
+    return saved === 'true';
+  });
+  const [accordionValue, setAccordionValue] = useState<string | undefined>(() => {
+    const saved = localStorage.getItem('resgatar-accordionValue');
+    return saved || undefined;
+  });
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [selectedExchange, setSelectedExchange] = useState<{points: number, value: number} | null>(null);
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
+
+  // Save checkbox state to localStorage whenever it changes
+  const handleShowOnlyAvailableChange = (checked: boolean) => {
+    setShowOnlyAvailable(checked);
+    localStorage.setItem('resgatar-showOnlyAvailable', checked.toString());
+  };
+
+  // Save accordion state to localStorage whenever it changes
+  const handleAccordionChange = (value: string) => {
+    setAccordionValue(value);
+    localStorage.setItem('resgatar-accordionValue', value || '');
+  };
 
   const handleWithdraw = () => {
     if (balance < minimumWithdrawal) {
@@ -191,7 +210,7 @@ const Resgatar = memo(function Resgatar({ balance, sessionPoints, setSessionPoin
               <Switch
                 id="filter-available"
                 checked={showOnlyAvailable}
-                onCheckedChange={setShowOnlyAvailable}
+                onCheckedChange={handleShowOnlyAvailableChange}
                 data-testid="filter-toggle"
               />
               <Label htmlFor="filter-available" className="text-sm text-gray-600">
@@ -304,7 +323,7 @@ const Resgatar = memo(function Resgatar({ balance, sessionPoints, setSessionPoin
           </div>
 
           {/* Como Funciona Accordion */}
-          <Accordion type="single" collapsible className="mb-6">
+          <Accordion type="single" collapsible className="mb-6" value={accordionValue} onValueChange={handleAccordionChange}>
             <AccordionItem value="how-it-works" className="border rounded-lg px-3">
               <AccordionTrigger className="hover:no-underline">
                 <span className="font-semibold text-gray-900">Como funciona?</span>
@@ -489,6 +508,4 @@ const Resgatar = memo(function Resgatar({ balance, sessionPoints, setSessionPoin
       </Dialog>
     </div>
   );
-});
-
-export default Resgatar;
+}
