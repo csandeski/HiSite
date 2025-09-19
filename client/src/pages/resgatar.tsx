@@ -296,7 +296,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                 <Clock className="w-4 h-4 text-green-600 mt-0.5" />
                 <div>
                   <p className="text-xs font-semibold text-green-900">Prazo PIX</p>
-                  <p className="text-sm text-green-700">Até 24 horas</p>
+                  <p className="text-sm text-green-700">Imediato</p>
                 </div>
               </div>
             </Card>
@@ -320,7 +320,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                    <p>Receba via PIX em até 24h</p>
+                    <p>Receba via PIX imediato</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
