@@ -1,6 +1,6 @@
 # Overview
 
-This is a full-stack web application built with React and Express.js using TypeScript. The application follows a monorepo structure with separate client and server directories, featuring a modern UI built with shadcn/ui components and a RESTful API backend. The project is configured for PostgreSQL database integration using Drizzle ORM and includes comprehensive tooling for development and deployment.
+RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
 # User Preferences
 
