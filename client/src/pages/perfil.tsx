@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
+import PixPaymentModal from '@/components/PixPaymentModal';
 
 interface PerfilProps {
   userName?: string;
@@ -36,6 +37,7 @@ interface PerfilProps {
 export default function Perfil({ userName, sessionPoints, balance }: PerfilProps) {
   const [, setLocation] = useLocation();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showPixModal, setShowPixModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showFAQModal, setShowFAQModal] = useState(false);
@@ -581,9 +583,9 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
               <Button
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 font-semibold py-5 text-sm"
                 onClick={() => {
-                  // Handle premium activation
-                  console.log('Activating premium...');
+                  // Open Pix payment modal
                   setShowPremiumModal(false);
+                  setShowPixModal(true);
                 }}
                 data-testid="button-confirm-premium"
               >
@@ -608,6 +610,12 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Pix Payment Modal */}
+      <PixPaymentModal 
+        open={showPixModal} 
+        onOpenChange={setShowPixModal}
+      />
     </div>
   );
 }
