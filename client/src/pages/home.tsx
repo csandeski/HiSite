@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, TrendingUp } from "lucide-react";
+import { Zap, TrendingUp, LogIn, UserPlus } from "lucide-react";
 
 export default function Home() {
   const handleButtonClick = (action: string) => {
@@ -11,7 +11,7 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="w-full bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="w-6 h-6 text-primary" />
@@ -19,20 +19,22 @@ export default function Home() {
                 RadioEarn
               </span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Button 
                 variant="ghost" 
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-3 py-2 h-auto"
                 data-testid="button-login"
                 onClick={() => handleButtonClick('login')}
               >
+                <LogIn className="w-4 h-4" />
                 Entrar
               </Button>
               <Button 
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 px-4 py-2 h-auto"
                 data-testid="button-register"
                 onClick={() => handleButtonClick('register')}
               >
+                <UserPlus className="w-4 h-4" />
                 Cadastrar
               </Button>
             </div>
