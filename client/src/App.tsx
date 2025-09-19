@@ -162,7 +162,7 @@ function App() {
       intervalRef.current = setInterval(() => {
         setShowPremiumPopup(true);
         setLastPopupTime(Date.now());
-      }, 15000); // 15 seconds
+      }, 50000); // 50 seconds
 
       return () => {
         if (intervalRef.current) {
