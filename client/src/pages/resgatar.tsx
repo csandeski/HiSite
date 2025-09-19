@@ -20,8 +20,9 @@ import {
   CheckCircle,
   Clock,
   PiggyBank,
-  Link2,
-  ArrowRight
+  RefreshCw,
+  ArrowRight,
+  TrendingUp
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
@@ -388,54 +389,95 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
       {/* Confirmation Modal */}
       <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-md w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full p-0 overflow-hidden mx-auto rounded-lg">
+          {/* Close button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-2 z-10 rounded-full w-8 h-8 hover:bg-gray-100"
+            onClick={() => setShowConfirmationModal(false)}
+            data-testid="close-conversion-modal"
+          >
+            <AlertCircle className="w-4 h-4 sr-only" />
+            <span className="sr-only">Fechar</span>
+          </Button>
+
+          <div className="p-4 sm:p-6 space-y-4">
+            {/* Header with Icon */}
             <div className="flex flex-col items-center text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center">
-                <Link2 className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-lg">
+                <RefreshCw className="w-8 h-8 text-white" />
               </div>
-              <DialogTitle className="text-xl font-bold">Confirmar Conversão</DialogTitle>
-            </div>
-          </DialogHeader>
-          
-          <div className="space-y-4 pt-2">
-            <p className="text-center text-gray-700">
-              Você está prestes a converter seus pontos em dinheiro real!
-            </p>
-
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-700">Pontos a converter:</span>
-                <span className="font-bold text-gray-900">{selectedExchange?.points} pts</span>
-              </div>
-              <div className="flex justify-center">
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-700">Valor em dinheiro:</span>
-                <span className="font-bold text-green-600 text-lg">R$ {selectedExchange?.value.toFixed(2)}</span>
-              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                Confirmar Conversão
+              </h2>
+              <p className="text-sm text-gray-600">
+                Você está prestes a converter seus pontos em dinheiro real!
+              </p>
             </div>
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start gap-2">
-              <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm">
-                <span className="font-semibold text-yellow-800">Atenção:</span>
-                <span className="text-yellow-700"> Esta ação não pode ser desfeita. Os pontos serão removidos da sua conta e o valor será adicionado à sua carteira.</span>
+            {/* Conversion Details */}
+            <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-4 border border-green-200">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Coins className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm text-gray-600">Pontos a converter</span>
+                  </div>
+                  <span className="text-lg font-bold text-gray-900">{selectedExchange?.points} pts</span>
+                </div>
+                
+                <div className="flex justify-center">
+                  <div className="bg-white rounded-full p-2">
+                    <ArrowRight className="w-4 h-4 text-green-600 transform rotate-90" />
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Wallet className="w-5 h-5 text-green-600" />
+                    <span className="text-sm text-gray-600">Valor em dinheiro</span>
+                  </div>
+                  <span className="text-xl font-bold text-green-600">R$ {selectedExchange?.value.toFixed(2)}</span>
+                </div>
+
+                <div className="border-t border-green-200 pt-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Taxa de conversão</span>
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3 text-green-600" />
+                      <span className="text-xs font-medium text-green-600">
+                        R$ {selectedExchange?.value && selectedExchange?.points ? 
+                          (selectedExchange.value / selectedExchange.points).toFixed(3) : '0.000'}/pt
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Warning */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+              <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="text-xs sm:text-sm">
+                <span className="font-semibold text-amber-800">Atenção:</span>
+                <span className="text-amber-700"> Esta ação não pode ser desfeita. Os pontos serão removidos da sua conta e o valor será adicionado à sua carteira.</span>
               </div>
             </div>
             
-            <div className="flex gap-3 pt-2">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Button
-                className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+                className="flex-1 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold py-5 sm:py-6"
                 onClick={confirmExchange}
                 data-testid="button-confirm-exchange"
               >
+                <CheckCircle className="w-4 h-4 mr-2" />
                 Confirmar Conversão
               </Button>
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 border-gray-300 hover:bg-gray-50 py-5 sm:py-6"
                 onClick={() => setShowConfirmationModal(false)}
                 data-testid="button-cancel-exchange"
               >
