@@ -1,17 +1,26 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Radio, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SendMessageModal from './SendMessageModal';
+import logoUrl from '@/assets/logo.png';
 
 const messages = [
   {
     id: 1,
-    text: "Quer ouvir seu nome na rádio?\nMande agora seu recado e receba um **\"Alô\" exclusivo na sua rádio favorita**!\n👉 Toque aqui e participe!"
+    icon: Radio,
+    title: "Quer ouvir seu nome na rádio?",
+    description: "Mande seu recado e receba um alô exclusivo!",
+    cta: "👉 Toque aqui e participe",
+    rating: true
   },
   {
     id: 2,
-    text: "📻 Seu recado no ar!\nPeça sua música ou mande aquele abraço na sua rádio favorita.\n👉 Clique e participe!"
+    icon: Music,
+    title: "📻 Seu recado no ar!",
+    description: "Peça sua música ou mande um abraço especial",
+    cta: "👉 Clique e participe agora",
+    rating: true
   }
 ];
 
@@ -59,23 +68,8 @@ export default function PushNotification() {
     setIsVisible(false);
   };
 
-  const formatMessage = (text: string) => {
-    // Split by ** for bold text
-    const parts = text.split(/\*\*(.*?)\*\*/g);
-    return parts.map((part, index) => {
-      if (index % 2 === 1) {
-        // Bold part
-        return <strong key={index} className="font-bold">{part}</strong>;
-      }
-      // Regular part, split by newline
-      return part.split('\n').map((line, lineIndex) => (
-        <span key={`${index}-${lineIndex}`}>
-          {line}
-          {lineIndex < part.split('\n').length - 1 && <br />}
-        </span>
-      ));
-    });
-  };
+  const currentMessage = messages[currentMessageIndex];
+  const Icon = currentMessage.icon;
 
   return (
     <>
@@ -86,36 +80,66 @@ export default function PushNotification() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 400, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 right-4 z-50 w-[calc(100%-2rem)] max-w-sm md:bottom-24 md:right-6"
+            className="fixed bottom-20 right-4 z-50 w-[calc(100%-2rem)] max-w-[320px] md:bottom-24 md:right-6"
             data-testid="push-notification"
           >
             <div
               onClick={handleClick}
-              className="relative bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl shadow-2xl p-4 cursor-pointer hover:scale-[1.02] transition-transform"
+              className="relative bg-white rounded-lg shadow-xl border border-gray-200 cursor-pointer hover:shadow-2xl transition-all overflow-hidden"
             >
+              {/* Close button */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleClose}
-                className="absolute top-2 right-2 w-7 h-7 rounded-full hover:bg-white/20 p-0"
+                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full hover:bg-gray-100 p-0 z-10"
                 data-testid="close-notification"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5 text-gray-500" />
               </Button>
               
-              <div className="pr-6">
-                <div className="text-sm leading-relaxed">
-                  {formatMessage(messages[currentMessageIndex].text)}
+              <div className="flex items-start gap-3 p-3">
+                {/* Logo/Icon Section */}
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-lg flex items-center justify-center">
+                    {currentMessageIndex === 0 ? (
+                      <img src={logoUrl} alt="RádioPlay" className="w-8 h-8 object-contain filter brightness-0 invert" />
+                    ) : (
+                      <Icon className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="flex-1 pr-4">
+                  <h3 className="text-sm font-bold text-gray-900 leading-tight mb-1">
+                    {currentMessage.title}
+                  </h3>
+                  <p className="text-xs text-gray-600 leading-normal mb-2">
+                    {currentMessage.description}
+                  </p>
+                  
+                  {/* Rating Stars */}
+                  {currentMessage.rating && (
+                    <div className="flex items-center gap-0.5 mb-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span key={star} className="text-yellow-400 text-xs">
+                          ★
+                        </span>
+                      ))}
+                      <span className="text-xs text-gray-500 ml-1">(4.9)</span>
+                    </div>
+                  )}
+                  
+                  {/* CTA Text */}
+                  <p className="text-xs font-semibold text-primary">
+                    {currentMessage.cta}
+                  </p>
                 </div>
               </div>
 
-              {/* Pulse animation indicator */}
-              <div className="absolute -top-1 -right-1">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
-                </span>
-              </div>
+              {/* Bottom accent line */}
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-blue-600"></div>
             </div>
           </motion.div>
         )}
