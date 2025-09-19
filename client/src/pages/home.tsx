@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign, Clock, Users, Star, Banknote } from "lucide-react";
+import { TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign, Clock, Users, Star, Banknote } from "lucide-react";
+import logoUrl from '@/assets/logo.png';
 
 export default function Home() {
   const handleButtonClick = (action: string) => {
@@ -13,11 +14,8 @@ export default function Home() {
       <header className="w-full bg-white border-b">
         <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap className="w-6 h-6 text-primary" />
-              <span className="text-xl font-bold text-foreground" data-testid="logo-text">
-                RádioPlay
-              </span>
+            <div className="flex items-center">
+              <img src={logoUrl} alt="RádioPlay" className="h-8 md:h-10" data-testid="logo-image" />
             </div>
             <div className="flex items-center gap-2">
               <Button 
