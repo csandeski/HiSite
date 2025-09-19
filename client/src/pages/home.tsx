@@ -109,45 +109,89 @@ export default function Home() {
       </main>
 
       {/* Como Funciona Section */}
-      <section className="w-full py-12 bg-white">
+      <section className="w-full py-16 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 max-w-6xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10" data-testid="section-title-how">
-            Como Funciona
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="section-title-how">
+              Como Funciona
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Comece a ganhar dinheiro hoje mesmo em apenas 3 passos simples
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className="bg-gray-50 rounded-xl p-6" data-testid="step-1">
-              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mx-auto mb-4">
-                <Headphones className="w-8 h-8 text-cyan-600" />
+            <div className="relative group" data-testid="step-1">
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-400 to-primary rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                  1
+                </div>
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Headphones className="w-10 h-10 text-cyan-600" />
+                </div>
+                <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Escolha sua Rádio</h3>
+                <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                  Navegue por nossa vasta biblioteca com mais de 500 rádios. Esportes, notícias, música, podcasts e muito mais ao seu alcance.
+                </p>
+                <div className="mt-4 flex justify-center">
+                  <div className="flex -space-x-2">
+                    <div className="w-6 h-6 bg-purple-100 rounded-full border-2 border-white"></div>
+                    <div className="w-6 h-6 bg-blue-100 rounded-full border-2 border-white"></div>
+                    <div className="w-6 h-6 bg-green-100 rounded-full border-2 border-white"></div>
+                    <div className="w-6 h-6 bg-yellow-100 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold">
+                      +
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-center mb-3">1. Escolha sua Rádio</h3>
-              <p className="text-sm text-muted-foreground text-center">
-                Selecione entre centenas de rádios disponíveis: esportes, notícias, música e muito mais.
-              </p>
             </div>
 
             {/* Step 2 */}
-            <div className="bg-gray-50 rounded-xl p-6" data-testid="step-2">
-              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mx-auto mb-4">
-                <Radio className="w-8 h-8 text-cyan-600" />
+            <div className="relative group" data-testid="step-2">
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-400 to-primary rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                  2
+                </div>
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Radio className="w-10 h-10 text-cyan-600" />
+                </div>
+                <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Ouça e Acumule</h3>
+                <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                  Deixe tocando enquanto trabalha, estuda ou relaxa. A cada minuto, você acumula pontos automaticamente sem esforço.
+                </p>
+                <div className="mt-4 flex justify-center items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-600 font-medium">Acumulando agora</span>
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-center mb-3">2. Ouça e Acumule</h3>
-              <p className="text-sm text-muted-foreground text-center">
-                A cada minuto ouvindo, você ganha pontos automaticamente. Quanto mais ouve, mais ganha!
-              </p>
             </div>
 
             {/* Step 3 */}
-            <div className="bg-gray-50 rounded-xl p-6" data-testid="step-3">
-              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="w-8 h-8 text-cyan-600" />
+            <div className="relative group" data-testid="step-3">
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-cyan-400 to-primary rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                  3
+                </div>
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-100 to-cyan-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <DollarSign className="w-10 h-10 text-cyan-600" />
+                </div>
+                <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Converta em Dinheiro</h3>
+                <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                  Transforme seus pontos em dinheiro real via PIX. Saques rápidos a partir de R$ 10,00 direto na sua conta.
+                </p>
+                <div className="mt-4 flex justify-center">
+                  <span className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-medium">
+                    PIX instantâneo
+                  </span>
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-center mb-3">3. Converta em Dinheiro</h3>
-              <p className="text-sm text-muted-foreground text-center">
-                Troque seus pontos por dinheiro real via PIX. Saques a partir de R$ 10,00.
-              </p>
             </div>
+          </div>
+
+          {/* Connection lines for desktop */}
+          <div className="hidden md:block relative -mt-32 mb-8">
+            <div className="absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
           </div>
         </div>
       </section>
