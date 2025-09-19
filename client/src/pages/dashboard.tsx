@@ -146,7 +146,7 @@ export default function Dashboard({
                       ? "bg-white border-primary border-l-primary shadow-md"
                       : playingRadioId === radio.id && !isPlaying
                       ? "bg-white border-primary/50 border-l-primary/50 shadow-sm"
-                      : "bg-white hover:shadow-md border-gray-200 border-l-green-500"
+                      : "bg-white hover:shadow-md border-gray-200 border-l-gray-400"
                 } transition-all duration-200 ${radio.isPremium ? "" : "cursor-pointer"}`}
                 data-testid={`radio-card-${radio.id}`}
                 onClick={() => handleRadioPlay(radio.id, radio.isPremium)}
