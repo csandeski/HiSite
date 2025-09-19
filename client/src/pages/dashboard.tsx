@@ -284,10 +284,18 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
                   <div className="bg-primary/10 p-2.5 rounded-lg">
-                    <Music className="w-5 h-5 text-primary" />
+                    <Radio className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-900">{playingRadio.name}</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-sm text-gray-900">{playingRadio.name}</h4>
+                      {playingRadio && playingRadioId !== null && (
+                        <div className="flex items-center gap-1 bg-red-500/10 px-2 py-0.5 rounded-full">
+                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+                          <span className="text-[10px] font-bold text-red-500">AO VIVO</span>
+                        </div>
+                      )}
+                    </div>
                     <p className="text-xs text-gray-500">{playingRadio.description}</p>
                   </div>
                 </div>
