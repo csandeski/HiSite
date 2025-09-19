@@ -82,7 +82,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-4 max-w-lg">
+      <main className="flex-1 container mx-auto px-4 py-4 max-w-lg pb-24">
         {/* Compact Profile Header */}
         <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 mb-4">
           <div className="flex items-center gap-4">
@@ -204,7 +204,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
         </div>
 
         {/* Compact Achievements & Stats */}
-        <Card className="p-3 border border-gray-100">
+        <Card className="p-3 border border-gray-100 mb-4">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
               <Award className="w-4 h-4 text-purple-600" />
@@ -246,6 +246,9 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
             </div>
           </div>
         </Card>
+        
+        {/* Extra bottom padding for fixed menu */}
+        <div className="h-20"></div>
       </main>
 
       {/* Edit Profile Modal */}
