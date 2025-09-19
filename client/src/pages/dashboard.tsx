@@ -290,8 +290,8 @@ export default function Dashboard({
                           ? "bg-primary text-white hover:bg-primary/90 shadow-lg"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       } w-12 h-12 rounded-full transition-all duration-200`}
-                      data-testid={`play-button-${radio.id}`}
-                      aria-label={`Play ${radio.name}`}
+                      data-testid={`${playingRadioId === radio.id && isPlaying ? 'pause' : 'play'}-button-${radio.id}`}
+                      aria-label={`${playingRadioId === radio.id && isPlaying ? 'Pause' : 'Play'} ${radio.name}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRadioPlay(radio.id, radio.isPremium);

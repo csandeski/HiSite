@@ -28,6 +28,7 @@ export const radios = [
     description: "Futebol e debates",
     pointsPerMin: 50,
     isPremium: false,
+    streamUrl: "https://stream.zeno.fm/c45wbq2us3buv",
   },
   {
     id: 2,
@@ -35,6 +36,7 @@ export const radios = [
     description: "Esportes e música",
     pointsPerMin: 45,
     isPremium: false,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 3,
@@ -42,6 +44,7 @@ export const radios = [
     description: "Hits e esportes",
     pointsPerMin: 60,
     isPremium: false,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 4,
@@ -49,6 +52,7 @@ export const radios = [
     description: "Pop nacional",
     pointsPerMin: 85,
     isPremium: true,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 5,
@@ -56,6 +60,7 @@ export const radios = [
     description: "Rock clássico",
     pointsPerMin: 90,
     isPremium: true,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 6,
@@ -63,6 +68,7 @@ export const radios = [
     description: "Hits atuais",
     pointsPerMin: 95,
     isPremium: true,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 7,
@@ -70,6 +76,7 @@ export const radios = [
     description: "Notícias 24h",
     pointsPerMin: 100,
     isPremium: true,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 8,
@@ -77,6 +84,7 @@ export const radios = [
     description: "Jornalismo",
     pointsPerMin: 105,
     isPremium: true,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 9,
@@ -84,6 +92,7 @@ export const radios = [
     description: "Variedades",
     pointsPerMin: 110,
     isPremium: true,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 10,
@@ -91,6 +100,7 @@ export const radios = [
     description: "Pop internacional",
     pointsPerMin: 115,
     isPremium: true,
+    streamUrl: "", // Stream URL a ser adicionada
   },
   {
     id: 11,
@@ -98,6 +108,7 @@ export const radios = [
     description: "Hits e clássicos",
     pointsPerMin: 120,
     isPremium: true,
+    streamUrl: "", // Stream URL a ser adicionada
   },
 ];
 
@@ -139,9 +150,47 @@ function App() {
   const [showPremiumPopup, setShowPremiumPopup] = useState(false);
   const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [userName, setUserName] = useState(() => {
     return localStorage.getItem('userName') || '';
   });
+
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio();
+    audioRef.current.volume = volume / 100;
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+    };
+  }, []);
+
+  // Handle radio playback
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    if (isPlaying && playingRadioId !== null) {
+      const radio = radios.find(r => r.id === playingRadioId);
+      if (radio && radio.streamUrl) {
+        audioRef.current.src = radio.streamUrl;
+        audioRef.current.play().catch(error => {
+          console.error("Erro ao tocar rádio:", error);
+          setIsPlaying(false);
+        });
+      }
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isPlaying, playingRadioId]);
+
+  // Handle volume changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
 
   // Sync active tab with current route
   useEffect(() => {
@@ -348,7 +397,7 @@ function App() {
                         variant="ghost"
                         className="bg-primary text-white w-8 h-8 rounded-full hover:bg-primary/90"
                         onClick={() => setIsPlaying(!isPlaying)}
-                        data-testid="pause-player"
+                        data-testid={isPlaying ? "pause-player" : "play-player"}
                       >
                         {isPlaying ? (
                           <Pause className="w-3.5 h-3.5" />
