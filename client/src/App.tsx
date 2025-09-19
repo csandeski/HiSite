@@ -7,9 +7,10 @@ import Home from "@/pages/home";
 import DashboardComp from "@/pages/dashboard";
 import Resgatar from "@/pages/resgatar";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, Pause, Play, Gift, User } from "lucide-react";
+import PremiumPopup from "@/components/PremiumPopup";
 
 // Lista de rádios (compartilhada)
 export const radios = [
@@ -122,10 +123,14 @@ function App() {
   const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
-  const [sessionPoints, setSessionPoints] = useState(22); // Starting with 22 points as shown in the design
+  const [sessionPoints, setSessionPoints] = useState(0); // Starting with 0 to allow reaching 15 points
   const [balance, setBalance] = useState(0);
   const [activeTab, setActiveTab] = useState("radio");
   const [location, setLocation] = useLocation();
+  const [hasReached15Points, setHasReached15Points] = useState(false);
+  const [showPremiumPopup, setShowPremiumPopup] = useState(false);
+  const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync active tab with current route
   useEffect(() => {
@@ -135,6 +140,45 @@ function App() {
       setActiveTab("resgatar");
     }
   }, [location]);
+
+  // Detect when user reaches 15 points for the first time
+  useEffect(() => {
+    if (sessionPoints >= 15 && !hasReached15Points) {
+      setHasReached15Points(true);
+      setShowPremiumPopup(true);
+      setLastPopupTime(Date.now());
+    }
+  }, [sessionPoints, hasReached15Points]);
+
+  // Show popup every 15 seconds after reaching 15 points
+  useEffect(() => {
+    if (hasReached15Points && !showPremiumPopup) {
+      // Clear any existing interval
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      // Set up new interval
+      intervalRef.current = setInterval(() => {
+        setShowPremiumPopup(true);
+        setLastPopupTime(Date.now());
+      }, 15000); // 15 seconds
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }
+  }, [hasReached15Points, showPremiumPopup]);
+
+  const handlePremiumPopupClose = (open: boolean) => {
+    setShowPremiumPopup(open);
+    if (!open) {
+      // Reset the timer when popup is closed
+      setLastPopupTime(Date.now());
+    }
+  };
 
   // Efeito para incrementar pontos enquanto toca
   useEffect(() => {
@@ -171,7 +215,9 @@ function App() {
     sessionPoints,
     setSessionPoints,
     balance,
-    setBalance
+    setBalance,
+    showPremiumPopup,
+    setShowPremiumPopup: handlePremiumPopupClose
   };
 
   // Wrapper components that pass props
@@ -321,6 +367,12 @@ function App() {
                 </div>
               </nav>
             )}
+            
+            {/* Premium Popup */}
+            <PremiumPopup 
+              open={showPremiumPopup} 
+              onOpenChange={handlePremiumPopupClose}
+            />
           </div>
         </PlayerContext.Provider>
       </TooltipProvider>
