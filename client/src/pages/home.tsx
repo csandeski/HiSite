@@ -28,7 +28,7 @@ export default function Home() {
                 Entrar
               </Button>
               <Button 
-                className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 px-4 py-2 h-auto"
+                className="bg-gradient-to-r from-primary to-blue-500 text-primary-foreground hover:opacity-90 flex items-center gap-1.5 px-4 py-2 h-auto"
                 data-testid="button-register"
                 onClick={() => handleButtonClick('register')}
               >
@@ -60,7 +60,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-5xl font-bold mb-2" data-testid="main-title">
               Ganhe Dinheiro
             </h1>
-            <h2 className="text-4xl md:text-5xl font-bold text-primary" data-testid="subtitle">
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent" data-testid="subtitle">
               Ouvindo Rádio
             </h2>
             <p className="mt-4 text-base text-muted-foreground max-w-md mx-auto" data-testid="text-description">
@@ -73,7 +73,7 @@ export default function Home() {
           <div className="flex flex-col gap-3 mb-8">
             <Button 
               size="lg"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-6 text-base"
+              className="w-full bg-gradient-to-r from-primary to-blue-500 text-primary-foreground hover:opacity-90 font-semibold py-6 text-base"
               data-testid="button-start-earning"
               onClick={() => handleButtonClick('start-earning')}
             >
@@ -124,11 +124,11 @@ export default function Home() {
             {/* Step 1 */}
             <div className="relative group" data-testid="step-1">
               <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   1
                 </div>
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Headphones className="w-10 h-10 text-primary" />
+                  <Headphones className="w-10 h-10" style={{background: 'linear-gradient(135deg, #023E73 0%, #3B82F6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}} />
                 </div>
                 <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Escolha sua Rádio</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
@@ -150,11 +150,11 @@ export default function Home() {
             {/* Step 2 */}
             <div className="relative group" data-testid="step-2">
               <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   2
                 </div>
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Radio className="w-10 h-10 text-primary" />
+                  <Radio className="w-10 h-10" style={{background: 'linear-gradient(135deg, #023E73 0%, #3B82F6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}} />
                 </div>
                 <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Ouça e Acumule</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
@@ -170,11 +170,11 @@ export default function Home() {
             {/* Step 3 */}
             <div className="relative group" data-testid="step-3">
               <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   3
                 </div>
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <DollarSign className="w-10 h-10 text-primary" />
+                  <DollarSign className="w-10 h-10" style={{background: 'linear-gradient(135deg, #023E73 0%, #3B82F6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}} />
                 </div>
                 <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Converta em Dinheiro</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
@@ -307,7 +307,7 @@ export default function Home() {
             <p className="text-muted-foreground mb-4">Junte-se a milhares de pessoas que já estão ganhando!</p>
             <Button 
               size="lg"
-              className="bg-gradient-to-r from-primary to-blue-600 text-white hover:opacity-90 font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+              className="bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
               onClick={() => console.log('start-now')}
             >
               Começar Agora Mesmo
