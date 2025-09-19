@@ -15,6 +15,7 @@ import PremiumPopup from "@/components/PremiumPopup";
 import PushNotification from "@/components/PushNotification";
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
+import hitsFmLogo from '@/assets/hits-fm-logo.png';
 
 // Lista de rádios (compartilhada)
 export const radios = [
@@ -285,6 +286,12 @@ function App() {
                           <img 
                             src={serraMarLogo} 
                             alt="Serramar FM" 
+                            className="w-4 h-4 object-contain"
+                          />
+                        ) : playingRadio.id === 3 ? (
+                          <img 
+                            src={hitsFmLogo} 
+                            alt="Rádio Hits FM" 
                             className="w-4 h-4 object-contain"
                           />
                         ) : (

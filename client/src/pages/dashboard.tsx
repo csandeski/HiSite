@@ -4,6 +4,7 @@ import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Ra
 import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
+import hitsFmLogo from '@/assets/hits-fm-logo.png';
 import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
@@ -202,6 +203,13 @@ export default function Dashboard({
                         <img 
                           src={serraMarLogo} 
                           alt="Serramar FM" 
+                          className="w-8 h-8 object-contain"
+                        />
+                      )}
+                      {radio.id === 3 && (
+                        <img 
+                          src={hitsFmLogo} 
+                          alt="Rádio Hits FM" 
                           className="w-8 h-8 object-contain"
                         />
                       )}
