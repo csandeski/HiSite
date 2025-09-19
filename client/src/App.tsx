@@ -7,7 +7,7 @@ import Home from "@/pages/home";
 import DashboardComp from "@/pages/dashboard";
 import Resgatar from "@/pages/resgatar";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect, createContext, useContext, useRef } from "react";
+import { useState, useEffect, createContext, useContext, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, Pause, Play, Gift, User } from "lucide-react";
 import PremiumPopup from "@/components/PremiumPopup";
@@ -220,9 +220,16 @@ function App() {
     setShowPremiumPopup: handlePremiumPopupClose
   };
 
-  // Wrapper components that pass props
-  const Dashboard = () => <DashboardComp {...playerProps} />;
-  const ResgatarWrapper = () => <Resgatar {...playerProps} />;
+  // Memoized wrapper components to prevent re-creation on every render
+  const Dashboard = useMemo(
+    () => () => <DashboardComp {...playerProps} />,
+    [playingRadioId, isPlaying, volume, sessionPoints, balance, showPremiumPopup]
+  );
+  
+  const ResgatarWrapper = useMemo(
+    () => () => <Resgatar {...playerProps} />,
+    [playingRadioId, isPlaying, volume, sessionPoints, balance, showPremiumPopup]
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
