@@ -166,6 +166,19 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             </Card>
           </div>
 
+          {/* Withdrawal Button */}
+          <div className="mb-6">
+            <Button 
+              variant="default"
+              className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold"
+              data-testid="button-withdraw"
+              onClick={handleWithdraw}
+            >
+              <Download className="w-5 h-5 mr-2" />
+              Realizar Saque
+            </Button>
+          </div>
+
           {/* Title and Filter */}
           <div className="mb-4">
             <h2 className="text-xl font-bold text-gray-900 mb-3">
@@ -318,18 +331,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             </AccordionItem>
           </Accordion>
 
-          {/* Withdrawal Button */}
-          <div className="mt-6">
-            <Button 
-              variant="outline"
-              className="w-full py-2"
-              data-testid="button-withdraw"
-              onClick={handleWithdraw}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Realizar Saque
-            </Button>
-          </div>
         </div>
       </main>
 
