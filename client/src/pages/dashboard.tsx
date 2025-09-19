@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import { radios } from "../App";
@@ -202,25 +202,42 @@ export default function Dashboard({
                       {radio.description}
                     </p>
                     
-                    {/* Contador de ouvintes */}
-                    <div className="flex items-center gap-1.5 mt-2 mb-2">
-                      <Users className={`w-3.5 h-3.5 ${radio.isPremium ? "text-gray-400" : "text-blue-500"}`} />
-                      <span className={`text-xs ${radio.isPremium ? "text-gray-400" : "text-gray-700"}`}>
-                        {listeners[radio.id]?.toLocaleString('pt-BR')} pessoas ouvindo agora
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-1">
-                      <Plus className={`w-4 h-4 ${radio.isPremium ? "text-gray-400" : "text-green-600"}`} />
-                      <span 
-                        className={`text-sm font-semibold ${radio.isPremium ? "text-gray-400" : "text-green-600"}`}
-                        data-testid={`points-per-min-${radio.id}`}
-                      >
-                        {radio.pointsPerMin} pontos/min
-                      </span>
+                    {/* Badge de ouvintes ao vivo e pontos */}
+                    <div className="flex items-center gap-2 mt-3">
+                      {/* Badge ao vivo */}
+                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${
+                        radio.isPremium 
+                          ? "bg-gray-100 text-gray-400" 
+                          : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm"
+                      }`}>
+                        <div className="relative">
+                          <RadioIcon className="w-3 h-3" />
+                          {!radio.isPremium && (
+                            <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-medium">
+                          {listeners[radio.id]?.toLocaleString('pt-BR')} ouvindo agora
+                        </span>
+                      </div>
+                      
+                      {/* Badge de pontos */}
+                      <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${
+                        radio.isPremium 
+                          ? "bg-gray-100" 
+                          : "bg-green-50 border border-green-200"
+                      }`}>
+                        <Zap className={`w-3.5 h-3.5 ${radio.isPremium ? "text-gray-400" : "text-green-600"}`} />
+                        <span className={`text-xs font-bold ${radio.isPremium ? "text-gray-400" : "text-green-700"}`}
+                          data-testid={`points-per-min-${radio.id}`}
+                        >
+                          {radio.pointsPerMin} pts/min
+                        </span>
+                      </div>
+                      
                       {radio.isPremium && (
-                        <span className="text-xs text-gray-400 ml-1">
-                          • Premium
+                        <span className="text-[10px] font-medium px-2 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-500 rounded-full">
+                          Premium
                         </span>
                       )}
                     </div>
@@ -232,9 +249,9 @@ export default function Dashboard({
                       variant="default"
                       className={`${
                         playingRadioId === radio.id && isPlaying
-                          ? "bg-primary text-white hover:bg-primary/90"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                      } w-10 h-10 rounded-full transition-all duration-200`}
+                          ? "bg-primary text-white hover:bg-primary/90 shadow-lg"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      } w-12 h-12 rounded-full transition-all duration-200`}
                       data-testid={`play-button-${radio.id}`}
                       aria-label={`Play ${radio.name}`}
                       onClick={(e) => {
@@ -243,15 +260,15 @@ export default function Dashboard({
                       }}
                     >
                       {playingRadioId === radio.id && isPlaying ? (
-                        <Pause className="w-4 h-4 animate-scale" />
+                        <Pause className="w-5 h-5 animate-scale" />
                       ) : (
-                        <Play className="w-4 h-4 ml-0.5" />
+                        <Play className="w-5 h-5 ml-0.5" />
                       )}
                     </Button>
                   )}
                   
                   {radio.isPremium && (
-                    <Lock className="w-6 h-6 text-gray-400" />
+                    <Lock className="w-7 h-7 text-gray-400" />
                   )}
                 </div>
               </Card>
