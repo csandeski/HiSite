@@ -215,14 +215,14 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="relative group" data-testid="step-1">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+              <div className="bg-white rounded-2xl p-4 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
                 <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   1
                 </div>
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
                   <Headphones className="w-10 h-10" style={{background: 'linear-gradient(135deg, #023E73 0%, #3B82F6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}} />
                 </div>
-                <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Escolha sua Rádio</h3>
+                <h3 className="text-lg md:text-xl font-bold text-center mb-2 md:mb-3 text-gray-900">Escolha sua Rádio</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Navegue por nossa vasta biblioteca com mais de 500 rádios. Esportes, notícias, música, podcasts e muito mais ao seu alcance.
                 </p>
@@ -241,14 +241,14 @@ export default function Home() {
 
             {/* Step 2 */}
             <div className="relative group" data-testid="step-2">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+              <div className="bg-white rounded-2xl p-4 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
                 <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   2
                 </div>
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
                   <Radio className="w-10 h-10" style={{background: 'linear-gradient(135deg, #023E73 0%, #3B82F6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}} />
                 </div>
-                <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Ouça e Acumule</h3>
+                <h3 className="text-lg md:text-xl font-bold text-center mb-2 md:mb-3 text-gray-900">Ouça e Acumule</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Deixe tocando enquanto trabalha, estuda ou relaxa. A cada minuto, você acumula pontos automaticamente sem esforço.
                 </p>
@@ -261,14 +261,14 @@ export default function Home() {
 
             {/* Step 3 */}
             <div className="relative group" data-testid="step-3">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+              <div className="bg-white rounded-2xl p-4 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
                 <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-primary to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
                   3
                 </div>
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300">
                   <DollarSign className="w-10 h-10" style={{background: 'linear-gradient(135deg, #023E73 0%, #3B82F6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}} />
                 </div>
-                <h3 className="text-xl font-bold text-center mb-3 text-gray-900">Converta em Dinheiro</h3>
+                <h3 className="text-lg md:text-xl font-bold text-center mb-2 md:mb-3 text-gray-900">Converta em Dinheiro</h3>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Transforme seus pontos em dinheiro real via PIX. Saques rápidos a partir de R$ 10,00 direto na sua conta.
                 </p>
@@ -302,7 +302,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {/* Ganhos Automáticos */}
-            <div className="group bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-green-200" data-testid="benefit-automatic">
+            <div className="group bg-white rounded-2xl p-4 md:p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-green-200" data-testid="benefit-automatic">
               <div className="flex gap-5">
                 <div className="flex-shrink-0">
                   <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -323,7 +323,7 @@ export default function Home() {
             </div>
 
             {/* Comunidade Ativa */}
-            <div className="group bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200" data-testid="benefit-community">
+            <div className="group bg-white rounded-2xl p-4 md:p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200" data-testid="benefit-community">
               <div className="flex gap-5">
                 <div className="flex-shrink-0">
                   <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -348,7 +348,7 @@ export default function Home() {
             </div>
 
             {/* Sistema de Conquistas */}
-            <div className="group bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-purple-200" data-testid="benefit-achievements">
+            <div className="group bg-white rounded-2xl p-4 md:p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-purple-200" data-testid="benefit-achievements">
               <div className="flex gap-5">
                 <div className="flex-shrink-0">
                   <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -372,7 +372,7 @@ export default function Home() {
             </div>
 
             {/* Saques Rápidos */}
-            <div className="group bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-emerald-200" data-testid="benefit-withdrawals">
+            <div className="group bg-white rounded-2xl p-4 md:p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-emerald-200" data-testid="benefit-withdrawals">
               <div className="flex gap-5">
                 <div className="flex-shrink-0">
                   <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
