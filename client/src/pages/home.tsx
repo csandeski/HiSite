@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign } from "lucide-react";
+import { Zap, TrendingUp, LogIn, UserPlus, Headphones, Radio, DollarSign, Clock, Users, Star, Banknote } from "lucide-react";
 
 export default function Home() {
   const handleButtonClick = (action: string) => {
@@ -192,6 +192,77 @@ export default function Home() {
           {/* Connection lines for desktop */}
           <div className="hidden md:block relative -mt-32 mb-8">
             <div className="absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* Por que escolher Section */}
+      <section className="w-full py-16 bg-white">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" data-testid="section-title-why">
+            Por que escolher o RádioPlay?
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+            {/* Ganhos Automáticos */}
+            <div className="flex gap-4 p-4 md:p-6" data-testid="benefit-automatic">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-100 flex items-center justify-center">
+                  <Clock className="w-6 h-6 md:w-7 md:h-7 text-green-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-bold text-base md:text-lg mb-2">Ganhos Automáticos</h3>
+                <p className="text-sm text-muted-foreground">
+                  Seus pontos são creditados automaticamente enquanto você ouve suas rádios favoritas.
+                </p>
+              </div>
+            </div>
+
+            {/* Comunidade Ativa */}
+            <div className="flex gap-4 p-4 md:p-6" data-testid="benefit-community">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Users className="w-6 h-6 md:w-7 md:h-7 text-blue-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-bold text-base md:text-lg mb-2">Comunidade Ativa</h3>
+                <p className="text-sm text-muted-foreground">
+                  Mais de 50.000 usuários já fazem parte da nossa comunidade de ouvintes.
+                </p>
+              </div>
+            </div>
+
+            {/* Sistema de Conquistas */}
+            <div className="flex gap-4 p-4 md:p-6" data-testid="benefit-achievements">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Star className="w-6 h-6 md:w-7 md:h-7 text-purple-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-bold text-base md:text-lg mb-2">Sistema de Conquistas</h3>
+                <p className="text-sm text-muted-foreground">
+                  Desbloqueie conquistas e ganhe bônus extras conforme você progride.
+                </p>
+              </div>
+            </div>
+
+            {/* Saques Rápidos */}
+            <div className="flex gap-4 p-4 md:p-6" data-testid="benefit-withdrawals">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-100 flex items-center justify-center">
+                  <Banknote className="w-6 h-6 md:w-7 md:h-7 text-green-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-bold text-base md:text-lg mb-2">Saques Rápidos</h3>
+                <p className="text-sm text-muted-foreground">
+                  Receba seus ganhos via PIX em até 24 horas após solicitar o saque.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
