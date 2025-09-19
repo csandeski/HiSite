@@ -207,20 +207,15 @@ export default function Dashboard({
                     
                     {/* Badge de ouvintes ao vivo e pontos */}
                     <div className="flex items-center gap-2 mt-3">
-                      {/* Badge ao vivo */}
+                      {/* Badge ao vivo - mais discreto */}
                       <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${
                         radio.isPremium 
                           ? "bg-gray-100 text-gray-400" 
-                          : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm"
+                          : "bg-gray-50 text-gray-600 border border-gray-200"
                       }`}>
-                        <div className="relative">
-                          <RadioIcon className="w-3 h-3" />
-                          {!radio.isPremium && (
-                            <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
-                          )}
-                        </div>
+                        <Users className="w-3 h-3 text-gray-500" />
                         <span className="text-[11px] font-medium">
-                          {listeners[radio.id]?.toLocaleString('pt-BR')} ouvindo agora
+                          {listeners[radio.id]?.toLocaleString('pt-BR')}
                         </span>
                       </div>
                       
