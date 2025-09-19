@@ -127,9 +127,6 @@ export default function Dashboard() {
 
           {/* Radio List */}
           <div className="space-y-3">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">
-              Escolha sua rádio
-            </h2>
             
             {radios.map((radio) => (
               <Card
