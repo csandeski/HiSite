@@ -85,16 +85,13 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center">
               <img 
                 src={logoUrl} 
                 alt="RádioPlay" 
                 className="h-8 md:h-10 w-auto object-contain" 
                 data-testid="dashboard-logo"
               />
-              <span className="text-sm text-gray-600">
-                Seja bem-vindo, Usuário
-              </span>
             </div>
 
             {/* Balance and Settings */}
@@ -122,6 +119,11 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 pb-20">
         <div className="container mx-auto px-4 py-6 max-w-2xl">
+          {/* Welcome Message */}
+          <p className="text-sm text-gray-600 mb-3">
+            Seja bem-vindo, Usuário
+          </p>
+          
           {/* Session Points Card */}
           <Card 
             className="bg-gradient-to-r from-primary to-blue-500 text-white p-6 mb-6 border-0 shadow-lg"
