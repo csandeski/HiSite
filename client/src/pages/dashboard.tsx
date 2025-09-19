@@ -7,6 +7,7 @@ import serraMarLogo from '@/assets/serra-mar-logo.png';
 import hitsFmLogo from '@/assets/hits-fm-logo.png';
 import antena1Logo from '@/assets/antena-1-logo.png';
 import fm89Logo from '@/assets/89fm-logo.png';
+import kissFmLogo from '@/assets/kiss-fm-logo.png';
 import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
@@ -226,6 +227,13 @@ export default function Dashboard({
                         <img 
                           src={fm89Logo} 
                           alt="89 FM" 
+                          className="w-8 h-8 object-contain"
+                        />
+                      )}
+                      {radio.id === 6 && (
+                        <img 
+                          src={kissFmLogo} 
+                          alt="Kiss FM" 
                           className="w-8 h-8 object-contain"
                         />
                       )}
