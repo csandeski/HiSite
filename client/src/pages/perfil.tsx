@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   User, 
   Trophy, 
@@ -55,6 +56,12 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [userStatus, setUserStatus] = useState(
+    localStorage.getItem('userStatus') || "Ouvindo rádio e ganhando pontos! 🎵"
+  );
+  const [tempStatus, setTempStatus] = useState("");
+  const [isPremium] = useState(false); // In production, this should come from user data
   
   // Check for highlight parameter in URL
   useEffect(() => {
@@ -76,6 +83,11 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
       }, 3000);
     }
   }, []);
+  
+  // Save status to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('userStatus', userStatus);
+  }, [userStatus]);
   
   // Get initials from name
   const getInitials = (name: string) => {
@@ -133,6 +145,74 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
       return { type: 'icon' as const, content: avatar };
     }
     return { type: 'initials' as const, content: getInitials(userName || '') };
+  };
+
+  // Generate achievement tags dynamically
+  const generateAchievementTags = () => {
+    const tags = [];
+    
+    // Check for "Primeira Conquista" (Iniciante badge) or "Ouvinte Dedicado" (100 Pts)
+    if (sessionPoints >= 1 || sessionPoints >= 100) {
+      tags.push({
+        id: 'ouvinte-ativo',
+        label: 'Ouvinte Ativo',
+        className: 'bg-blue-100 text-blue-700',
+        testId: 'tag-ouvinte-ativo'
+      });
+    }
+    
+    // Check for "Multiplicador de Pontos" (1K Pts) or "Colecionador de Pontos" (500 Pts)
+    if (sessionPoints >= 1000 || sessionPoints >= 500) {
+      tags.push({
+        id: 'top-ganhos',
+        label: 'Top Ganhos',
+        className: 'bg-purple-100 text-purple-700',
+        testId: 'tag-top-ganhos'
+      });
+    }
+    
+    // Check for premium membership
+    if (isPremium) {
+      tags.push({
+        id: 'membro-gold',
+        label: 'Membro Gold',
+        className: 'bg-orange-100 text-orange-700',
+        testId: 'tag-membro-gold'
+      });
+    }
+    
+    // Additional achievement-based tags
+    if (sessionPoints >= 5000) {
+      tags.push({
+        id: 'super-ouvinte',
+        label: 'Super Ouvinte',
+        className: 'bg-red-100 text-red-700',
+        testId: 'tag-super-ouvinte'
+      });
+    }
+    
+    if (sessionPoints >= 10000) {
+      tags.push({
+        id: 'lenda',
+        label: 'Lenda',
+        className: 'bg-indigo-100 text-indigo-700',
+        testId: 'tag-lenda'
+      });
+    }
+    
+    return tags;
+  };
+  
+  const handleStatusEdit = () => {
+    setTempStatus(userStatus);
+    setShowStatusModal(true);
+  };
+  
+  const handleStatusSave = () => {
+    if (tempStatus.trim()) {
+      setUserStatus(tempStatus.trim());
+    }
+    setShowStatusModal(false);
   };
 
   return (
@@ -199,6 +279,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                   onClick={() => setShowAvatarModal(true)}
                   className="absolute bottom-0 right-0 w-7 h-7 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-200 hover:bg-gray-50 transition-colors"
                   aria-label="Editar avatar"
+                  data-testid="button-edit-avatar"
                 >
                   <Camera className="w-4 h-4 text-gray-600" />
                 </button>
@@ -226,21 +307,31 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
               </div>
               
               {/* Bio/Status */}
-              <p className="text-sm text-gray-600 italic">
-                "Ouvindo rádio e ganhando pontos! 🎵"
-              </p>
+              <div className="flex items-center gap-2 group">
+                <p className="text-sm text-gray-600 italic flex-1" data-testid="text-user-status">
+                  "{userStatus}"
+                </p>
+                <button
+                  onClick={handleStatusEdit}
+                  className="p-1.5 rounded-full hover:bg-gray-100 transition-all duration-200 opacity-60 hover:opacity-100 group-hover:scale-110"
+                  aria-label="Editar status"
+                  data-testid="button-edit-status"
+                >
+                  <Edit className="w-3.5 h-3.5 text-gray-500" />
+                </button>
+              </div>
               
               {/* Tags */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                <span className="text-xs px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
-                  Ouvinte Ativo
-                </span>
-                <span className="text-xs px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
-                  Top Ganhos
-                </span>
-                <span className="text-xs px-2.5 py-1 bg-orange-100 text-orange-700 rounded-full font-medium">
-                  Membro Gold
-                </span>
+              <div className="flex flex-wrap gap-2 mt-3" data-testid="container-achievement-tags">
+                {generateAchievementTags().map((tag) => (
+                  <span
+                    key={tag.id}
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${tag.className}`}
+                    data-testid={tag.testId}
+                  >
+                    {tag.label}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
@@ -303,6 +394,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           <Card 
             className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
             onClick={() => setShowEditModal(true)}
+            data-testid="card-edit-profile"
           >
             <div className="flex flex-col items-center gap-2">
               <Edit className="w-6 h-6 text-blue-500" />
@@ -313,6 +405,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           <Card 
             className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
             onClick={() => setShowHistoryModal(true)}
+            data-testid="card-history"
           >
             <div className="flex flex-col items-center gap-2">
               <History className="w-6 h-6 text-green-500" />
@@ -323,6 +416,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           <Card 
             className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
             onClick={() => setShowFAQModal(true)}
+            data-testid="card-help"
           >
             <div className="flex flex-col items-center gap-2">
               <HelpCircle className="w-6 h-6 text-purple-500" />
@@ -333,6 +427,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           <Card 
             className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer bg-red-50"
             onClick={handleLogout}
+            data-testid="card-logout"
           >
             <div className="flex flex-col items-center gap-2">
               <LogOut className="w-6 h-6 text-red-500" />
@@ -530,6 +625,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                   variant="ghost"
                   className="w-full justify-start p-2 h-auto text-sm font-medium text-gray-700 hover:bg-gray-50"
                   onClick={() => setShowPasswordFields(!showPasswordFields)}
+                  data-testid="button-change-password"
                 >
                   <Lock className="w-4 h-4 mr-2" />
                   Alterar Senha
@@ -577,6 +673,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                 variant="outline"
                 className="flex-1"
                 onClick={() => setShowEditModal(false)}
+                data-testid="button-cancel-edit-profile"
               >
                 Cancelar
               </Button>
@@ -586,6 +683,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                   // Handle save
                   setShowEditModal(false);
                 }}
+                data-testid="button-save-edit-profile"
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Salvar
@@ -627,6 +725,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
             <Button
               className="w-full bg-teal-500 hover:bg-teal-600 text-white"
               onClick={() => setShowHistoryModal(false)}
+              data-testid="button-close-history"
             >
               Fechar
             </Button>
@@ -712,6 +811,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
             <Button
               className="w-full bg-teal-500 hover:bg-teal-600 text-white"
               onClick={() => setShowFAQModal(false)}
+              data-testid="button-close-faq"
             >
               Fechar
             </Button>
@@ -854,6 +954,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                         ? 'border-primary shadow-lg' 
                         : 'border-transparent hover:border-gray-300'
                     }`}
+                    data-testid={`button-avatar-${avatar.id}`}
                   >
                     <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${avatar.color} flex items-center justify-center`}>
                       <Icon className="w-8 h-8 text-white" />
@@ -901,14 +1002,83 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                 variant="outline"
                 className="flex-1"
                 onClick={() => setShowAvatarModal(false)}
+                data-testid="button-cancel-avatar"
               >
                 Cancelar
               </Button>
               <Button
                 className="flex-1 bg-primary hover:bg-primary/90"
                 onClick={() => setShowAvatarModal(false)}
+                data-testid="button-confirm-avatar"
               >
                 Confirmar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Status Modal */}
+      <Dialog open={showStatusModal} onOpenChange={setShowStatusModal}>
+        <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Edit className="w-5 h-5" />
+              Editar Status
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="status" className="text-xs font-medium text-gray-700 mb-2 block">
+                Seu status (máximo 100 caracteres)
+              </Label>
+              <Textarea
+                id="status"
+                value={tempStatus}
+                onChange={(e) => setTempStatus(e.target.value.slice(0, 100))}
+                placeholder="Digite seu status..."
+                className="min-h-[80px] resize-none"
+                data-testid="input-status-text"
+              />
+              <div className="flex justify-between items-center mt-1">
+                <span className="text-xs text-gray-500">
+                  {tempStatus.length}/100 caracteres
+                </span>
+                {/* Emoji suggestions */}
+                <div className="flex gap-1">
+                  {['🎵', '🎧', '📻', '💰', '🏆', '⭐', '🚀', '💎'].map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => setTempStatus(prev => prev + emoji)}
+                      className="text-lg hover:scale-125 transition-transform"
+                      data-testid={`button-emoji-${emoji}`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowStatusModal(false)}
+                data-testid="button-cancel-status"
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="flex-1 bg-teal-500 hover:bg-teal-600 text-white"
+                onClick={handleStatusSave}
+                disabled={!tempStatus.trim()}
+                data-testid="button-save-status"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Salvar
               </Button>
             </div>
           </div>
