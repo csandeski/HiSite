@@ -2,6 +2,14 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
+## Recent Updates (20/09/2025)
+- Implemented UTM parameter tracking system
+- UTMs are now captured on page entry and preserved throughout user journey
+- UTMs are correctly passed to payment checkout (PIX) flows
+- Fixed message overflow issue in PIX payment modal
+- Improved error handling for insufficient points during conversion
+- UTMs are merged when navigating with partial new parameters
+
 ## Recent Updates (19/09/2025)
 - Enhanced Profile page with responsive design and user stats
 - Implemented Edit Profile, Withdrawal History, and FAQ modals
