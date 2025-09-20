@@ -199,8 +199,12 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
 
         {/* Scrollable content wrapper */}
         <div className="max-h-[95vh] overflow-y-auto">
-          {/* Header with gradient */}
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-3 sticky top-0 z-10">
+          {/* Header with gradient - Blue for authorization, Purple for others */}
+          <div className={`px-4 py-3 sticky top-0 z-10 ${
+            type === 'authorization' 
+              ? 'bg-gradient-to-r from-blue-500 to-blue-600'
+              : 'bg-gradient-to-r from-purple-500 to-pink-500'
+          }`}>
             <div className="flex items-center gap-2.5 text-white">
               <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                 <QrCode className="w-5 h-5" />
@@ -222,7 +226,9 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
           <div className="p-4 space-y-3">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
+                <Loader2 className={`w-8 h-8 animate-spin ${
+                  type === 'authorization' ? 'text-blue-500' : 'text-purple-500'
+                }`} />
                 <p className="text-sm text-gray-600">Gerando código PIX...</p>
               </div>
             ) : error ? (
@@ -233,7 +239,11 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
                 <p className="text-sm text-red-600 text-center">{error}</p>
                 <Button
                   onClick={generatePixPayment}
-                  className="bg-purple-500 hover:bg-purple-600 text-white"
+                  className={`text-white ${
+                    type === 'authorization'
+                      ? 'bg-blue-500 hover:bg-blue-600'
+                      : 'bg-purple-500 hover:bg-purple-600'
+                  }`}
                   data-testid="retry-pix-generation"
                 >
                   Tentar novamente
@@ -319,14 +329,24 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
             
             {/* Benefits reminder - Compact */}
             {!loading && !error && (
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-2.5">
+              <div className={`rounded-lg p-2.5 border ${
+                type === 'authorization'
+                  ? 'bg-blue-50 border-blue-200'
+                  : 'bg-purple-50 border-purple-200'
+              }`}>
                 <div className="flex items-center gap-1.5 mb-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
-                  <span className="text-[11px] font-semibold text-purple-900">
+                  <ShieldCheck className={`w-3.5 h-3.5 ${
+                    type === 'authorization' ? 'text-blue-600' : 'text-purple-600'
+                  }`} />
+                  <span className={`text-[11px] font-semibold ${
+                    type === 'authorization' ? 'text-blue-900' : 'text-purple-900'
+                  }`}>
                     Ativação automática
                   </span>
                 </div>
-                <p className="text-[10px] text-purple-700 leading-relaxed">
+                <p className={`text-[10px] leading-relaxed ${
+                  type === 'authorization' ? 'text-blue-700' : 'text-purple-700'
+                }`}>
                   {type === 'authorization' 
                     ? "Após a confirmação do pagamento, sua conta será autorizada automaticamente em até 5 minutos."
                     : type === 'premium'
