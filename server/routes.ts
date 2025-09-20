@@ -656,6 +656,203 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // OrinPay Payment Routes
+  app.post("/api/payment/create-pix", requireAuth, async (req, res) => {
+    try {
+      const { type, amount, utms } = req.body;
+      
+      // Get user info
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Import OrinPay service
+      const orinpay = require('./services/orinpay').default;
+      
+      // Validate amount
+      const amountInCents = orinpay.reaisToCentavos(amount);
+      if (!orinpay.validateAmount(amountInCents)) {
+        return res.status(400).json({ error: "Valor inválido. Máximo permitido: R$ 999,99" });
+      }
+      
+      // Generate reference
+      const reference = orinpay.generateReference(req.session.userId!, type);
+      
+      // Create PIX transaction
+      const pixData = {
+        paymentMethod: 'pix' as const,
+        reference,
+        customer: {
+          name: user.fullName || user.username,
+          email: user.email || `${user.username}@radioplay.com`,
+          phone: orinpay.formatPhone(user.phone || '11999999999'),
+          document: {
+            number: orinpay.formatCPF(user.cpf || '00000000000'),
+            type: 'cpf' as const
+          }
+        },
+        shipping: {
+          fee: 0,
+          address: {
+            street: "Rua Virtual",
+            streetNumber: "100",
+            zipCode: "00000000",
+            neighborhood: "Centro",
+            city: "São Paulo",
+            state: "SP",
+            country: "Brasil",
+            complement: ""
+          }
+        },
+        items: [
+          {
+            title: type === 'premium' ? 'Assinatura Premium RádioPlay' : 'Créditos RádioPlay',
+            description: type === 'premium' ? 'Acesso Premium com multiplicador 3x' : `Adicionar R$ ${amount.toFixed(2)} em créditos`,
+            unitPrice: amountInCents,
+            quantity: 1,
+            tangible: false
+          }
+        ],
+        isInfoProducts: true,
+        utms: utms || {}
+      };
+      
+      // Create transaction with OrinPay
+      const pixResponse = await orinpay.createPixTransaction(pixData);
+      
+      // Store payment record in database
+      await storage.createPayment({
+        userId: req.session.userId!,
+        transactionId: pixResponse.id.toString(),
+        reference: pixResponse.reference,
+        amount,
+        type,
+        status: 'pending',
+        pixData: {
+          encodedImage: pixResponse.pix.encodedImage,
+          payload: pixResponse.pix.payload
+        }
+      });
+      
+      res.json({
+        success: true,
+        transactionId: pixResponse.id,
+        reference: pixResponse.reference,
+        pix: pixResponse.pix,
+        amount
+      });
+      
+    } catch (error: any) {
+      console.error("Create PIX payment error:", error);
+      res.status(500).json({ error: error.message || "Erro ao criar pagamento PIX" });
+    }
+  });
+  
+  // OrinPay Webhook
+  app.post("/api/webhook/orinpay", async (req, res) => {
+    try {
+      const webhookData = req.body;
+      
+      // Log webhook for debugging
+      console.log('OrinPay Webhook received:', webhookData.event, webhookData.status);
+      
+      // Get payment by reference
+      const payment = await storage.getPaymentByReference(webhookData.reference);
+      if (!payment) {
+        console.error('Payment not found for reference:', webhookData.reference);
+        return res.status(404).json({ error: 'Payment not found' });
+      }
+      
+      // Update payment status
+      await storage.updatePaymentStatus(payment.id, webhookData.status);
+      
+      // Handle approved payments
+      if (webhookData.event === 'compra_aprovada' && webhookData.status === 'approved') {
+        // Get user
+        const user = await storage.getUser(payment.userId);
+        if (!user) {
+          console.error('User not found for payment:', payment.userId);
+          return res.status(404).json({ error: 'User not found' });
+        }
+        
+        // Process based on payment type
+        if (payment.type === 'premium') {
+          // Activate premium subscription
+          const endDate = new Date();
+          endDate.setDate(endDate.getDate() + 30); // 30 days premium
+          
+          await storage.createPremiumSubscription({
+            userId: payment.userId,
+            plan: 'monthly',
+            price: payment.amount,
+            endDate
+          });
+          
+          // Create notification
+          await storage.createNotification({
+            userId: payment.userId,
+            type: 'payment_approved',
+            title: 'Assinatura Premium Ativada!',
+            message: 'Sua assinatura Premium foi ativada com sucesso. Aproveite o multiplicador 3x!',
+            data: { paymentId: payment.id }
+          });
+          
+        } else if (payment.type === 'credits') {
+          // Add credits to balance
+          const newBalance = parseFloat(user.balance) + payment.amount;
+          await storage.updateUser(payment.userId, { balance: newBalance.toString() });
+          
+          // Create transaction record
+          await storage.createTransaction({
+            userId: payment.userId,
+            type: 'earning',
+            amount: payment.amount,
+            points: 0,
+            description: `Créditos adicionados via PIX - R$ ${payment.amount.toFixed(2)}`
+          });
+          
+          // Create notification
+          await storage.createNotification({
+            userId: payment.userId,
+            type: 'payment_approved',
+            title: 'Pagamento Aprovado!',
+            message: `R$ ${payment.amount.toFixed(2)} foram adicionados ao seu saldo.`,
+            data: { paymentId: payment.id }
+          });
+        }
+      }
+      
+      // Handle rejected payments
+      if (webhookData.event === 'compra_recusada' && webhookData.status === 'rejected') {
+        await storage.createNotification({
+          userId: payment.userId,
+          type: 'payment_rejected',
+          title: 'Pagamento Recusado',
+          message: 'Seu pagamento PIX foi recusado. Por favor, tente novamente.',
+          data: { paymentId: payment.id }
+        });
+      }
+      
+      // Handle refunds
+      if (webhookData.event === 'reembolso' && webhookData.status === 'TRANSACTION_REFUNDED') {
+        await storage.createNotification({
+          userId: payment.userId,
+          type: 'payment_refunded',
+          title: 'Reembolso Processado',
+          message: `Seu pagamento de R$ ${payment.amount.toFixed(2)} foi reembolsado.`,
+          data: { paymentId: payment.id }
+        });
+      }
+      
+      res.json({ success: true });
+      
+    } catch (error) {
+      console.error("OrinPay webhook error:", error);
+      res.status(500).json({ error: "Erro ao processar webhook" });
+    }
+  });
+
   // Admin login route (separate from regular login)
   app.post("/api/admin/login", async (req, res) => {
     try {
