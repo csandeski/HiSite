@@ -13,7 +13,7 @@ import Perfil from "@/pages/perfil";
 import { AdminPage } from "@/pages/admin";
 import { AdminLoginPage } from "@/pages/admin-login";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect, createContext, useContext, useRef, useMemo } from "react";
+import { useState, useEffect, createContext, useContext, useRef, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
 import PremiumPopup from "@/components/PremiumPopup";
@@ -169,8 +169,11 @@ function App() {
   
   // Time tracking states
   const [listeningStartTime, setListeningStartTime] = useState<number | null>(null);
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [sessionStartTime, setSessionStartTime] = useState<number>(0);
+  const sessionInfoRef = useRef<{sessionId: string | null; sessionStartTime: number; sessionPoints: number}>({
+    sessionId: null,
+    sessionStartTime: 0,
+    sessionPoints: 0
+  });
   const [totalListeningTime, setTotalListeningTime] = useState<number>(() => {
     // Load previous listening time from localStorage
     const savedTime = localStorage.getItem('totalListeningTime');
@@ -287,26 +290,91 @@ function App() {
     }
   };
 
+  // Helper function to end listening session
+  const endListeningSession = useCallback(() => {
+    if (sessionInfoRef.current.sessionId && sessionInfoRef.current.sessionStartTime) {
+      const duration = Math.floor((Date.now() - sessionInfoRef.current.sessionStartTime) / 1000);
+      const sessionId = sessionInfoRef.current.sessionId;
+      const points = sessionInfoRef.current.sessionPoints;
+      
+      // Clear session info immediately
+      sessionInfoRef.current = { sessionId: null, sessionStartTime: 0, sessionPoints: 0 };
+      
+      // End session in backend
+      api.endListening({
+        sessionId,
+        duration,
+        pointsEarned: points
+      }).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      }).catch((error) => {
+        console.error('Failed to end listening session:', error);
+      });
+    }
+  }, []);
+
+  // Handle page visibility changes and unload
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && isPlaying) {
+        endListeningSession();
+      }
+    };
+    
+    const handleBeforeUnload = () => {
+      if (isPlaying) {
+        endListeningSession();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isPlaying, endListeningSession]);
+
   // Effect to track listening time and points while playing
   useEffect(() => {
     if (isPlaying && playingRadioId !== null) {
+      // Reset session points when starting new session
+      setSessionPoints(0);
+      sessionInfoRef.current.sessionPoints = 0;
+      
       // Start tracking listening time
       const startTime = Date.now();
       setListeningStartTime(startTime);
-      setSessionStartTime(startTime);
+      sessionInfoRef.current.sessionStartTime = startTime;
+      
+      // Get the radio's points per minute
+      const playingRadio = radios.find(r => r.id === playingRadioId);
+      const pointsPerMin = playingRadio?.pointsPerMin || 50;
+      const isPremiumRadio = playingRadio?.isPremium || false;
       
       // Start listening session in backend (if logged in)
       api.startListening(playingRadioId.toString()).then((response) => {
-        setCurrentSessionId(response.session.id);
+        sessionInfoRef.current.sessionId = response.session.id;
       }).catch((error) => {
         console.error('Failed to start listening session:', error);
         // Continue tracking locally even if backend fails
       });
       
+      // Calculate points interval based on pointsPerMin
+      // Points per second = pointsPerMin / 60
+      const pointsPerSecond = pointsPerMin / 60;
+      const intervalMs = 1000; // Update every second
+      const pointsPerInterval = pointsPerSecond;
+      
       // Increment points
       const pointsInterval = setInterval(() => {
-        setSessionPoints((prev) => prev + 1);
-      }, 1500); // Increment every 1.5 seconds
+        setSessionPoints((prev) => {
+          const newPoints = prev + pointsPerInterval;
+          sessionInfoRef.current.sessionPoints = newPoints;
+          return newPoints;
+        });
+      }, intervalMs);
       
       // Update total listening time every second
       const timeInterval = setInterval(() => {
@@ -321,29 +389,15 @@ function App() {
         clearInterval(pointsInterval);
         clearInterval(timeInterval);
         
-        // End listening session in backend (if session was started)
-        if (currentSessionId && sessionStartTime) {
-          const duration = Math.floor((Date.now() - sessionStartTime) / 1000); // Duration in seconds
-          api.endListening({
-            sessionId: currentSessionId,
-            duration: duration,
-            pointsEarned: sessionPoints
-          }).then(() => {
-            // Invalidate queries to refresh user data
-            queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-          }).catch((error) => {
-            console.error('Failed to end listening session:', error);
-          });
-        }
+        // End listening session
+        endListeningSession();
         
         setListeningStartTime(null);
-        setCurrentSessionId(null);
-        setSessionStartTime(0);
       };
     } else {
       setListeningStartTime(null);
     }
-  }, [isPlaying, playingRadioId, currentSessionId, sessionStartTime, sessionPoints]);
+  }, [isPlaying, playingRadioId, endListeningSession]);
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 
