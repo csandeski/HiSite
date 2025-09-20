@@ -500,6 +500,7 @@ function App() {
     setPlayingRadioId,
     isPlaying,
     setIsPlaying,
+    isSyncing,
     volume,
     setVolume,
     sessionPoints,

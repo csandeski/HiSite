@@ -13,7 +13,7 @@ import bandNewsLogo from '@assets/BandNews_FM_logo_2019_1758327521220.png';
 import radioGloboLogo from '@assets/radio-globo-default-removebg-preview_1758327521221.png';
 import transamericaLogo from '@assets/Rede_Transamérica_logo_1758327521220.png';
 import mixFmLogo from '@assets/Logotipo_da_Mix_FM_1758327521220.png';
-import { radios, usePlayer } from "../App";
+import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,6 +23,7 @@ interface DashboardProps {
   setPlayingRadioId: (id: number | null) => void;
   isPlaying: boolean;
   setIsPlaying: (playing: boolean) => void;
+  isSyncing: boolean;
   volume: number;
   setVolume: (volume: number) => void;
   sessionPoints: number;
@@ -54,12 +55,12 @@ export default function Dashboard({
   setPlayingRadioId,
   isPlaying,
   setIsPlaying,
+  isSyncing,
   sessionPoints,
   balance,
   userName,
   totalListeningTime = 0
 }: DashboardProps) {
-  const { isSyncing } = usePlayer();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
