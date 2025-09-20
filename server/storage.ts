@@ -302,7 +302,10 @@ export class SupabaseStorage implements IStorage {
     for (const achievement of achievements) {
       let progress = 0;
       let progressMax = 0;
-      const requirement = JSON.parse(achievement.requirement as string);
+      // requirement might be a JSON string or already an object
+      const requirement = typeof achievement.requirement === 'string' 
+        ? JSON.parse(achievement.requirement) 
+        : achievement.requirement;
       
       switch (requirement.type) {
         case 'listening_hours':

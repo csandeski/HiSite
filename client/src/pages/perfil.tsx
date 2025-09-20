@@ -106,7 +106,8 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   useEffect(() => {
     if (user) {
       api.getUserAchievements()
-        .then((data) => {
+        .then((data: any) => {
+          // The API returns achievements with details from the join
           setUserAchievements(data.achievements || []);
         })
         .catch((err) => {
