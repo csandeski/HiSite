@@ -128,6 +128,18 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
   const confirmExchange = () => {
     if (selectedExchange) {
+      // Double check points before proceeding
+      if (sessionPoints < selectedExchange.points) {
+        toast({
+          title: "Pontos insuficientes",
+          description: `Você tem ${sessionPoints} pontos, mas precisa de ${selectedExchange.points} pontos para esta conversão.`,
+          variant: "destructive",
+          duration: 5000,
+        });
+        setShowConfirmationModal(false);
+        return;
+      }
+      
       // Store conversion data before opening modal
       const dataToConvert = { points: selectedExchange.points, value: selectedExchange.value };
       setConversionData(dataToConvert);
@@ -161,14 +173,37 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
           description: `${result.pointsConverted} pontos convertidos em R$ ${result.amountAdded.toFixed(2)}`,
           duration: 5000,
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Conversion failed:', error);
-        toast({
-          title: "Erro na conversão",
-          description: "Não foi possível converter os pontos. Tente novamente.",
-          variant: "destructive",
-          duration: 5000,
-        });
+        
+        // Check if it's an insufficient points error
+        const errorMessage = error?.response?.data?.error || error?.message || "Erro desconhecido";
+        
+        if (errorMessage === "Pontos insuficientes") {
+          toast({
+            title: "Pontos insuficientes",
+            description: `Você precisa de ${conversionData.points} pontos para fazer esta conversão. Continue ouvindo para acumular mais pontos!`,
+            variant: "destructive",
+            duration: 5000,
+          });
+          
+          // Update points from server to ensure we have the latest value
+          try {
+            const userData = await api.getCurrentUser();
+            if (userData?.user) {
+              setSessionPoints(userData.user.points);
+            }
+          } catch (err) {
+            console.error('Failed to fetch updated points:', err);
+          }
+        } else {
+          toast({
+            title: "Erro na conversão",
+            description: errorMessage || "Não foi possível converter os pontos. Tente novamente.",
+            variant: "destructive",
+            duration: 5000,
+          });
+        }
       }
     }
   };
