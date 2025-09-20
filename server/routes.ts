@@ -337,18 +337,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate points based on duration and premium status
       // Points are always awarded as integers (1 point at a time)
       let pointsEarned = 0;
-      if (duration >= 30) {
-        const premiumMultiplier = user.isPremium ? 3 : 1;
-        
-        // Calculate interval in seconds for earning 1 point
-        // For example: if pointsPerMinute is 50, then interval is 60/50 = 1.2 seconds per point
-        // But we round to ensure integer intervals
-        const baseIntervalSeconds = Math.max(1, Math.round(60 / station.pointsPerMinute));
-        const intervalWithPremium = Math.max(1, Math.round(baseIntervalSeconds / premiumMultiplier));
-        
-        // Calculate how many points earned based on duration
-        pointsEarned = Math.floor(duration / intervalWithPremium);
-      }
+      
+      // Always calculate points earned (remove 30 second minimum)
+      const premiumMultiplier = user.isPremium ? 3 : 1;
+      
+      // Calculate interval in seconds for earning 1 point
+      // Use Math.floor for consistency with frontend
+      const baseIntervalSeconds = Math.max(1, Math.floor(60 / station.pointsPerMinute));
+      const intervalWithPremium = Math.max(1, Math.floor(baseIntervalSeconds / premiumMultiplier));
+      
+      // Calculate how many points earned based on duration
+      pointsEarned = Math.floor(duration / intervalWithPremium);
       
       // End session
       await storage.endListeningSession(sessionId, duration, pointsEarned);

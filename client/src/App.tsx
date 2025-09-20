@@ -409,7 +409,7 @@ function App() {
       // Calculate points interval based on pointsPerMin
       // Always increment by 1 point at a time
       // Calculate interval in milliseconds for earning 1 point
-      const baseIntervalSeconds = Math.max(1, Math.round(60 / pointsPerMin));
+      const baseIntervalSeconds = Math.max(1, Math.floor(60 / pointsPerMin));
       // Note: Premium multiplier is handled server-side, so we use base interval here
       const intervalMs = baseIntervalSeconds * 1000; // Convert to milliseconds
       
