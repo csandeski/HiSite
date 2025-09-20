@@ -27,8 +27,27 @@ export function useUTMTracking() {
     const hasUTMs = Object.values(newUTMs).some(value => value !== undefined);
     
     if (hasUTMs) {
+      // Get existing UTMs from localStorage
+      let existingUTMs: UTMParams = {};
+      try {
+        const stored = localStorage.getItem('utm_params');
+        if (stored) {
+          existingUTMs = JSON.parse(stored);
+        }
+      } catch (error) {
+        console.error('Error reading existing UTM params:', error);
+      }
+      
+      // Merge new UTMs with existing ones (new ones overwrite if present)
+      const mergedUTMs: UTMParams = {
+        ...existingUTMs,
+        ...Object.fromEntries(
+          Object.entries(newUTMs).filter(([_, value]) => value !== undefined)
+        )
+      };
+      
       // Only update localStorage if new UTMs are present
-      localStorage.setItem('utm_params', JSON.stringify(newUTMs));
+      localStorage.setItem('utm_params', JSON.stringify(mergedUTMs));
     }
   }, []); // Run only once on mount
   
