@@ -13,7 +13,7 @@ import bandNewsLogo from '@assets/BandNews_FM_logo_2019_1758327521220.png';
 import radioGloboLogo from '@assets/radio-globo-default-removebg-preview_1758327521221.png';
 import transamericaLogo from '@assets/Rede_Transamérica_logo_1758327521220.png';
 import mixFmLogo from '@assets/Logotipo_da_Mix_FM_1758327521220.png';
-import { radios } from "../App";
+import { radios, usePlayer } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
@@ -59,6 +59,7 @@ export default function Dashboard({
   userName,
   totalListeningTime = 0
 }: DashboardProps) {
+  const { isSyncing } = usePlayer();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -264,7 +265,7 @@ export default function Dashboard({
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
                       <div className="flex flex-col items-center">
-                        <div className={playingRadioId === radio.id && isPlaying ? "animate-pulse-scale" : ""}>
+                        <div className={playingRadioId === radio.id && isPlaying && !isSyncing ? "animate-pulse-scale" : ""}>
                           {radio.id === 1 && (
                             <img 
                               src={jovemPanLogo} 
@@ -343,7 +344,7 @@ export default function Dashboard({
                             />
                           )}
                         </div>
-                        {playingRadioId === radio.id && isPlaying && (
+                        {playingRadioId === radio.id && isPlaying && !isSyncing && (
                           <div className="sound-wave mt-1">
                             <span className="bar"></span>
                             <span className="bar"></span>
@@ -352,9 +353,21 @@ export default function Dashboard({
                             <span className="bar"></span>
                           </div>
                         )}
+                        {playingRadioId === radio.id && isPlaying && isSyncing && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <div className="w-1.5 h-4 bg-blue-500 rounded-full animate-pulse"></div>
+                            <div className="w-1.5 h-4 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '150ms'}}></div>
+                            <div className="w-1.5 h-4 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '300ms'}}></div>
+                          </div>
+                        )}
                       </div>
                       <h3 className={`font-semibold text-base ${radio.isPremium ? "text-gray-400" : "text-gray-900"}`}>
                         {radio.name}
+                        {playingRadioId === radio.id && isPlaying && isSyncing && (
+                          <span className="ml-2 text-xs font-normal text-blue-600 animate-pulse">
+                            Sincronizando...
+                          </span>
+                        )}
                       </h3>
                     </div>
                     <p className={`text-sm ${radio.isPremium ? "text-gray-400" : "text-gray-600"}`}>
