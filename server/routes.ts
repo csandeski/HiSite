@@ -9,6 +9,7 @@ declare module "express-session" {
   interface SessionData {
     userId?: string;
     username?: string;
+    isAdmin?: boolean;
   }
 }
 
@@ -32,6 +33,26 @@ function requireAuth(req: Request, res: Response, next: any) {
   }
   next();
 }
+
+// Admin middleware
+function requireAdmin(req: Request, res: Response, next: any) {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "Autenticação necessária" });
+  }
+  if (!req.session.isAdmin) {
+    return res.status(403).json({ error: "Acesso negado - apenas administradores" });
+  }
+  next();
+}
+
+// Admin validation schemas
+const updatePointsSchema = z.object({
+  points: z.number().int().min(0).max(1000000)
+});
+
+const updateBalanceSchema = z.object({
+  balance: z.number().min(0).max(100000)
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check
@@ -61,6 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create session
       req.session.userId = user.id;
       req.session.username = user.username;
+      req.session.isAdmin = user.isAdmin || false;
       
       res.json({ 
         user: {
@@ -70,7 +92,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           fullName: user.fullName,
           points: user.points,
           balance: user.balance,
-          isPremium: user.isPremium
+          isPremium: user.isPremium,
+          isAdmin: user.isAdmin
         }
       });
     } catch (error) {
@@ -101,6 +124,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create session
       req.session.userId = user.id;
       req.session.username = user.username;
+      req.session.isAdmin = user.isAdmin || false;
+      
+      // Update last login
+      await storage.updateUser(user.id, { lastLoginAt: new Date() });
       
       res.json({ 
         user: {
@@ -110,7 +137,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           fullName: user.fullName,
           points: user.points,
           balance: user.balance,
-          isPremium: user.isPremium
+          isPremium: user.isPremium,
+          isAdmin: user.isAdmin
         }
       });
     } catch (error) {
@@ -144,6 +172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           points: user.points,
           balance: user.balance,
           isPremium: user.isPremium,
+          isAdmin: user.isAdmin,
           avatarType: user.avatarType,
           avatarData: user.avatarData,
           bio: user.bio,
@@ -433,6 +462,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Update settings error:", error);
       res.status(500).json({ error: "Erro ao atualizar configurações" });
+    }
+  });
+
+  // Admin routes
+  app.get("/api/admin/users", requireAdmin, async (_req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      // Sanitize user data - remove sensitive fields
+      const sanitizedUsers = users.map(user => ({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
+        cpf: user.cpf,
+        points: user.points,
+        balance: user.balance,
+        totalEarnings: user.totalEarnings,
+        totalWithdrawn: user.totalWithdrawn,
+        isPremium: user.isPremium,
+        premiumExpiresAt: user.premiumExpiresAt,
+        isAdmin: user.isAdmin,
+        loginStreak: user.loginStreak,
+        lastLoginDate: user.lastLoginDate,
+        lastLoginAt: user.lastLoginAt,
+        totalListeningTime: user.totalListeningTime,
+        status: user.status,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        // Computed fields for admin panel
+        hasPurchased: parseFloat(user.totalEarnings) > 0
+      }));
+      res.json({ users: sanitizedUsers });
+    } catch (error) {
+      console.error("Get all users error:", error);
+      res.status(500).json({ error: "Erro ao buscar usuários" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id/points", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = updatePointsSchema.parse(req.body);
+      
+      const user = await storage.updateUser(id, { points: data.points });
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      res.json({ user });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
+      console.error("Update user points error:", error);
+      res.status(500).json({ error: "Erro ao atualizar pontos" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id/balance", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = updateBalanceSchema.parse(req.body);
+      
+      const user = await storage.updateUser(id, { balance: data.balance.toFixed(2) });
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      res.json({ user });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
+      console.error("Update user balance error:", error);
+      res.status(500).json({ error: "Erro ao atualizar saldo" });
+    }
+  });
+
+  app.get("/api/admin/transactions/:userId", requireAdmin, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const transactions = await storage.getUserTransactions(userId, 50);
+      res.json({ transactions });
+    } catch (error) {
+      console.error("Get user transactions error:", error);
+      res.status(500).json({ error: "Erro ao buscar transações" });
     }
   });
 

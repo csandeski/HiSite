@@ -10,6 +10,7 @@ import RegisterPage from "@/pages/register";
 import DashboardComp from "@/pages/dashboard";
 import Resgatar from "@/pages/resgatar";
 import Perfil from "@/pages/perfil";
+import { AdminPage } from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 import { useState, useEffect, createContext, useContext, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -388,6 +389,9 @@ function App() {
                   memberSince={memberSince}
                 />
                 <PushNotification />
+              </Route>
+              <Route path="/adm">
+                <AdminPage />
               </Route>
               <Route component={NotFound} />
             </Switch>

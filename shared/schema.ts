@@ -44,8 +44,10 @@ export const users = pgTable("users", {
   referredBy: varchar("referred_by"),
   isPremium: boolean("is_premium").notNull().default(false),
   premiumExpiresAt: timestamp("premium_expires_at"),
+  isAdmin: boolean("is_admin").notNull().default(false),
   loginStreak: integer("login_streak").notNull().default(0),
   lastLoginDate: date("last_login_date"),
+  lastLoginAt: timestamp("last_login_at"),
   totalListeningTime: integer("total_listening_time").notNull().default(0), // in seconds
   status: userStatusEnum("status").notNull().default('active'),
   createdAt: timestamp("created_at").notNull().defaultNow(),

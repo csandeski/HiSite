@@ -10,6 +10,7 @@ export interface User {
   points: number;
   balance: string;
   isPremium: boolean;
+  isAdmin: boolean;
   avatarType?: string;
   avatarData?: string;
   bio?: string;

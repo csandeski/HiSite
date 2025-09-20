@@ -26,6 +26,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   
   // Radio station methods
   getRadioStations(): Promise<RadioStation[]>;
@@ -140,6 +141,10 @@ export class SupabaseStorage implements IStorage {
       .where(eq(schema.users.id, id))
       .returning();
     return result[0];
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(schema.users).orderBy(desc(schema.users.createdAt));
   }
 
   // Radio station methods
