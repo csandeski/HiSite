@@ -10,16 +10,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 // Login form schema
 const loginSchema = z.object({
-  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  username: z.string().min(3, "Usuário deve ter pelo menos 3 caracteres"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
 // Register form schema
 const registerSchema = z.object({
-  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  fullName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  username: z.string().min(3, "Usuário deve ter pelo menos 3 caracteres"),
   email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
@@ -35,12 +38,15 @@ export default function Home({ setUserName }: HomeProps) {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
+  const { login, register } = useAuth();
+  const { toast } = useToast();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -48,7 +54,8 @@ export default function Home({ setUserName }: HomeProps) {
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
+      fullName: "",
+      username: "",
       email: "",
       password: "",
     },
@@ -67,31 +74,55 @@ export default function Home({ setUserName }: HomeProps) {
     }
   };
 
-  const onLoginSubmit = (data: LoginFormValues) => {
-    // Here you would typically make an API call to authenticate
-    // For now, save email as username
-    const name = data.email.split('@')[0]; // Extract name from email
-    localStorage.setItem('userName', name);
-    if (setUserName) {
-      setUserName(name);
+  const onLoginSubmit = async (data: LoginFormValues) => {
+    setIsLoading(true);
+    try {
+      await login(data.username, data.password);
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Bem-vindo de volta!",
+      });
+      setLoginOpen(false);
+      loginForm.reset();
+      // Redirect to dashboard after successful login
+      setLocation('/dashboard');
+    } catch (error) {
+      toast({
+        title: "Erro ao fazer login",
+        description: error instanceof Error ? error.message : "Usuário ou senha inválidos",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setLoginOpen(false);
-    loginForm.reset();
-    // Redirect to dashboard after successful login
-    setLocation('/dashboard');
   };
 
-  const onRegisterSubmit = (data: RegisterFormValues) => {
-    // Here you would typically make an API call to create account
-    // Save user name
-    localStorage.setItem('userName', data.name);
-    if (setUserName) {
-      setUserName(data.name);
+  const onRegisterSubmit = async (data: RegisterFormValues) => {
+    setIsLoading(true);
+    try {
+      await register({
+        email: data.email,
+        username: data.username,
+        password: data.password,
+        fullName: data.fullName,
+      });
+      toast({
+        title: "Cadastro realizado com sucesso!",
+        description: "Bem-vindo ao RádioPlay!",
+      });
+      setRegisterOpen(false);
+      registerForm.reset();
+      // Redirect to dashboard after successful registration
+      setLocation('/dashboard');
+    } catch (error) {
+      toast({
+        title: "Erro ao criar conta",
+        description: error instanceof Error ? error.message : "Erro ao criar conta",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setRegisterOpen(false);
-    registerForm.reset();
-    // Redirect to dashboard after successful registration
-    setLocation('/dashboard');
   };
 
   return (
@@ -437,16 +468,16 @@ export default function Home({ setUserName }: HomeProps) {
               <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                 <FormField
                   control={loginForm.control}
-                  name="email"
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Usuário</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Digite seu email"
-                          type="email"
+                          placeholder="Digite seu usuário"
+                          type="text"
                           className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
-                          data-testid="input-login-email"
+                          data-testid="input-login-username"
                           {...field}
                         />
                       </FormControl>
@@ -503,10 +534,11 @@ export default function Home({ setUserName }: HomeProps) {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  disabled={isLoading}
+                  className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
                   data-testid="button-submit-login"
                 >
-                  Entrar
+                  {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
               </form>
             </Form>
@@ -543,7 +575,7 @@ export default function Home({ setUserName }: HomeProps) {
               <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
                 <FormField
                   control={registerForm.control}
-                  name="name"
+                  name="fullName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-gray-700">Nome completo</FormLabel>
@@ -551,7 +583,25 @@ export default function Home({ setUserName }: HomeProps) {
                         <Input
                           placeholder="Digite seu nome completo"
                           className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
-                          data-testid="input-register-name"
+                          data-testid="input-register-fullname"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">Usuário</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Digite seu nome de usuário"
+                          className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
+                          data-testid="input-register-username"
                           {...field}
                         />
                       </FormControl>
@@ -616,10 +666,11 @@ export default function Home({ setUserName }: HomeProps) {
                 />
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  disabled={isLoading}
+                  className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 text-white hover:opacity-90 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
                   data-testid="button-submit-register"
                 >
-                  Criar Conta
+                  {isLoading ? "Criando conta..." : "Criar Conta"}
                 </Button>
               </form>
             </Form>
