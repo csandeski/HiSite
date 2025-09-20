@@ -151,8 +151,8 @@ export const usePlayer = () => {
   return context;
 };
 
-function App() {
-  const { user, refreshUser } = useAuth(); // Get user from auth context
+function App({ user }: { user: any }) {
+  const { refreshUser } = useAuth(); // Get refreshUser from auth context
   const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -308,18 +308,18 @@ function App() {
     }
   }, [location]);
 
-  // Detect when user reaches 25 points for the first time
+  // Detect when user reaches 25 points for the first time (only if logged in)
   useEffect(() => {
-    if (sessionPoints >= 25 && !hasReached25Points) {
+    if (user && sessionPoints >= 25 && !hasReached25Points) {
       setHasReached25Points(true);
       setShowPremiumPopup(true);
       setLastPopupTime(Date.now());
     }
-  }, [sessionPoints, hasReached25Points]);
+  }, [user, sessionPoints, hasReached25Points]);
 
-  // Show popup every 75 seconds (1:15 min) after reaching 25 points
+  // Show popup every 75 seconds (1:15 min) after reaching 25 points (only if logged in)
   useEffect(() => {
-    if (hasReached25Points && !showPremiumPopup) {
+    if (user && hasReached25Points && !showPremiumPopup) {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -546,11 +546,11 @@ function App() {
               </Route>
               <Route path="/dashboard">
                 <DashboardComp {...playerProps} totalListeningTime={totalListeningTime} />
-                <PushNotification />
+                {user && <PushNotification />}
               </Route>
               <Route path="/resgatar">
                 <Resgatar {...playerProps} />
-                <PushNotification />
+                {user && <PushNotification />}
               </Route>
               <Route path="/perfil">
                 <Perfil 
@@ -560,7 +560,7 @@ function App() {
                   totalListeningTime={totalListeningTime}
                   memberSince={memberSince}
                 />
-                <PushNotification />
+                {user && <PushNotification />}
               </Route>
               <Route path="/adm/login">
                 <AdminLoginPage />
@@ -790,11 +790,13 @@ function App() {
               </nav>
             )}
             
-            {/* Premium Popup */}
-            <PremiumPopup 
-              open={showPremiumPopup} 
-              onOpenChange={handlePremiumPopupClose}
-            />
+            {/* Premium Popup - Only show when logged in */}
+            {user && (
+              <PremiumPopup 
+                open={showPremiumPopup} 
+                onOpenChange={handlePremiumPopupClose}
+              />
+            )}
           </div>
         </PlayerContext.Provider>
       </TooltipProvider>
@@ -831,7 +833,7 @@ function ProtectedApp() {
     );
   }
   
-  return <App />;
+  return <App user={user} />;
 }
 
 // Main export with AuthProvider
