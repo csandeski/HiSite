@@ -37,6 +37,7 @@ import {
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import PixPaymentModal from '@/components/PixPaymentModal';
+import PremiumPopup from '@/components/PremiumPopup';
 
 interface PerfilProps {
   userName?: string;
@@ -61,7 +62,10 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
     localStorage.getItem('userStatus') || "Ouvindo rádio e ganhando pontos! 🎵"
   );
   const [tempStatus, setTempStatus] = useState("");
-  const [isPremium] = useState(false); // In production, this should come from user data
+  const [isPremium, setIsPremium] = useState(() => {
+    const saved = localStorage.getItem('isPremium');
+    return saved === 'true';
+  });
   
   // Check for highlight parameter in URL
   useEffect(() => {
@@ -88,6 +92,11 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
   useEffect(() => {
     localStorage.setItem('userStatus', userStatus);
   }, [userStatus]);
+  
+  // Save premium status to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('isPremium', String(isPremium));
+  }, [isPremium]);
   
   // Get initials from name
   const getInitials = (name: string) => {
@@ -152,7 +161,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
     const tags = [];
     
     // Check for "Primeira Conquista" (Iniciante badge) or "Ouvinte Dedicado" (100 Pts)
-    if (sessionPoints >= 1 || sessionPoints >= 100) {
+    if (sessionPoints >= 1) {
       tags.push({
         id: 'ouvinte-ativo',
         label: 'Ouvinte Ativo',
@@ -162,7 +171,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
     }
     
     // Check for "Multiplicador de Pontos" (1K Pts) or "Colecionador de Pontos" (500 Pts)
-    if (sessionPoints >= 1000 || sessionPoints >= 500) {
+    if (sessionPoints >= 500) {
       tags.push({
         id: 'top-ganhos',
         label: 'Top Ganhos',
@@ -213,6 +222,11 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
       setUserStatus(tempStatus.trim());
     }
     setShowStatusModal(false);
+  };
+  
+  const handlePremiumActivation = () => {
+    setIsPremium(true);
+    setShowPremiumModal(false);
   };
 
   return (
@@ -1098,6 +1112,13 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
       <PixPaymentModal 
         open={showPixModal} 
         onOpenChange={setShowPixModal}
+      />
+      
+      {/* Premium Popup Modal */}
+      <PremiumPopup
+        open={showPremiumModal}
+        onOpenChange={setShowPremiumModal}
+        onActivatePremium={handlePremiumActivation}
       />
     </div>
   );

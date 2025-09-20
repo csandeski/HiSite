@@ -7,15 +7,26 @@ import { useLocation } from "wouter";
 interface PremiumPopupProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onActivatePremium?: () => void;
 }
 
-export default function PremiumPopup({ open, onOpenChange }: PremiumPopupProps) {
+export default function PremiumPopup({ open, onOpenChange, onActivatePremium }: PremiumPopupProps) {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
   const handleUnlockPremium = () => {
+    // Activate premium if handler is provided
+    if (onActivatePremium) {
+      onActivatePremium();
+    }
     onOpenChange(false);
-    // Navegar para perfil com parâmetro para destacar o card premium
+    // Show success toast
+    toast({
+      title: "Premium Ativado! 🎉",
+      description: "Você agora é um membro Gold e ganhará 3x mais pontos!",
+      className: "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0",
+    });
+    // Navigate to profile to show the new status
     setLocation("/perfil?highlight=premium");
   };
 
