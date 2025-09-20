@@ -78,16 +78,25 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
         utmContent: urlParams.get('utm_content') || undefined
       };
       
-      const response = await api.post('/api/payment/create-pix', {
-        type,
-        amount,
-        utms
+      const response = await fetch('/api/payment/create-pix', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          type,
+          amount,
+          utms
+        })
       });
       
-      if (response.data.success) {
-        setPixData(response.data);
+      const data = await response.json();
+      
+      if (data.success) {
+        setPixData(data);
       } else {
-        throw new Error(response.data.error || 'Erro ao gerar pagamento');
+        throw new Error(data.error || 'Erro ao gerar pagamento');
       }
     } catch (error: any) {
       console.error('Error generating PIX payment:', error);
