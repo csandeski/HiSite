@@ -41,9 +41,26 @@ interface PerfilProps {
   userName?: string;
   sessionPoints: number;
   balance: number;
+  totalListeningTime?: number;
+  memberSince?: string;
 }
 
-export default function Perfil({ userName, sessionPoints, balance }: PerfilProps) {
+// Format milliseconds to Brazilian time format (e.g., "2h5min" or "45min")
+function formatListeningTime(milliseconds: number): string {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  
+  if (hours > 0) {
+    return `${hours}h${minutes > 0 ? minutes + 'min' : ''}`;
+  } else if (minutes > 0) {
+    return `${minutes}min`;
+  } else {
+    return '0min';
+  }
+}
+
+export default function Perfil({ userName, sessionPoints, balance, totalListeningTime = 0, memberSince }: PerfilProps) {
   const [, setLocation] = useLocation();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showPixModal, setShowPixModal] = useState(false);
@@ -97,8 +114,13 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
     { id: 'user', icon: User, color: 'from-gray-400 to-slate-500' },
   ];
 
-  // Get member since date
-  const memberSince = "Set 2025";
+  // Use memberSince from props or calculate it
+  const displayMemberSince = memberSince || (() => {
+    const now = new Date();
+    return now.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+      .replace(/\b\w/g, l => l.toUpperCase())
+      .replace(/\.$/, '');
+  })();
 
   const handleLogout = () => {
     localStorage.removeItem('userName');
@@ -221,7 +243,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                 </h1>
                 <p className="text-sm text-gray-500 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
-                  Membro desde {memberSince}
+                  Membro desde {displayMemberSince}
                 </p>
               </div>
               
@@ -266,7 +288,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
             {/* Listening Time */}
             <div className="px-3 text-center">
               <Clock className="w-5 h-5 text-blue-500 mx-auto mb-1.5" />
-              <h3 className="text-lg font-bold text-gray-900">3.2h</h3>
+              <h3 className="text-lg font-bold text-gray-900">{formatListeningTime(totalListeningTime)}</h3>
               <p className="text-xs text-gray-500">Hoje</p>
             </div>
           </div>

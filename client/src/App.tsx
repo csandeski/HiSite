@@ -160,6 +160,37 @@ function App() {
   const [userName, setUserName] = useState(() => {
     return localStorage.getItem('userName') || '';
   });
+  
+  // Time tracking states
+  const [listeningStartTime, setListeningStartTime] = useState<number | null>(null);
+  const [totalListeningTime, setTotalListeningTime] = useState<number>(() => {
+    // Load previous listening time from localStorage
+    const savedTime = localStorage.getItem('totalListeningTime');
+    const savedDate = localStorage.getItem('lastListeningDate');
+    const today = new Date().toDateString();
+    
+    // Reset if it's a new day
+    if (savedDate !== today) {
+      localStorage.setItem('lastListeningDate', today);
+      localStorage.setItem('totalListeningTime', '0');
+      return 0;
+    }
+    
+    return savedTime ? parseInt(savedTime) : 0;
+  });
+  
+  // User creation date
+  const [memberSince] = useState(() => {
+    const saved = localStorage.getItem('memberSince');
+    if (saved) return saved;
+    
+    const now = new Date();
+    const formatted = now.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+      .replace(/\b\w/g, l => l.toUpperCase())
+      .replace(/\.$/, '');
+    localStorage.setItem('memberSince', formatted);
+    return formatted;
+  });
 
   // Initialize audio element
   useEffect(() => {
@@ -248,15 +279,34 @@ function App() {
     }
   };
 
-  // Efeito para incrementar pontos enquanto toca
+  // Effect to track listening time and points while playing
   useEffect(() => {
-    if (!isPlaying || playingRadioId === null) return;
-
-    const interval = setInterval(() => {
-      setSessionPoints((prev) => prev + 1);
-    }, 1500); // Incrementa a cada 1,5 segundos
-
-    return () => clearInterval(interval);
+    if (isPlaying && playingRadioId !== null) {
+      // Start tracking listening time
+      setListeningStartTime(Date.now());
+      
+      // Increment points
+      const pointsInterval = setInterval(() => {
+        setSessionPoints((prev) => prev + 1);
+      }, 1500); // Increment every 1.5 seconds
+      
+      // Update total listening time every second
+      const timeInterval = setInterval(() => {
+        setTotalListeningTime((prev) => {
+          const newTotal = prev + 1000; // Add 1 second
+          localStorage.setItem('totalListeningTime', newTotal.toString());
+          return newTotal;
+        });
+      }, 1000);
+      
+      return () => {
+        clearInterval(pointsInterval);
+        clearInterval(timeInterval);
+        setListeningStartTime(null);
+      };
+    } else {
+      setListeningStartTime(null);
+    }
   }, [isPlaying, playingRadioId]);
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
@@ -313,7 +363,7 @@ function App() {
                 <Home setUserName={setUserName} />
               </Route>
               <Route path="/dashboard">
-                <DashboardComp {...playerProps} />
+                <DashboardComp {...playerProps} totalListeningTime={totalListeningTime} />
                 <PushNotification />
               </Route>
               <Route path="/resgatar">
@@ -321,7 +371,13 @@ function App() {
                 <PushNotification />
               </Route>
               <Route path="/perfil">
-                <Perfil userName={userName} sessionPoints={sessionPoints} balance={balance} />
+                <Perfil 
+                  userName={userName} 
+                  sessionPoints={sessionPoints} 
+                  balance={balance}
+                  totalListeningTime={totalListeningTime}
+                  memberSince={memberSince}
+                />
                 <PushNotification />
               </Route>
               <Route component={NotFound} />

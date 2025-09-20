@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
@@ -30,6 +30,22 @@ interface DashboardProps {
   setBalance: (balance: number) => void;
   userName?: string;
   setUserName?: (name: string) => void;
+  totalListeningTime?: number;
+}
+
+// Format milliseconds to Brazilian time format (e.g., "2h5min" or "45min")
+function formatListeningTime(milliseconds: number): string {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  
+  if (hours > 0) {
+    return `${hours}h${minutes > 0 ? minutes + 'min' : ''}`;
+  } else if (minutes > 0) {
+    return `${minutes}min`;
+  } else {
+    return '0min';
+  }
 }
 
 export default function Dashboard({
@@ -39,9 +55,11 @@ export default function Dashboard({
   setIsPlaying,
   sessionPoints,
   balance,
-  userName
+  userName,
+  totalListeningTime = 0
 }: DashboardProps) {
   const [, setLocation] = useLocation();
+  const [currentTime, setCurrentTime] = useState(new Date());
   // Estado para rastrear ouvintes por rádio
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
     const initial: { [key: number]: number } = {};
@@ -74,6 +92,24 @@ export default function Dashboard({
 
     return () => clearInterval(interval);
   }, []);
+  
+  // Update current time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+    
+    return () => clearInterval(timer);
+  }, []);
+  
+  // Format current time in Portuguese format
+  const formatCurrentTime = () => {
+    return currentTime.toLocaleTimeString('pt-BR', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false 
+    }).replace(':', 'h') + 'min';
+  };
 
   const handleRadioPlay = (radioId: number, isPremium: boolean) => {
     if (isPremium) {
@@ -136,10 +172,24 @@ export default function Dashboard({
       {/* Main Content */}
       <main className="flex-1 pb-32">
         <div className="container mx-auto px-4 py-6 max-w-2xl">
-          {/* Welcome Message */}
-          <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-3">
-            <User className="w-4 h-4" />
-            <span>Seja bem-vindo, {userName || 'Usuário'}</span>
+          {/* Welcome Message and Time Info */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <User className="w-4 h-4" />
+              <span>Seja bem-vindo, {userName || 'Usuário'}</span>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span className="font-medium">{formatCurrentTime()}</span>
+              </div>
+              {totalListeningTime > 0 && (
+                <div className="flex items-center gap-1">
+                  <Volume2 className="w-4 h-4" />
+                  <span className="font-medium">Ouvindo há {formatListeningTime(totalListeningTime)}</span>
+                </div>
+              )}
+            </div>
           </div>
           
           {/* Session Points Card */}
@@ -169,13 +219,30 @@ export default function Dashboard({
             </div>
             
             {/* Live earning indicator inside the card */}
-            {playingRadio && isPlaying && (
-              <div className="bg-white/10 rounded-lg px-2.5 py-1.5 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-xs text-white/90">
-                  Ganhando pontos ao vivo • {playingRadio.name}
-                </span>
+            {playingRadio && isPlaying ? (
+              <div className="space-y-2">
+                <div className="bg-white/10 rounded-lg px-2.5 py-1.5 flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-white/90">
+                    Ganhando pontos ao vivo • {playingRadio.name}
+                  </span>
+                </div>
+                <div className="bg-white/10 rounded-lg px-2.5 py-1.5 flex items-center justify-between">
+                  <span className="text-xs text-white/90">Tempo de escuta hoje:</span>
+                  <span className="text-xs font-bold text-white">
+                    {formatListeningTime(totalListeningTime)}
+                  </span>
+                </div>
               </div>
+            ) : (
+              totalListeningTime > 0 && (
+                <div className="bg-white/10 rounded-lg px-2.5 py-1.5 flex items-center justify-between">
+                  <span className="text-xs text-white/90">Tempo de escuta hoje:</span>
+                  <span className="text-xs font-bold text-white">
+                    {formatListeningTime(totalListeningTime)}
+                  </span>
+                </div>
+              )
             )}
           </Card>
 
