@@ -155,12 +155,8 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
   const [lastVolume, setLastVolume] = useState(50);
-  const [sessionPoints, setSessionPoints] = useState(() => {
-    return user?.points || 0;
-  }); // Starting with user points or 0
-  const [balance, setBalance] = useState(() => {
-    return user?.balance ? parseFloat(user.balance) : 0;
-  });
+  const [sessionPoints, setSessionPoints] = useState(0); // Will be synced with user data via useEffect
+  const [balance, setBalance] = useState(0); // Will be synced with user data via useEffect
   const [activeTab, setActiveTab] = useState("radio");
   const [location, setLocation] = useLocation();
   const [hasReached15Points, setHasReached15Points] = useState(false);
@@ -213,6 +209,10 @@ function App() {
     if (user) {
       setSessionPoints(user.points || 0);
       setBalance(user.balance ? parseFloat(user.balance) : 0);
+    } else {
+      // Reset values when user is logged out
+      setSessionPoints(0);
+      setBalance(0);
     }
   }, [user]);
 
