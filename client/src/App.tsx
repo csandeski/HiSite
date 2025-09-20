@@ -298,8 +298,8 @@ function App() {
       const sessionId = sessionInfoRef.current.sessionId;
       const points = sessionInfoRef.current.sessionPoints;
       
-      // Clear session info immediately
-      sessionInfoRef.current = { sessionId: null, sessionStartTime: 0, sessionPoints: 0 };
+      // Clear only session ID and start time, but KEEP the points
+      sessionInfoRef.current = { sessionId: null, sessionStartTime: 0, sessionPoints: points };
       
       // End session in backend and refresh user data
       api.endListening({
@@ -339,12 +339,21 @@ function App() {
     };
   }, [isPlaying, endListeningSession]);
 
+  // Track previous radio ID to detect radio changes
+  const [prevRadioId, setPrevRadioId] = useState<number | null>(null);
+  
   // Effect to track listening time and points while playing
   useEffect(() => {
     if (isPlaying && playingRadioId !== null) {
-      // Reset session points when starting new session
-      setSessionPoints(0);
-      sessionInfoRef.current.sessionPoints = 0;
+      // DON'T reset session points when resuming same radio
+      // Only reset if we never had points or changed radio
+      if (prevRadioId !== playingRadioId && prevRadioId !== null) {
+        // Radio changed - keep accumulated points but start new backend session
+        setPrevRadioId(playingRadioId);
+      } else if (prevRadioId === null) {
+        // First time playing - keep existing session points (don't reset)
+        setPrevRadioId(playingRadioId);
+      }
       
       // Start tracking listening time
       const startTime = Date.now();
