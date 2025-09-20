@@ -185,12 +185,6 @@ export default function Dashboard({
                 <Clock className="w-4 h-4" />
                 <span className="font-medium">{formatCurrentTime()}</span>
               </div>
-              {totalListeningTime > 0 && (
-                <div className="flex items-center gap-1">
-                  <Volume2 className="w-4 h-4" />
-                  <span className="font-medium">Ouvindo há {formatListeningTime(totalListeningTime)}</span>
-                </div>
-              )}
             </div>
           </div>
           
