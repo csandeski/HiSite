@@ -110,8 +110,10 @@ export default function Home({ setUserName }: HomeProps) {
       });
       setRegisterOpen(false);
       registerForm.reset();
-      // Redirect to dashboard after successful registration
-      setLocation('/dashboard');
+      // Aguardar um pouco para garantir que o estado do usuário seja atualizado
+      setTimeout(() => {
+        setLocation('/dashboard');
+      }, 200);
     } catch (error) {
       toast({
         title: "Erro ao criar conta",
