@@ -129,6 +129,8 @@ interface PlayerContextType {
   setPlayingRadioId: (id: number | null) => void;
   isPlaying: boolean;
   setIsPlaying: (playing: boolean) => void;
+  isSyncing: boolean;
+  setIsSyncing: (syncing: boolean) => void;
   volume: number;
   setVolume: (volume: number) => void;
   sessionPoints: number;
@@ -153,6 +155,7 @@ function App() {
   const { user, refreshUser } = useAuth(); // Get user from auth context
   const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [volume, setVolume] = useState(50);
   const [lastVolume, setLastVolume] = useState(50);
   const [sessionPoints, setSessionPoints] = useState(0); // Will be synced with user data via useEffect
@@ -230,8 +233,35 @@ function App() {
   useEffect(() => {
     audioRef.current = new Audio();
     audioRef.current.volume = volume / 100;
+    
+    // Add event listeners to detect when audio is ready
+    const audio = audioRef.current;
+    
+    const handleCanPlay = () => {
+      console.log('Audio can play - syncing complete');
+      setIsSyncing(false);
+    };
+    
+    const handleWaiting = () => {
+      console.log('Audio is waiting for data');
+      setIsSyncing(true);
+    };
+    
+    const handleError = () => {
+      console.error('Audio error occurred');
+      setIsSyncing(false);
+      setIsPlaying(false);
+    };
+    
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('waiting', handleWaiting);
+    audio.addEventListener('error', handleError);
+    
     return () => {
       if (audioRef.current) {
+        audio.removeEventListener('canplay', handleCanPlay);
+        audio.removeEventListener('waiting', handleWaiting);
+        audio.removeEventListener('error', handleError);
         audioRef.current.pause();
         audioRef.current.src = "";
       }
@@ -245,14 +275,18 @@ function App() {
     if (isPlaying && playingRadioId !== null) {
       const radio = radios.find(r => r.id === playingRadioId);
       if (radio && radio.streamUrl) {
+        // Start syncing
+        setIsSyncing(true);
         audioRef.current.src = radio.streamUrl;
         audioRef.current.play().catch(error => {
           console.error("Erro ao tocar rádio:", error);
           setIsPlaying(false);
+          setIsSyncing(false);
         });
       }
     } else {
       audioRef.current.pause();
+      setIsSyncing(false);
     }
   }, [isPlaying, playingRadioId]);
 
@@ -371,7 +405,8 @@ function App() {
     let timeInterval: NodeJS.Timeout | null = null;
     let shouldEndSession = false;
     
-    if (isPlaying && playingRadioId !== null) {
+    // Only start counting points when playing and NOT syncing
+    if (isPlaying && playingRadioId !== null && !isSyncing) {
       shouldEndSession = true; // Mark that we should end session on cleanup
       
       // DON'T reset session points when resuming same radio
@@ -445,7 +480,7 @@ function App() {
       
       setListeningStartTime(null);
     };
-  }, [isPlaying, playingRadioId]); // Remove endListeningSession from deps
+  }, [isPlaying, playingRadioId, isSyncing]); // Add isSyncing to deps
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 
@@ -485,6 +520,8 @@ function App() {
           setPlayingRadioId,
           isPlaying,
           setIsPlaying,
+          isSyncing,
+          setIsSyncing,
           volume,
           setVolume,
           sessionPoints,
