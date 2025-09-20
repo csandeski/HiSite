@@ -465,6 +465,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin login route (separate from regular login)
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      // Validação básica
+      if (!username || !password) {
+        return res.status(400).json({ error: "Usuário e senha são obrigatórios" });
+      }
+      
+      // Buscar usuário admin
+      const user = await storage.getUserByUsername(username);
+      if (!user || !user.isAdmin) {
+        return res.status(401).json({ error: "Credenciais inválidas ou usuário não é administrador" });
+      }
+      
+      // Verificar senha
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ error: "Credenciais inválidas" });
+      }
+      
+      // Criar sessão admin
+      req.session.userId = user.id;
+      req.session.username = user.username;
+      req.session.isAdmin = true;
+      
+      res.json({ 
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          isAdmin: user.isAdmin
+        }
+      });
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ error: "Erro ao fazer login administrativo" });
+    }
+  });
+
   // Admin routes
   app.get("/api/admin/users", requireAdmin, async (_req, res) => {
     try {

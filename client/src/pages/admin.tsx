@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
 import {
   Table,
@@ -29,24 +28,23 @@ import type { User as UserType } from "@shared/schema";
 
 export function AdminPage() {
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editType, setEditType] = useState<"points" | "balance">("points");
   const [editValue, setEditValue] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Verificar se o usuário é admin
+  // Verificar se o usuário está autenticado como admin
   useEffect(() => {
-    if (!authLoading && (!user || !user.isAdmin)) {
-      toast({
-        title: "Acesso negado",
-        description: "Você não tem permissão para acessar esta página.",
-        variant: "destructive",
-      });
-      setLocation("/dashboard");
+    const adminAuth = sessionStorage.getItem('adminAuth');
+    if (!adminAuth || adminAuth !== 'true') {
+      // Redirecionar para login de admin
+      setLocation('/adm/login');
+    } else {
+      setIsAuthenticated(true);
     }
-  }, [user, authLoading, setLocation, toast]);
+  }, [setLocation]);
 
   // Buscar todos os usuários
   const { data: usersData, isLoading } = useQuery<{ users: UserType[] }>({
