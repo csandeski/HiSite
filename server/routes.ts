@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import type { User } from "@shared/schema";
+import orinpay from "./services/orinpay";
 
 // Session types
 declare module "express-session" {
@@ -44,6 +45,56 @@ function requireAdmin(req: Request, res: Response, next: any) {
     return res.status(403).json({ error: "Acesso negado - apenas administradores" });
   }
   next();
+}
+
+// Generate fake user data for OrinPay testing
+function generateFakeUserData() {
+  // Generate random CPF (valid format but fake)
+  const generateRandomCPF = () => {
+    const digits = [];
+    for (let i = 0; i < 9; i++) {
+      digits.push(Math.floor(Math.random() * 10));
+    }
+    
+    // Calculate first check digit
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += digits[i] * (10 - i);
+    }
+    let remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    digits.push(remainder);
+    
+    // Calculate second check digit
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += digits[i] * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    digits.push(remainder);
+    
+    return digits.join('');
+  };
+
+  const fakeNames = [
+    'João Silva Santos', 'Maria Oliveira Costa', 'Pedro Ferreira Lima', 
+    'Ana Paula Rodrigues', 'Carlos Eduardo Souza', 'Fernanda Alves Pereira',
+    'Rafael Santos Cruz', 'Juliana Barbosa Martins', 'Lucas Gomes Araújo',
+    'Patricia Ribeiro Almeida', 'Diego Costa Nascimento', 'Camila Torres Silva'
+  ];
+  
+  const fakeName = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+  const fakeEmail = fakeName.toLowerCase().replace(/\s+/g, '.') + '@teste.com';
+  const fakePhone = '11' + Math.floor(900000000 + Math.random() * 100000000);
+  const fakeCPF = generateRandomCPF();
+  
+  return {
+    name: fakeName,
+    email: fakeEmail,
+    phone: fakePhone,
+    cpf: fakeCPF
+  };
 }
 
 // Admin validation schemas
@@ -686,8 +737,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
       
-      // Import OrinPay service
-      const orinpay = require('./services/orinpay').default;
+      // Use the imported OrinPay service (already imported at top)
       
       // Validate amount
       const amountInCents = orinpay.reaisToCentavos(amount);
@@ -698,16 +748,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate reference
       const reference = orinpay.generateReference(req.session.userId!, type);
       
+      // Generate fake user data for OrinPay testing (never use real user data)
+      const fakeUser = generateFakeUserData();
+      
       // Create PIX transaction
       const pixData = {
         paymentMethod: 'pix' as const,
         reference,
         customer: {
-          name: user.fullName || user.username,
-          email: user.email || `${user.username}@radioplay.com`,
-          phone: orinpay.formatPhone(user.phoneNumber || '11999999999'),
+          name: fakeUser.name,
+          email: fakeUser.email,
+          phone: orinpay.formatPhone(fakeUser.phone),
           document: {
-            number: orinpay.formatCPF(user.cpf || '00000000000'),
+            number: orinpay.formatCPF(fakeUser.cpf),
             type: 'cpf' as const
           }
         },
