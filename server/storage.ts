@@ -26,6 +26,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
+  incrementUserPoints(userId: string, points: number): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
   
   // Radio station methods
@@ -140,6 +141,18 @@ export class SupabaseStorage implements IStorage {
     const result = await db.update(schema.users)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(schema.users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async incrementUserPoints(userId: string, points: number): Promise<User | undefined> {
+    // Atomic increment of user points
+    const result = await db.update(schema.users)
+      .set({ 
+        points: sql`${schema.users.points} + ${points}`,
+        updatedAt: new Date() 
+      })
+      .where(eq(schema.users.id, userId))
       .returning();
     return result[0];
   }

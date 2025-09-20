@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import type { User } from "@shared/schema";
 
 // Session types
 declare module "express-session" {
@@ -273,12 +274,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Update user points and daily stats
           if (pointsEarned > 0) {
-            await storage.updateUser(req.session.userId!, {
-              points: user.points + pointsEarned,
-              totalListeningTime: user.totalListeningTime + duration
-            });
+            await storage.incrementUserPoints(req.session.userId!, pointsEarned);
             await storage.updateDailyStats(req.session.userId!, duration, pointsEarned);
           }
+          // Always update listening time
+          await storage.updateUser(req.session.userId!, {
+            totalListeningTime: user.totalListeningTime + duration
+          });
         } else {
           // End session without points if conditions not met
           await storage.endListeningSession(existingSession.id, duration, 0);
@@ -354,9 +356,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update daily stats
       await storage.updateDailyStats(req.session.userId!, duration, pointsEarned);
       
-      // Update user points and listening time
-      const updatedUser = await storage.updateUser(req.session.userId!, {
-        points: user.points + pointsEarned,
+      // Update user points atomically
+      let updatedUser: User | undefined;
+      if (pointsEarned > 0) {
+        updatedUser = await storage.incrementUserPoints(req.session.userId!, pointsEarned);
+      }
+      
+      // Update listening time
+      updatedUser = await storage.updateUser(req.session.userId!, {
         totalListeningTime: user.totalListeningTime + duration
       });
       
