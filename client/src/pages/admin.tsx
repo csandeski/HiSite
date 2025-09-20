@@ -57,7 +57,7 @@ export function AdminPage() {
   // Mutation para atualizar pontos
   const updatePointsMutation = useMutation({
     mutationFn: async ({ userId, points }: { userId: string; points: number }) => {
-      return await apiRequest(`/api/admin/users/${userId}/points`, "PATCH", { points });
+      return await apiRequest("PATCH", `/api/admin/users/${userId}/points`, { points });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -80,7 +80,7 @@ export function AdminPage() {
   // Mutation para atualizar saldo
   const updateBalanceMutation = useMutation({
     mutationFn: async ({ userId, balance }: { userId: string; balance: number }) => {
-      return await apiRequest(`/api/admin/users/${userId}/balance`, "PATCH", { balance });
+      return await apiRequest("PATCH", `/api/admin/users/${userId}/balance`, { balance });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
