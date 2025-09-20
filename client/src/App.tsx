@@ -362,15 +362,16 @@ function App() {
       });
       
       // Calculate points interval based on pointsPerMin
-      // Points per second = pointsPerMin / 60
-      const pointsPerSecond = pointsPerMin / 60;
-      const intervalMs = 1000; // Update every second
-      const pointsPerInterval = pointsPerSecond;
+      // Always increment by 1 point at a time
+      // Calculate interval in milliseconds for earning 1 point
+      const baseIntervalSeconds = Math.max(1, Math.round(60 / pointsPerMin));
+      // Note: Premium multiplier is handled server-side, so we use base interval here
+      const intervalMs = baseIntervalSeconds * 1000; // Convert to milliseconds
       
-      // Increment points
+      // Increment points by 1 at calculated intervals
       const pointsInterval = setInterval(() => {
         setSessionPoints((prev) => {
-          const newPoints = prev + pointsPerInterval;
+          const newPoints = prev + 1; // Always increment by 1
           sessionInfoRef.current.sessionPoints = newPoints;
           return newPoints;
         });
