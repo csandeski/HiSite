@@ -170,10 +170,11 @@ function App() {
   
   // Time tracking states
   const [listeningStartTime, setListeningStartTime] = useState<number | null>(null);
-  const sessionInfoRef = useRef<{sessionId: string | null; sessionStartTime: number; sessionPoints: number}>({
+  const sessionInfoRef = useRef<{sessionId: string | null; sessionStartTime: number; sessionPoints: number; baselinePoints: number}>({
     sessionId: null,
     sessionStartTime: 0,
-    sessionPoints: 0
+    sessionPoints: 0,
+    baselinePoints: 0
   });
   const [totalListeningTime, setTotalListeningTime] = useState<number>(() => {
     // Load previous listening time from localStorage
@@ -308,16 +309,20 @@ function App() {
     if (sessionInfoRef.current.sessionId && sessionInfoRef.current.sessionStartTime) {
       const duration = Math.floor((Date.now() - sessionInfoRef.current.sessionStartTime) / 1000);
       const sessionId = sessionInfoRef.current.sessionId;
-      const points = sessionInfoRef.current.sessionPoints;
+      const currentPoints = sessionInfoRef.current.sessionPoints;
+      const baselinePoints = sessionInfoRef.current.baselinePoints;
+      
+      // Calculate points earned in this session only
+      const pointsEarnedThisSession = Math.max(0, currentPoints - baselinePoints);
       
       // Clear only session ID and start time, but KEEP the points
-      sessionInfoRef.current = { sessionId: null, sessionStartTime: 0, sessionPoints: points };
+      sessionInfoRef.current = { sessionId: null, sessionStartTime: 0, sessionPoints: currentPoints, baselinePoints: 0 };
       
       // End session in backend and refresh user data
       api.endListening({
         sessionId,
         duration,
-        pointsEarned: points
+        pointsEarned: pointsEarnedThisSession
       }).then(() => {
         // Refresh user data to get updated points
         refreshUser();
@@ -371,6 +376,10 @@ function App() {
       const startTime = Date.now();
       setListeningStartTime(startTime);
       sessionInfoRef.current.sessionStartTime = startTime;
+      
+      // Set baseline points for this session (current user total)
+      sessionInfoRef.current.baselinePoints = sessionPoints;
+      sessionInfoRef.current.sessionPoints = sessionPoints;
       
       // Get the radio's points per minute
       const playingRadio = radios.find(r => r.id === playingRadioId);

@@ -229,6 +229,22 @@ class ApiClient {
     return this.request('/withdrawals');
   }
 
+  // Points conversion
+  async convertPoints(data: {
+    points: number;
+  }): Promise<{ 
+    success: boolean;
+    pointsConverted: number;
+    amountAdded: number;
+    newBalance: number;
+    newPoints: number;
+  }> {
+    return this.request('/points/convert', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
   // Premium subscription
   async subscribePremium(plan: 'monthly' | 'quarterly' | 'annual'): Promise<any> {
     return this.request('/premium/subscribe', {

@@ -477,6 +477,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Points conversion
+  app.post("/api/points/convert", requireAuth, async (req, res) => {
+    try {
+      const conversionSchema = z.object({
+        points: z.number().int().positive("Pontos deve ser um número positivo")
+      });
+
+      const { points } = conversionSchema.parse(req.body);
+      
+      // Get user to check points balance
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      if (user.points < points) {
+        return res.status(400).json({ error: "Pontos insuficientes" });
+      }
+      
+      // Define conversion rates (server-controlled for security)
+      const conversionRates = {
+        100: 7.50,   // R$ 0,075/pt
+        300: 24.00,  // R$ 0,08/pt  
+        600: 60.00,  // R$ 0,10/pt
+        1200: 150.00 // R$ 0,125/pt
+      };
+      
+      // Check if points amount is valid
+      const amount = conversionRates[points as keyof typeof conversionRates];
+      if (!amount) {
+        return res.status(400).json({ 
+          error: "Quantidade de pontos inválida",
+          validAmounts: Object.keys(conversionRates).map(Number)
+        });
+      }
+      
+      // Deduct points from user
+      await storage.updateUser(req.session.userId!, {
+        points: user.points - points
+      });
+      
+      // Create transaction to add to balance
+      await storage.createTransaction({
+        userId: req.session.userId!,
+        type: 'earning',
+        amount: amount,
+        points: points,
+        description: `Conversão de ${points} pontos em R$ ${amount.toFixed(2)}`
+      });
+      
+      // Get updated user data
+      const updatedUser = await storage.getUser(req.session.userId!);
+      
+      res.json({ 
+        success: true,
+        pointsConverted: points,
+        amountAdded: amount,
+        newBalance: parseFloat(updatedUser?.balance || "0"),
+        newPoints: updatedUser?.points || 0
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
+      console.error("Convert points error:", error);
+      res.status(500).json({ error: "Erro ao converter pontos" });
+    }
+  });
+
   // Premium subscription
   app.post("/api/premium/subscribe", requireAuth, async (req, res) => {
     try {

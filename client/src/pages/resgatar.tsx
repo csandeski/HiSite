@@ -32,6 +32,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 interface ResgatarProps {
   playingRadioId: number | null;
@@ -138,13 +139,37 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     }
   };
   
-  const handleConversionSuccess = () => {
+  const handleConversionSuccess = async () => {
     if (conversionData) {
-      // Deduct points and add to balance
-      setSessionPoints((prev: number) => prev - conversionData.points);
-      setBalance(prev => prev + conversionData.value);
-      setSelectedExchange(null);
-      setConversionData(null);
+      try {
+        // Call API to convert points
+        const result = await api.convertPoints({
+          points: conversionData.points
+        });
+        
+        // Update local state with server response
+        setSessionPoints(result.newPoints);
+        setBalance(result.newBalance);
+        
+        // Clear conversion data
+        setSelectedExchange(null);
+        setConversionData(null);
+        
+        // Show success toast
+        toast({
+          title: "Conversão realizada com sucesso!",
+          description: `${result.pointsConverted} pontos convertidos em R$ ${result.amountAdded.toFixed(2)}`,
+          duration: 5000,
+        });
+      } catch (error) {
+        console.error('Conversion failed:', error);
+        toast({
+          title: "Erro na conversão",
+          description: "Não foi possível converter os pontos. Tente novamente.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
     }
   };
 
