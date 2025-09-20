@@ -16,6 +16,7 @@ import mixFmLogo from '@assets/Logotipo_da_Mix_FM_1758327521220.png';
 import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -59,6 +60,7 @@ export default function Dashboard({
   totalListeningTime = 0
 }: DashboardProps) {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   // Estado para rastrear ouvintes por rádio
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
@@ -176,7 +178,7 @@ export default function Dashboard({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-1.5 text-sm text-gray-600">
               <User className="w-4 h-4" />
-              <span>Seja bem-vindo, {userName || 'Usuário'}</span>
+              <span>Seja bem-vindo, {user?.fullName || user?.username || 'Usuário'}</span>
             </div>
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <div className="flex items-center gap-1">

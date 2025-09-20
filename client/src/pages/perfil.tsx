@@ -36,6 +36,7 @@ import {
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import PixPaymentModal from '@/components/PixPaymentModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PerfilProps {
   userName?: string;
@@ -62,6 +63,7 @@ function formatListeningTime(milliseconds: number): string {
 
 export default function Perfil({ userName, sessionPoints, balance, totalListeningTime = 0, memberSince }: PerfilProps) {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showPixModal, setShowPixModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -154,7 +156,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
       const avatar = avatarIcons.find(a => a.id === selectedAvatar);
       return { type: 'icon' as const, content: avatar };
     }
-    return { type: 'initials' as const, content: getInitials(userName || '') };
+    return { type: 'initials' as const, content: getInitials(user?.fullName || user?.username || '') };
   };
 
   return (
@@ -239,7 +241,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
             <div className="space-y-2">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {userName || 'Usuário'}
+                  {user?.fullName || user?.username || 'Usuário'}
                 </h1>
                 <p className="text-sm text-gray-500 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
