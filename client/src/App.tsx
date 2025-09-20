@@ -205,17 +205,20 @@ function App() {
     return formatted;
   });
 
-  // Sync balance and points with authenticated user
+  // Initialize balance and points only once when user logs in/out
   useEffect(() => {
     if (user) {
-      setSessionPoints(user.points || 0);
+      // Only set balance, not points (points are managed by listening sessions)
       setBalance(user.balance ? parseFloat(user.balance) : 0);
+      
+      // Only set points if they are currently 0 (initial load or after logout)
+      setSessionPoints(prev => prev === 0 ? (user.points || 0) : prev);
     } else {
       // Reset values when user is logged out
       setSessionPoints(0);
       setBalance(0);
     }
-  }, [user]);
+  }, [user?.id]); // Only run when user ID changes (login/logout)
 
   // Initialize audio element
   useEffect(() => {
@@ -324,34 +327,29 @@ function App() {
         duration,
         pointsEarned: pointsEarnedThisSession
       }).then(() => {
-        // Refresh user data to get updated points
-        refreshUser();
-        queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+        // Refresh user data to get updated points from backend
+        // But preserve local session points if they're higher
+        api.getCurrentUser().then(({ user }) => {
+          setSessionPoints(prev => Math.max(prev, user.points || 0));
+          queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+        });
       }).catch((error) => {
         console.error('Failed to end listening session:', error);
       });
     }
-  }, [refreshUser]);
+  }, []);
 
-  // Handle page visibility changes and unload
+  // Handle page unload only (not visibility changes)
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden && isPlaying) {
-        endListeningSession();
-      }
-    };
-    
     const handleBeforeUnload = () => {
       if (isPlaying) {
         endListeningSession();
       }
     };
     
-    document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('beforeunload', handleBeforeUnload);
     
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isPlaying, endListeningSession]);
@@ -361,7 +359,13 @@ function App() {
   
   // Effect to track listening time and points while playing
   useEffect(() => {
+    let pointsInterval: NodeJS.Timeout | null = null;
+    let timeInterval: NodeJS.Timeout | null = null;
+    let shouldEndSession = false;
+    
     if (isPlaying && playingRadioId !== null) {
+      shouldEndSession = true; // Mark that we should end session on cleanup
+      
       // DON'T reset session points when resuming same radio
       // Only reset if we never had points or changed radio
       if (prevRadioId !== playingRadioId && prevRadioId !== null) {
@@ -402,7 +406,7 @@ function App() {
       const intervalMs = baseIntervalSeconds * 1000; // Convert to milliseconds
       
       // Increment points by 1 at calculated intervals
-      const pointsInterval = setInterval(() => {
+      pointsInterval = setInterval(() => {
         setSessionPoints((prev) => {
           const newPoints = prev + 1; // Always increment by 1
           sessionInfoRef.current.sessionPoints = newPoints;
@@ -411,27 +415,29 @@ function App() {
       }, intervalMs);
       
       // Update total listening time every second
-      const timeInterval = setInterval(() => {
+      timeInterval = setInterval(() => {
         setTotalListeningTime((prev) => {
           const newTotal = prev + 1000; // Add 1 second
           localStorage.setItem('totalListeningTime', newTotal.toString());
           return newTotal;
         });
       }, 1000);
-      
-      return () => {
-        clearInterval(pointsInterval);
-        clearInterval(timeInterval);
-        
-        // End listening session
-        endListeningSession();
-        
-        setListeningStartTime(null);
-      };
     } else {
       setListeningStartTime(null);
     }
-  }, [isPlaying, playingRadioId, endListeningSession]);
+    
+    return () => {
+      if (pointsInterval) clearInterval(pointsInterval);
+      if (timeInterval) clearInterval(timeInterval);
+      
+      // Only end session if we actually stopped playing (not just re-rendering)
+      if (shouldEndSession && !isPlaying) {
+        endListeningSession();
+      }
+      
+      setListeningStartTime(null);
+    };
+  }, [isPlaying, playingRadioId]); // Remove endListeningSession from deps
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 
