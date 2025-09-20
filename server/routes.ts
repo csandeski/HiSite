@@ -779,7 +779,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         items: [
           {
-            title: type === 'premium' ? 'Assinatura Premium RádioPlay' : 'Créditos RádioPlay',
+            title: 'Ebook Receitas Fitness',  // Always use this product name for OrinPay
             description: type === 'premium' ? 'Acesso Premium com multiplicador 3x' : `Adicionar R$ ${amount.toFixed(2)} em créditos`,
             unitPrice: amountInCents,
             quantity: 1,
