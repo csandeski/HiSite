@@ -5,7 +5,7 @@ import { queryClient } from '@/lib/queryClient';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   register: (data: {
     email: string;
     username: string;
@@ -52,8 +52,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const login = async (username: string, password: string) => {
-    const { user } = await api.login({ username, password });
+  const login = async (email: string, password: string) => {
+    const { user } = await api.login({ email, password });
     setUser(user);
     // Invalidate queries to refresh data
     queryClient.invalidateQueries();

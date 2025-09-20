@@ -15,14 +15,13 @@ import { useToast } from "@/hooks/use-toast";
 
 // Login form schema
 const loginSchema = z.object({
-  username: z.string().min(3, "Usuário deve ter pelo menos 3 caracteres"),
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
 // Register form schema
 const registerSchema = z.object({
   fullName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  username: z.string().min(3, "Usuário deve ter pelo menos 3 caracteres"),
   email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
@@ -46,7 +45,7 @@ export default function Home({ setUserName }: HomeProps) {
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -55,7 +54,6 @@ export default function Home({ setUserName }: HomeProps) {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       fullName: "",
-      username: "",
       email: "",
       password: "",
     },
@@ -77,7 +75,7 @@ export default function Home({ setUserName }: HomeProps) {
   const onLoginSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await login(data.username, data.password);
+      await login(data.email, data.password);
       toast({
         title: "Login realizado com sucesso!",
         description: "Bem-vindo de volta!",
@@ -89,7 +87,7 @@ export default function Home({ setUserName }: HomeProps) {
     } catch (error) {
       toast({
         title: "Erro ao fazer login",
-        description: error instanceof Error ? error.message : "Usuário ou senha inválidos",
+        description: error instanceof Error ? error.message : "Email ou senha inválidos",
         variant: "destructive",
       });
     } finally {
@@ -102,7 +100,7 @@ export default function Home({ setUserName }: HomeProps) {
     try {
       await register({
         email: data.email,
-        username: data.username,
+        username: data.email.split('@')[0], // Usar parte do email como username
         password: data.password,
         fullName: data.fullName,
       });
@@ -468,16 +466,16 @@ export default function Home({ setUserName }: HomeProps) {
               <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                 <FormField
                   control={loginForm.control}
-                  name="username"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Usuário</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Digite seu usuário"
-                          type="text"
+                          placeholder="Digite seu email"
+                          type="email"
                           className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
-                          data-testid="input-login-username"
+                          data-testid="input-login-email"
                           {...field}
                         />
                       </FormControl>
@@ -584,24 +582,6 @@ export default function Home({ setUserName }: HomeProps) {
                           placeholder="Digite seu nome completo"
                           className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
                           data-testid="input-register-fullname"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={registerForm.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Usuário</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Digite seu nome de usuário"
-                          className="w-full h-12 px-4 border-gray-200 focus:border-primary focus:ring-primary rounded-lg"
-                          data-testid="input-register-username"
                           {...field}
                         />
                       </FormControl>

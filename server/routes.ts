@@ -15,7 +15,7 @@ declare module "express-session" {
 
 // Validation schemas
 const loginSchema = z.object({
-  username: z.string().min(3),
+  email: z.string().email(),
   password: z.string().min(6)
 });
 
@@ -109,16 +109,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const data = loginSchema.parse(req.body);
       
-      // Get user
-      const user = await storage.getUserByUsername(data.username);
+      // Get user by email
+      const user = await storage.getUserByEmail(data.email);
       if (!user) {
-        return res.status(401).json({ error: "Usuário ou senha inválidos" });
+        return res.status(401).json({ error: "Email ou senha inválidos" });
       }
       
       // Check password
       const validPassword = await bcrypt.compare(data.password, user.password);
       if (!validPassword) {
-        return res.status(401).json({ error: "Usuário ou senha inválidos" });
+        return res.status(401).json({ error: "Email ou senha inválidos" });
       }
       
       // Create session

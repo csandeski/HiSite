@@ -1,0 +1,36 @@
+authLoading is not defined
+The above error occurred in the <AdminPage> component:
+
+    at AdminPage (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/src/pages/admin.tsx:46:21)
+    at Route (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=77a5825e:323:16)
+    at Switch (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=77a5825e:379:17)
+    at div
+    at Provider (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=77a5825e:38:15)
+    at TooltipProvider (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=77a5825e:61:5)
+    at QueryClientProvider (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=77a5825e:2805:3)
+    at App (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/src/App.tsx?v=HnY4BZTDhCL8PDqdq7c1C:151:47)
+    at ProtectedApp (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/src/App.tsx?v=HnY4BZTDhCL8PDqdq7c1C:988:29)
+    at AuthProvider (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/src/contexts/AuthContext.tsx:31:32)
+    at AppWithAuth
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+at AdminPage (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/src/pages/admin.tsx:46:21)
+at Route (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=77a5825e:323:16)
+at Switch (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=77a5825e:379:17)
+at div
+at Provider (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=77a5825e:38:15)
+at TooltipProvider (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=77a5825e:61:5)
+at QueryClientProvider (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=77a5825e:2805:3)
+at App (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/src/App.tsx?v=HnY4BZTDhCL8PDqdq7c1C:151:47)
+at ProtectedApp (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/src/App.tsx?v=HnY4BZTDhCL8PDqdq7c1C:988:29)
+at AuthProvider (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/src/contexts/AuthContext.tsx:31:32)
+at AppWithAuth
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+at t.value (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://c73f475e-1505-43e8-99a6-52bfeb197add-00-2lwa7qgsn74z1.spock.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400

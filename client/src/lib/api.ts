@@ -131,7 +131,7 @@ class ApiClient {
   }
 
   async login(data: {
-    username: string;
+    email: string;
     password: string;
   }): Promise<{ user: User }> {
     return this.request('/auth/login', {
