@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Ícones PWA - RádioPlay</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #7c3aed; }
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .icon-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .icon-card canvas {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .download-btn {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .download-btn:hover {
+            background: #5b21b6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ícones PWA - RádioPlay</h1>
+    <p>Ícones gerados automaticamente para o PWA</p>
+    <div id="icons-container" class="icons-grid"></div>
+
+    <script>
+        const sizes = [16, 32, 48, 72, 96, 128, 144, 152, 192, 384, 512];
+        const container = document.getElementById('icons-container');
+
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#7c3aed');
+            gradient.addColorStop(1, '#5b21b6');
+            
+            // Draw rounded square background
+            const radius = size * 0.15;
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(size - radius, 0);
+            ctx.quadraticCurveTo(size, 0, size, radius);
+            ctx.lineTo(size, size - radius);
+            ctx.quadraticCurveTo(size, size, size - radius, size);
+            ctx.lineTo(radius, size);
+            ctx.quadraticCurveTo(0, size, 0, size - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw "R" letter for RádioPlay
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.5}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('R', size / 2, size / 2);
+            
+            // Add radio waves effect
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = size * 0.02;
+            const waveRadius1 = size * 0.35;
+            const waveRadius2 = size * 0.45;
+            
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, waveRadius1, -Math.PI * 0.3, Math.PI * 0.3, false);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, waveRadius2, -Math.PI * 0.2, Math.PI * 0.2, false);
+            ctx.stroke();
+            
+            return canvas;
+        }
+
+        // Generate all icons
+        sizes.forEach(size => {
+            const card = document.createElement('div');
+            card.className = 'icon-card';
+            
+            const canvas = generateIcon(size);
+            card.appendChild(canvas);
+            
+            const label = document.createElement('div');
+            label.textContent = `${size}x${size}`;
+            label.style.marginBottom = '5px';
+            label.style.fontWeight = 'bold';
+            card.appendChild(label);
+            
+            const downloadBtn = document.createElement('a');
+            downloadBtn.className = 'download-btn';
+            downloadBtn.textContent = 'Download';
+            downloadBtn.download = `icon-${size}x${size}.png`;
+            
+            // Convert canvas to blob URL
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                downloadBtn.href = url;
+            });
+            
+            card.appendChild(downloadBtn);
+            container.appendChild(card);
+        });
+    </script>
+</body>
+</html>

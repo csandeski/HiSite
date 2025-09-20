@@ -1,0 +1,99 @@
+{
+  "name": "RádioPlay - Ganhe Dinheiro Ouvindo Rádio",
+  "short_name": "RádioPlay",
+  "description": "Ganhe dinheiro real ouvindo suas rádios favoritas. Acumule pontos e converta em dinheiro via PIX.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#7c3aed",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "categories": ["entertainment", "music", "finance"],
+  "lang": "pt-BR",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-1.png",
+      "sizes": "540x1200",
+      "type": "image/png",
+      "label": "Tela de Login"
+    },
+    {
+      "src": "/screenshot-2.png",
+      "sizes": "540x1200",
+      "type": "image/png",
+      "label": "Dashboard Principal"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Minhas Rádios",
+      "short_name": "Rádios",
+      "description": "Acesse suas rádios favoritas",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Resgatar Pontos",
+      "short_name": "Resgatar",
+      "description": "Converta seus pontos em dinheiro",
+      "url": "/resgatar",
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+}

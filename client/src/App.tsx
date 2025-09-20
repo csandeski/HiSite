@@ -20,6 +20,7 @@ import PremiumPopup from "@/components/PremiumPopup";
 import { api } from "@/lib/api";
 import PushNotification from "@/components/PushNotification";
 import { useUTMTracking } from "@/hooks/useUTMTracking";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
 import hitsFmLogo from '@/assets/hits-fm-logo.png';
