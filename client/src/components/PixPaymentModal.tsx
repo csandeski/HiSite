@@ -12,6 +12,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUTMTracking } from "@/hooks/useUTMTracking";
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -25,6 +26,7 @@ interface PixPaymentModalProps {
 export default function PixPaymentModal({ open, onOpenChange, type = 'premium', amount = 27.00 }: PixPaymentModalProps) {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { getStoredUTMs } = useUTMTracking();
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pixData, setPixData] = useState<any>(null);
@@ -109,15 +111,8 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
     setError(null);
     
     try {
-      // Get UTM parameters if they exist
-      const urlParams = new URLSearchParams(window.location.search);
-      const utms = {
-        utmSource: urlParams.get('utm_source') || undefined,
-        utmMedium: urlParams.get('utm_medium') || undefined,
-        utmCampaign: urlParams.get('utm_campaign') || undefined,
-        utmTerm: urlParams.get('utm_term') || undefined,
-        utmContent: urlParams.get('utm_content') || undefined
-      };
+      // Get stored UTM parameters from localStorage (or fallback to URL)
+      const utms = getStoredUTMs();
       
       const response = await fetch('/api/payment/create-pix', {
         method: 'POST',

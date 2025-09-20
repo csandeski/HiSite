@@ -13,6 +13,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUTMTracking } from "@/hooks/useUTMTracking";
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
@@ -40,6 +41,7 @@ export default function MessagePaymentModal({
 }: MessagePaymentModalProps) {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { getStoredUTMs } = useUTMTracking();
   const [copied, setCopied] = useState(false);
   const [deliveryTime, setDeliveryTime] = useState("");
   const [loading, setLoading] = useState(false);
@@ -111,15 +113,8 @@ export default function MessagePaymentModal({
     setError(null);
     
     try {
-      // Get UTM parameters if they exist
-      const urlParams = new URLSearchParams(window.location.search);
-      const utms = {
-        utmSource: urlParams.get('utm_source') || undefined,
-        utmMedium: urlParams.get('utm_medium') || undefined,
-        utmCampaign: urlParams.get('utm_campaign') || undefined,
-        utmTerm: urlParams.get('utm_term') || undefined,
-        utmContent: urlParams.get('utm_content') || undefined
-      };
+      // Get stored UTM parameters from localStorage (or fallback to URL)
+      const utms = getStoredUTMs();
       
       const response = await fetch('/api/payment/create-pix', {
         method: 'POST',

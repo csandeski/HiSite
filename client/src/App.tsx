@@ -19,6 +19,7 @@ import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
 import PremiumPopup from "@/components/PremiumPopup";
 import { api } from "@/lib/api";
 import PushNotification from "@/components/PushNotification";
+import { useUTMTracking } from "@/hooks/useUTMTracking";
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
 import hitsFmLogo from '@/assets/hits-fm-logo.png';
@@ -153,6 +154,9 @@ export const usePlayer = () => {
 
 function App({ user }: { user: any }) {
   const { refreshUser } = useAuth(); // Get refreshUser from auth context
+  
+  // Capture UTM parameters early in app initialization
+  useUTMTracking();
   const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
