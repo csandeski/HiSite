@@ -238,8 +238,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Listening sessions
   app.post("/api/listening/start", requireAuth, async (req, res) => {
     try {
-      const { stationId } = req.body;
-      const session = await storage.createListeningSession(req.session.userId!, stationId);
+      const { radioId } = req.body;
+      
+      if (!radioId) {
+        return res.status(400).json({ error: "Radio ID é obrigatório" });
+      }
+      
+      const session = await storage.createListeningSession(req.session.userId!, radioId);
       res.json({ session });
     } catch (error) {
       console.error("Start listening error:", error);
@@ -249,7 +254,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/listening/end", requireAuth, async (req, res) => {
     try {
-      const { sessionId, duration, pointsEarned } = req.body;
+      const { sessionId, duration: clientDuration } = req.body;
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID é obrigatório" });
+      }
+      
+      // Get session and verify ownership
+      const session = await storage.getListeningSession(sessionId);
+      if (!session) {
+        return res.status(404).json({ error: "Sessão não encontrada" });
+      }
+      
+      // Verify session belongs to authenticated user
+      if (session.userId !== req.session.userId) {
+        return res.status(403).json({ error: "Não autorizado a finalizar esta sessão" });
+      }
+      
+      // Calculate actual duration (server-side validation)
+      const now = new Date();
+      const sessionStart = new Date(session.startedAt);
+      const actualDuration = Math.floor((now.getTime() - sessionStart.getTime()) / 1000);
+      
+      // Use minimum of client-reported and server-calculated duration
+      const duration = Math.min(actualDuration, clientDuration || actualDuration);
+      
+      // Get user to check premium status
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Calculate points based on duration and premium status
+      // Base rate: 50 points per minute (same as frontend display)
+      const basePointsPerMin = 50;
+      const premiumMultiplier = user.isPremium ? 3 : 1;
+      const minutes = Math.max(1, Math.ceil(duration / 60));
+      const pointsEarned = minutes * basePointsPerMin * premiumMultiplier;
       
       // End session
       await storage.endListeningSession(sessionId, duration, pointsEarned);
@@ -258,15 +299,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateDailyStats(req.session.userId!, duration, pointsEarned);
       
       // Update user points and listening time
-      const user = await storage.getUser(req.session.userId!);
-      if (user) {
-        await storage.updateUser(req.session.userId!, {
-          points: user.points + pointsEarned,
-          totalListeningTime: user.totalListeningTime + duration
-        });
-      }
+      const updatedUser = await storage.updateUser(req.session.userId!, {
+        points: user.points + pointsEarned,
+        totalListeningTime: user.totalListeningTime + duration
+      });
       
-      res.json({ success: true });
+      res.json({ 
+        success: true,
+        pointsEarned,
+        duration,
+        updatedPoints: updatedUser?.points || 0,
+        totalListeningTime: updatedUser?.totalListeningTime || 0
+      });
     } catch (error) {
       console.error("End listening error:", error);
       res.status(500).json({ error: "Erro ao finalizar sessão" });

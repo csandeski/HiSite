@@ -34,6 +34,7 @@ export interface IStorage {
   
   // Listening session methods
   createListeningSession(userId: string, stationId: string): Promise<ListeningSession>;
+  getListeningSession(sessionId: string): Promise<ListeningSession | undefined>;
   endListeningSession(sessionId: string, duration: number, pointsEarned: number): Promise<void>;
   getUserListeningSessions(userId: string, limit?: number): Promise<ListeningSession[]>;
   
@@ -168,6 +169,13 @@ export class SupabaseStorage implements IStorage {
       isPremiumSession: isPremium
     }).returning();
     
+    return result[0];
+  }
+
+  async getListeningSession(sessionId: string): Promise<ListeningSession | undefined> {
+    const result = await db.select().from(schema.listeningSessions)
+      .where(eq(schema.listeningSessions.id, sessionId))
+      .limit(1);
     return result[0];
   }
 
