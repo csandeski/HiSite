@@ -181,6 +181,37 @@
   }
 }
 
+/* Custom slider styles for volume control */
+.slider-thumb::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #023E73;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.slider-thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #0366b8;
+}
+
+.slider-thumb::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #023E73;
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+  transition: all 0.2s;
+}
+
+.slider-thumb::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: #0366b8;
+}
+
 @layer utilities {
   .gradient-bg {
     background: linear-gradient(180deg, hsl(206, 95%, 23%) 0%, hsl(206, 80%, 35%) 100%);

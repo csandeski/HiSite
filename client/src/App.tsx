@@ -10,7 +10,7 @@ import Perfil from "@/pages/perfil";
 import NotFound from "@/pages/not-found";
 import { useState, useEffect, createContext, useContext, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Radio, Volume2, Pause, Play, Gift, User } from "lucide-react";
+import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
 import PremiumPopup from "@/components/PremiumPopup";
 import PushNotification from "@/components/PushNotification";
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
@@ -147,6 +147,7 @@ function App() {
   const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
+  const [lastVolume, setLastVolume] = useState(50);
   const [sessionPoints, setSessionPoints] = useState(0); // Starting with 0 to allow reaching 15 points
   const [balance, setBalance] = useState(0);
   const [activeTab, setActiveTab] = useState("radio");
@@ -413,20 +414,53 @@ function App() {
                         <p className="text-[10px] text-gray-500 truncate">{playingRadio.description}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Volume2 className="w-3.5 h-3.5 text-gray-500" />
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={volume}
-                        onChange={(e) => setVolume(Number(e.target.value))}
-                        className="w-14 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                        data-testid="volume-slider"
-                        style={{
-                          background: `linear-gradient(to right, #023E73 0%, #023E73 ${volume}%, #e5e7eb ${volume}%, #e5e7eb 100%)`
-                        }}
-                      />
+                    <div className="flex items-center gap-3">
+                      {/* Volume controls */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            if (volume > 0) {
+                              setLastVolume(volume);
+                              setVolume(0);
+                            } else {
+                              setVolume(lastVolume);
+                            }
+                          }}
+                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                          aria-label={volume > 0 ? "Silenciar" : "Ativar som"}
+                          data-testid="volume-toggle"
+                        >
+                          {volume === 0 ? (
+                            <VolumeX className="w-3.5 h-3.5 text-gray-500" />
+                          ) : (
+                            <Volume2 className="w-3.5 h-3.5 text-gray-500" />
+                          )}
+                        </button>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={volume}
+                          onChange={(e) => {
+                            const newVolume = Number(e.target.value);
+                            setVolume(newVolume);
+                            if (newVolume > 0) {
+                              setLastVolume(newVolume);
+                            }
+                          }}
+                          className="w-16 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+                          data-testid="volume-slider"
+                          style={{
+                            background: `linear-gradient(to right, #023E73 0%, #023E73 ${volume}%, #e5e7eb ${volume}%, #e5e7eb 100%)`
+                          }}
+                        />
+                        <span className="text-[10px] text-gray-500 min-w-[25px] text-right">{volume}%</span>
+                      </div>
+                      
+                      {/* Divider line */}
+                      <div className="w-px h-6 bg-gray-200"></div>
+                      
+                      {/* Play/Pause button */}
                       <Button
                         size="icon"
                         variant="ghost"
