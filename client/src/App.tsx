@@ -150,6 +150,7 @@ export const usePlayer = () => {
 };
 
 function App() {
+  const { user, refreshUser } = useAuth(); // Get user from auth context
   const [playingRadioId, setPlayingRadioId] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
@@ -300,18 +301,20 @@ function App() {
       // Clear session info immediately
       sessionInfoRef.current = { sessionId: null, sessionStartTime: 0, sessionPoints: 0 };
       
-      // End session in backend
+      // End session in backend and refresh user data
       api.endListening({
         sessionId,
         duration,
         pointsEarned: points
       }).then(() => {
+        // Refresh user data to get updated points
+        refreshUser();
         queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
       }).catch((error) => {
         console.error('Failed to end listening session:', error);
       });
     }
-  }, []);
+  }, [refreshUser]);
 
   // Handle page visibility changes and unload
   useEffect(() => {
@@ -470,7 +473,7 @@ function App() {
               <Route path="/perfil">
                 <Perfil 
                   userName={userName} 
-                  sessionPoints={sessionPoints} 
+                  sessionPoints={user?.points || 0} 
                   balance={balance}
                   totalListeningTime={totalListeningTime}
                   memberSince={memberSince}
