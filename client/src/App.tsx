@@ -1,9 +1,12 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Home from "@/pages/home";
+import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
 import DashboardComp from "@/pages/dashboard";
 import Resgatar from "@/pages/resgatar";
 import Perfil from "@/pages/perfil";
@@ -362,6 +365,12 @@ function App() {
               <Route path="/">
                 <Home setUserName={setUserName} />
               </Route>
+              <Route path="/login">
+                <LoginPage />
+              </Route>
+              <Route path="/register">
+                <RegisterPage />
+              </Route>
               <Route path="/dashboard">
                 <DashboardComp {...playerProps} totalListeningTime={totalListeningTime} />
                 <PushNotification />
@@ -614,4 +623,40 @@ function App() {
   );
 }
 
-export default App;
+// Protected App with Auth
+function ProtectedApp() {
+  const { user, loading } = useAuth();
+  const [location, setLocation] = useLocation();
+  
+  // Redirect to login if not authenticated and trying to access protected routes
+  useEffect(() => {
+    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
+    if (!loading && !user && protectedRoutes.includes(location)) {
+      setLocation('/login');
+    }
+  }, [user, loading, location, setLocation]);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return <App />;
+}
+
+// Main export with AuthProvider
+function AppWithAuth() {
+  return (
+    <AuthProvider>
+      <ProtectedApp />
+    </AuthProvider>
+  );
+}
+
+export default AppWithAuth;
