@@ -19,6 +19,11 @@ import hitsFmLogo from '@/assets/hits-fm-logo.png';
 import antena1Logo from '@/assets/antena-1-logo.png';
 import fm89Logo from '@/assets/89fm-logo.png';
 import kissFmLogo from '@/assets/kiss-fm-logo.png';
+import cbnLogo from '@assets/cbn_1758327521219.png';
+import bandNewsLogo from '@assets/BandNews_FM_logo_2019_1758327521220.png';
+import radioGloboLogo from '@assets/radio-globo-default-removebg-preview_1758327521221.png';
+import transamericaLogo from '@assets/Rede_Transamérica_logo_1758327521220.png';
+import mixFmLogo from '@assets/Logotipo_da_Mix_FM_1758327521220.png';
 
 // Lista de rádios (compartilhada)
 export const radios = [
@@ -76,7 +81,7 @@ export const radios = [
     description: "Notícias 24h",
     pointsPerMin: 100,
     isPremium: true,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://stream.zeno.fm/cbn-fm",
   },
   {
     id: 8,
@@ -84,7 +89,7 @@ export const radios = [
     description: "Jornalismo",
     pointsPerMin: 105,
     isPremium: true,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://stream.zeno.fm/bandnews-fm",
   },
   {
     id: 9,
@@ -92,7 +97,7 @@ export const radios = [
     description: "Variedades",
     pointsPerMin: 110,
     isPremium: true,
-    streamUrl: "", // Stream URL a ser adicionada
+    streamUrl: "https://stream.zeno.fm/radio-globo",
   },
   {
     id: 10,
@@ -362,6 +367,36 @@ function App() {
                           <img 
                             src={kissFmLogo} 
                             alt="Kiss FM" 
+                            className="w-4 h-4 object-contain"
+                          />
+                        ) : playingRadio.id === 7 ? (
+                          <img 
+                            src={cbnLogo} 
+                            alt="CBN" 
+                            className="w-4 h-4 object-contain"
+                          />
+                        ) : playingRadio.id === 8 ? (
+                          <img 
+                            src={bandNewsLogo} 
+                            alt="BandNews FM" 
+                            className="w-4 h-4 object-contain"
+                          />
+                        ) : playingRadio.id === 9 ? (
+                          <img 
+                            src={radioGloboLogo} 
+                            alt="Rádio Globo" 
+                            className="w-4 h-4 object-contain"
+                          />
+                        ) : playingRadio.id === 10 ? (
+                          <img 
+                            src={mixFmLogo} 
+                            alt="Mix FM" 
+                            className="w-4 h-4 object-contain"
+                          />
+                        ) : playingRadio.id === 11 ? (
+                          <img 
+                            src={transamericaLogo} 
+                            alt="Transamérica" 
                             className="w-4 h-4 object-contain"
                           />
                         ) : (

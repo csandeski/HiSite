@@ -8,6 +8,11 @@ import hitsFmLogo from '@/assets/hits-fm-logo.png';
 import antena1Logo from '@/assets/antena-1-logo.png';
 import fm89Logo from '@/assets/89fm-logo.png';
 import kissFmLogo from '@/assets/kiss-fm-logo.png';
+import cbnLogo from '@assets/cbn_1758327521219.png';
+import bandNewsLogo from '@assets/BandNews_FM_logo_2019_1758327521220.png';
+import radioGloboLogo from '@assets/radio-globo-default-removebg-preview_1758327521221.png';
+import transamericaLogo from '@assets/Rede_Transamérica_logo_1758327521220.png';
+import mixFmLogo from '@assets/Logotipo_da_Mix_FM_1758327521220.png';
 import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
@@ -236,6 +241,41 @@ export default function Dashboard({
                             <img 
                               src={kissFmLogo} 
                               alt="Kiss FM" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 7 && (
+                            <img 
+                              src={cbnLogo} 
+                              alt="CBN" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 8 && (
+                            <img 
+                              src={bandNewsLogo} 
+                              alt="BandNews FM" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 9 && (
+                            <img 
+                              src={radioGloboLogo} 
+                              alt="Rádio Globo" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 10 && (
+                            <img 
+                              src={mixFmLogo} 
+                              alt="Mix FM" 
+                              className="w-8 h-8 object-contain"
+                            />
+                          )}
+                          {radio.id === 11 && (
+                            <img 
+                              src={transamericaLogo} 
+                              alt="Transamérica" 
                               className="w-8 h-8 object-contain"
                             />
                           )}
