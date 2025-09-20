@@ -82,6 +82,7 @@ export interface IStorage {
     title: string;
     message: string;
     type: string;
+    data?: any;
   }): Promise<Notification>;
   getUserNotifications(userId: string, unreadOnly?: boolean): Promise<Notification[]>;
   markNotificationAsRead(notificationId: string): Promise<void>;
@@ -89,6 +90,19 @@ export interface IStorage {
   // Settings methods
   getUserSettings(userId: string): Promise<UserSettings | undefined>;
   updateUserSettings(userId: string, settings: Partial<UserSettings>): Promise<UserSettings>;
+  
+  // Payment methods (OrinPay)
+  createPayment(data: {
+    userId: string;
+    transactionId: string;
+    reference: string;
+    amount: number;
+    type: string;
+    status: string;
+    pixData?: any;
+  }): Promise<any>;
+  getPaymentByReference(reference: string): Promise<any | undefined>;
+  updatePaymentStatus(paymentId: string, status: string): Promise<void>;
 }
 
 // Supabase database implementation
@@ -516,6 +530,7 @@ export class SupabaseStorage implements IStorage {
     title: string;
     message: string;
     type: string;
+    data?: any;
   }): Promise<Notification> {
     const result = await db.insert(schema.notifications).values(data).returning();
     return result[0];
@@ -565,6 +580,51 @@ export class SupabaseStorage implements IStorage {
         .values({ ...settings, userId })
         .returning();
       return result[0];
+    }
+  }
+
+  // Payment methods (OrinPay)
+  async createPayment(data: {
+    userId: string;
+    transactionId: string;
+    reference: string;
+    amount: number;
+    type: string;
+    status: string;
+    pixData?: any;
+  }): Promise<any> {
+    // For now, store payments in memory until we create a proper payments table
+    const payment = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    // Store in a temporary in-memory store
+    if (!global.payments) {
+      global.payments = [];
+    }
+    global.payments.push(payment);
+    
+    return payment;
+  }
+
+  async getPaymentByReference(reference: string): Promise<any | undefined> {
+    if (!global.payments) {
+      return undefined;
+    }
+    return global.payments.find((p: any) => p.reference === reference);
+  }
+
+  async updatePaymentStatus(paymentId: string, status: string): Promise<void> {
+    if (!global.payments) {
+      return;
+    }
+    const payment = global.payments.find((p: any) => p.id === paymentId);
+    if (payment) {
+      payment.status = status;
+      payment.updatedAt = new Date();
     }
   }
 }

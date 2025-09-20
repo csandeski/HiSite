@@ -686,7 +686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customer: {
           name: user.fullName || user.username,
           email: user.email || `${user.username}@radioplay.com`,
-          phone: orinpay.formatPhone(user.phone || '11999999999'),
+          phone: orinpay.formatPhone(user.phoneNumber || '11999999999'),
           document: {
             number: orinpay.formatCPF(user.cpf || '00000000000'),
             type: 'cpf' as const
