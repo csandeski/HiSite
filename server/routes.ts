@@ -791,7 +791,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       // Create transaction with OrinPay
+      console.log('Creating PIX transaction with OrinPay...');
       const pixResponse = await orinpay.createPixTransaction(pixData);
+      
+      // Log response to debug QR Code issue
+      console.log('OrinPay Response:', {
+        hasQRCode: !!pixResponse.pix?.encodedImage,
+        hasPayload: !!pixResponse.pix?.payload,
+        reference: pixResponse.reference,
+        status: pixResponse.status
+      });
       
       // Store payment record in database
       await storage.createPayment({

@@ -125,11 +125,26 @@ class OrinPayService {
     }
     
     try {
+      console.log('Sending PIX request to OrinPay:', {
+        url: `${ORINPAY_API_URL}/transactions/pix`,
+        hasApiKey: !!this.headers.Authorization
+      });
+      
       const response = await axios.post(
         `${ORINPAY_API_URL}/transactions/pix`,
         data,
         { headers: this.headers }
       );
+
+      console.log('OrinPay API Response:', {
+        status: response.status,
+        hasData: !!response.data,
+        hasPix: !!response.data?.pix,
+        hasEncodedImage: !!response.data?.pix?.encodedImage,
+        hasPayload: !!response.data?.pix?.payload,
+        transactionId: response.data?.id,
+        reference: response.data?.reference
+      });
 
       return response.data;
     } catch (error: any) {
