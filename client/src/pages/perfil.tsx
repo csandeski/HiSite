@@ -1020,7 +1020,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Edit Status Modal */}
       <Dialog open={showStatusModal} onOpenChange={setShowStatusModal}>
-        <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl">
+        <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl" data-testid="modal-edit-status">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Edit className="w-5 h-5" />
@@ -1039,7 +1039,7 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                 onChange={(e) => setTempStatus(e.target.value.slice(0, 100))}
                 placeholder="Digite seu status..."
                 className="min-h-[80px] resize-none"
-                data-testid="input-status-text"
+                data-testid="input-status"
               />
               <div className="flex justify-between items-center mt-1">
                 <span className="text-xs text-gray-500">
@@ -1047,12 +1047,21 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
                 </span>
                 {/* Emoji suggestions */}
                 <div className="flex gap-1">
-                  {['🎵', '🎧', '📻', '💰', '🏆', '⭐', '🚀', '💎'].map((emoji) => (
+                  {[
+                    { emoji: '🎵', name: 'music' },
+                    { emoji: '🎧', name: 'headphones' },
+                    { emoji: '📻', name: 'radio' },
+                    { emoji: '💰', name: 'money' },
+                    { emoji: '🏆', name: 'trophy' },
+                    { emoji: '⭐', name: 'star' },
+                    { emoji: '🚀', name: 'rocket' },
+                    { emoji: '💎', name: 'diamond' }
+                  ].map(({ emoji, name }) => (
                     <button
                       key={emoji}
                       onClick={() => setTempStatus(prev => prev + emoji)}
                       className="text-lg hover:scale-125 transition-transform"
-                      data-testid={`button-emoji-${emoji}`}
+                      data-testid={`button-emoji-${name}`}
                     >
                       {emoji}
                     </button>
