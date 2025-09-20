@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { 
   X, 
@@ -18,7 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 interface PixPaymentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  type?: 'premium' | 'credits';
+  type?: 'premium' | 'credits' | 'authorization';
   amount?: number;
 }
 
@@ -57,11 +57,23 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
         
         if (data.status === 'approved') {
           // Payment approved!
+          let toastTitle = "Pagamento aprovado!";
+          let toastDescription = "Seu pagamento foi processado com sucesso.";
+          
+          if (type === 'premium') {
+            toastTitle = "Premium ativado!";
+            toastDescription = "Sua assinatura Premium foi ativada com sucesso. Aproveite o multiplicador 3x!";
+          } else if (type === 'credits') {
+            toastTitle = "Créditos adicionados!";
+            toastDescription = `R$ ${amount.toFixed(2)} foram adicionados ao seu saldo.`;
+          } else if (type === 'authorization') {
+            toastTitle = "Conta autorizada!";
+            toastDescription = "Sua conta foi autorizada com sucesso. Agora você tem acesso completo à plataforma.";
+          }
+          
           toast({
-            title: type === 'premium' ? "Premium ativado!" : "Créditos adicionados!",
-            description: type === 'premium' 
-              ? "Sua assinatura Premium foi ativada com sucesso. Aproveite o multiplicador 3x!" 
-              : `R$ ${amount.toFixed(2)} foram adicionados ao seu saldo.`,
+            title: toastTitle,
+            description: toastDescription,
             duration: 5000,
           });
           
@@ -168,6 +180,12 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] max-w-sm p-0 mx-auto rounded-2xl max-h-[95vh] overflow-hidden">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Pagamento via Pix</DialogTitle>
+          <DialogDescription>
+            Complete seu pagamento escaneando o QR Code ou copiando o código PIX
+          </DialogDescription>
+        </DialogHeader>
         {/* Close button */}
         <Button
           variant="ghost"
@@ -190,7 +208,11 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
               <div>
                 <h2 className="text-base font-bold">Pagamento via Pix</h2>
                 <p className="text-[11px] opacity-90">
-                  {type === 'premium' ? `Premium Vitalício - R$ ${amount.toFixed(2)}` : `Adicionar R$ ${amount.toFixed(2)} em créditos`}
+                  {type === 'premium' 
+                    ? `Premium Vitalício - R$ ${amount.toFixed(2)}` 
+                    : type === 'credits'
+                    ? `Adicionar R$ ${amount.toFixed(2)} em créditos`
+                    : `Autorização de Conta - R$ ${amount.toFixed(2)}`}
                 </p>
               </div>
             </div>
@@ -305,8 +327,12 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
                   </span>
                 </div>
                 <p className="text-[10px] text-purple-700 leading-relaxed">
-                  Após a confirmação do pagamento, seu plano Premium será ativado automaticamente 
-                  em até 5 minutos. Você receberá uma notificação de confirmação.
+                  {type === 'authorization' 
+                    ? "Após a confirmação do pagamento, sua conta será autorizada automaticamente em até 5 minutos."
+                    : type === 'premium'
+                    ? "Após a confirmação do pagamento, seu plano Premium será ativado automaticamente em até 5 minutos."
+                    : "Após a confirmação do pagamento, os créditos serão adicionados automaticamente em até 5 minutos."}
+                  {' '}Você receberá uma notificação de confirmação.
                 </p>
               </div>
             )}

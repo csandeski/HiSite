@@ -1,7 +1,9 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Shield, Clock, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import PixPaymentModal from "@/components/PixPaymentModal";
 
 interface AccountAuthorizationModalProps {
   open: boolean;
@@ -20,14 +22,24 @@ export default function AccountAuthorizationModal({
 }: AccountAuthorizationModalProps) {
   const { toast } = useToast();
   const authorizationFee = 19.99;
+  const [showPixModal, setShowPixModal] = useState(false);
 
   const handleAuthorize = () => {
-    toast({
-      title: "Autorização em processamento",
-      description: "Você será notificado quando a autorização for concluída.",
-      duration: 3000,
-    });
-    onAuthorize();
+    // Close the authorization modal and open PIX payment modal
+    onOpenChange(false);
+    setShowPixModal(true);
+  };
+
+  const handlePixComplete = (success: boolean) => {
+    setShowPixModal(false);
+    if (success) {
+      toast({
+        title: "Conta autorizada com sucesso!",
+        description: "Sua conta foi autorizada e agora você tem acesso completo.",
+        duration: 5000,
+      });
+      onAuthorize();
+    }
   };
 
   const handleLater = () => {
@@ -40,8 +52,15 @@ export default function AccountAuthorizationModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Autorização de Conta Necessária</DialogTitle>
+          <DialogDescription>
+            Autorize sua conta para acessar todas as funcionalidades
+          </DialogDescription>
+        </DialogHeader>
         {/* Close button */}
         <Button
           variant="ghost"
@@ -122,5 +141,19 @@ export default function AccountAuthorizationModal({
         </div>
       </DialogContent>
     </Dialog>
+    
+    {/* PIX Payment Modal */}
+    <PixPaymentModal 
+      open={showPixModal} 
+      onOpenChange={(open) => {
+        setShowPixModal(open);
+        if (!open) {
+          handlePixComplete(false);
+        }
+      }}
+      type="authorization"
+      amount={authorizationFee}
+    />
+    </>
   );
 }
