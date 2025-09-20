@@ -13,6 +13,7 @@ import {
   LogOut,
   ChevronRight,
   Edit,
+  Edit2,
   History,
   HelpCircle,
   Award,
@@ -37,6 +38,20 @@ import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import PixPaymentModal from '@/components/PixPaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
+import api from '@/lib/api';
+
+interface Achievement {
+  achievementId: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  progress: number;
+  progressMax: number;
+  isCompleted: boolean;
+  completedAt: string | null;
+  rewardPoints: number;
+}
 
 interface PerfilProps {
   userName?: string;
@@ -74,7 +89,46 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioText, setBioText] = useState("");
+  const [userAchievements, setUserAchievements] = useState<Achievement[]>([]);
   
+  // Initialize bio from user data
+  useEffect(() => {
+    if (user?.bio) {
+      setBioText(user.bio);
+    } else {
+      setBioText("Ouvindo rádio e ganhando pontos! 🎵");
+    }
+  }, [user]);
+
+  // Fetch user achievements
+  useEffect(() => {
+    if (user) {
+      api.request('/api/user/achievements')
+        .then((data) => {
+          setUserAchievements(data.achievements || []);
+        })
+        .catch((err) => {
+          console.error('Failed to fetch achievements:', err);
+        });
+    }
+  }, [user]);
+
+  // Handle save bio
+  const handleSaveBio = async () => {
+    try {
+      await api.request('/api/user/profile', {
+        method: 'PATCH',
+        body: JSON.stringify({ bio: bioText })
+      });
+      setEditingBio(false);
+    } catch (error) {
+      console.error('Failed to save bio:', error);
+      setBioText(user?.bio || "Ouvindo rádio e ganhando pontos! 🎵");
+    }
+  };
+
   // Check for highlight parameter in URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -249,22 +303,90 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
                 </p>
               </div>
               
-              {/* Bio/Status */}
-              <p className="text-sm text-gray-600 italic">
-                "Ouvindo rádio e ganhando pontos! 🎵"
-              </p>
+              {/* Bio/Status - Editável */}
+              <div className="relative">
+                {editingBio ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={bioText}
+                      onChange={(e) => setBioText(e.target.value.slice(0, 200))}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSaveBio();
+                        } else if (e.key === 'Escape') {
+                          setEditingBio(false);
+                          setBioText(user?.bio || "Ouvindo rádio e ganhando pontos! 🎵");
+                        }
+                      }}
+                      className="flex-1 px-2 py-1 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="Digite seu status..."
+                      maxLength={200}
+                      autoFocus
+                    />
+                    <Button
+                      size="sm"
+                      onClick={handleSaveBio}
+                      className="px-2 py-1 h-auto"
+                    >
+                      <Check className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setEditingBio(false);
+                        setBioText(user?.bio || "Ouvindo rádio e ganhando pontos! 🎵");
+                      }}
+                      className="px-2 py-1 h-auto"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm text-gray-600 italic flex-1">
+                      "{bioText}"
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setEditingBio(true)}
+                      className="p-1 h-auto"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 text-gray-500" />
+                    </Button>
+                  </div>
+                )}
+              </div>
               
-              {/* Tags */}
+              {/* Conquistas do Usuário */}
               <div className="flex flex-wrap gap-2 mt-3">
-                <span className="text-xs px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
-                  Ouvinte Ativo
-                </span>
-                <span className="text-xs px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
-                  Top Ganhos
-                </span>
-                <span className="text-xs px-2.5 py-1 bg-orange-100 text-orange-700 rounded-full font-medium">
-                  Membro Gold
-                </span>
+                {userAchievements.filter(a => a.isCompleted).slice(0, 3).map((achievement) => {
+                  const getAchievementColor = () => {
+                    switch (achievement.category) {
+                      case 'listening': return 'bg-blue-100 text-blue-700';
+                      case 'points': return 'bg-green-100 text-green-700';
+                      case 'referral': return 'bg-purple-100 text-purple-700';
+                      case 'premium': return 'bg-orange-100 text-orange-700';
+                      default: return 'bg-gray-100 text-gray-700';
+                    }
+                  };
+                  return (
+                    <span
+                      key={achievement.achievementId}
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium ${getAchievementColor()}`}
+                      title={achievement.description}
+                    >
+                      {achievement.name}
+                    </span>
+                  );
+                })}
+                {userAchievements.filter(a => a.isCompleted).length === 0 && (
+                  <span className="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
+                    Nenhuma conquista ainda
+                  </span>
+                )}
               </div>
             </div>
           </div>
