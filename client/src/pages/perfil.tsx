@@ -238,27 +238,80 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
               <Award className="w-5 h-5 text-purple-600" />
               <h3 className="font-semibold text-base text-gray-900">Conquistas</h3>
             </div>
-            <span className="text-xs text-gray-500">2 de 10</span>
+            <span className="text-xs text-gray-500">{sessionPoints >= 1000 ? 3 : sessionPoints >= 100 ? 2 : 1} de 10</span>
           </div>
           
-          {/* Achievement badges */}
-          <div className="flex gap-2 mb-3">
-            <div className="flex-1 bg-yellow-50 rounded-lg py-2 px-2.5 border border-yellow-200">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="text-sm">🎧</span>
-                <span className="text-xs font-medium text-gray-700">Iniciante</span>
+          {/* All Achievement badges */}
+          <div className="space-y-2 mb-3">
+            {/* First row - 3 badges */}
+            <div className="flex gap-2">
+              <div className="flex-1 bg-yellow-50 rounded-lg py-2 px-2.5 border border-yellow-200">
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">🎧</span>
+                  <span className="text-xs font-medium text-gray-700">Iniciante</span>
+                </div>
+              </div>
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 100 ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">💰</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 100 ? 'text-gray-700' : 'text-gray-400'}`}>100 Pts</span>
+                </div>
+              </div>
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 500 ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">⭐</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 500 ? 'text-gray-700' : 'text-gray-400'}`}>500 Pts</span>
+                </div>
               </div>
             </div>
-            <div className="flex-1 bg-green-50 rounded-lg py-2 px-2.5 border border-green-200">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="text-sm">💰</span>
-                <span className="text-xs font-medium text-gray-700">100 Pts</span>
+            
+            {/* Second row - 3 badges */}
+            <div className="flex gap-2">
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 1000 ? 'bg-purple-50 border-purple-200' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">🏆</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 1000 ? 'text-gray-700' : 'text-gray-400'}`}>1K Pts</span>
+                </div>
+              </div>
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 2500 ? 'bg-orange-50 border-orange-200' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">🔥</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 2500 ? 'text-gray-700' : 'text-gray-400'}`}>2.5K</span>
+                </div>
+              </div>
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 5000 ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">🚀</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 5000 ? 'text-gray-700' : 'text-gray-400'}`}>5K</span>
+                </div>
               </div>
             </div>
-            <div className="flex-1 bg-gray-50 rounded-lg py-2 px-2.5 border border-gray-200 opacity-40">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="text-sm">🏆</span>
-                <span className="text-xs font-medium text-gray-400">1K Pts</span>
+            
+            {/* Third row - 4 badges */}
+            <div className="flex gap-2">
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 10000 ? 'bg-pink-50 border-pink-200' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">💎</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 10000 ? 'text-gray-700' : 'text-gray-400'}`}>10K</span>
+                </div>
+              </div>
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 25000 ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">🌟</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 25000 ? 'text-gray-700' : 'text-gray-400'}`}>25K</span>
+                </div>
+              </div>
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 50000 ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">👑</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 50000 ? 'text-gray-700' : 'text-gray-400'}`}>50K</span>
+                </div>
+              </div>
+              <div className={`flex-1 rounded-lg py-2 px-2.5 border ${sessionPoints >= 100000 ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-amber-300' : 'bg-gray-50 border-gray-200 opacity-40'}`}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-sm">🏅</span>
+                  <span className={`text-xs font-medium ${sessionPoints >= 100000 ? 'text-gray-700' : 'text-gray-400'}`}>100K</span>
+                </div>
               </div>
             </div>
           </div>
@@ -267,10 +320,36 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
           <div className="bg-gray-50 rounded-lg p-3">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs font-medium text-gray-600">Próxima conquista</span>
-              <span className="text-xs font-bold text-purple-600">900 pts</span>
+              <span className="text-xs font-bold text-purple-600">
+                {sessionPoints < 100 ? '100' : 
+                 sessionPoints < 500 ? '500' : 
+                 sessionPoints < 1000 ? '1000' :
+                 sessionPoints < 2500 ? '2500' :
+                 sessionPoints < 5000 ? '5000' :
+                 sessionPoints < 10000 ? '10K' :
+                 sessionPoints < 25000 ? '25K' :
+                 sessionPoints < 50000 ? '50K' :
+                 sessionPoints < 100000 ? '100K' : 'Máximo'} pts
+              </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all" style={{width: '10%'}}></div>
+              <div 
+                className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all" 
+                style={{
+                  width: `${
+                    sessionPoints < 100 ? (sessionPoints / 100) * 100 :
+                    sessionPoints < 500 ? ((sessionPoints - 100) / 400) * 100 :
+                    sessionPoints < 1000 ? ((sessionPoints - 500) / 500) * 100 :
+                    sessionPoints < 2500 ? ((sessionPoints - 1000) / 1500) * 100 :
+                    sessionPoints < 5000 ? ((sessionPoints - 2500) / 2500) * 100 :
+                    sessionPoints < 10000 ? ((sessionPoints - 5000) / 5000) * 100 :
+                    sessionPoints < 25000 ? ((sessionPoints - 10000) / 15000) * 100 :
+                    sessionPoints < 50000 ? ((sessionPoints - 25000) / 25000) * 100 :
+                    sessionPoints < 100000 ? ((sessionPoints - 50000) / 50000) * 100 :
+                    100
+                  }%`
+                }}
+              ></div>
             </div>
           </div>
         </Card>
