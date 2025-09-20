@@ -174,7 +174,7 @@ class ApiClient {
   async startListening(stationId: string): Promise<{ session: ListeningSession }> {
     return this.request('/listening/start', {
       method: 'POST',
-      body: JSON.stringify({ stationId })
+      body: JSON.stringify({ radioId: stationId })
     });
   }
 

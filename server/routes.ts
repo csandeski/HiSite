@@ -244,6 +244,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Radio ID é obrigatório" });
       }
       
+      // Validate radio station exists
+      const station = await storage.getRadioStation(radioId);
+      if (!station) {
+        return res.status(400).json({ error: "Estação de rádio inválida" });
+      }
+      
+      // End any existing active sessions for this user
+      const existingSessions = await storage.getUserListeningSessions(req.session.userId!, 1);
+      if (existingSessions.length > 0 && !existingSessions[0].endedAt) {
+        const now = new Date();
+        const sessionStart = new Date(existingSessions[0].startedAt);
+        const duration = Math.floor((now.getTime() - sessionStart.getTime()) / 1000);
+        
+        await storage.endListeningSession(
+          existingSessions[0].id, 
+          duration, 
+          0 // Points will be recalculated
+        );
+      }
+      
       const session = await storage.createListeningSession(req.session.userId!, radioId);
       res.json({ session });
     } catch (error) {
@@ -285,12 +305,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
       
+      // Get radio station to get points per minute
+      const station = await storage.getRadioStation(session.radioStationId!);
+      if (!station) {
+        return res.status(400).json({ error: "Estação de rádio não encontrada" });
+      }
+      
       // Calculate points based on duration and premium status
-      // Base rate: 50 points per minute (same as frontend display)
-      const basePointsPerMin = 50;
-      const premiumMultiplier = user.isPremium ? 3 : 1;
-      const minutes = Math.max(1, Math.ceil(duration / 60));
-      const pointsEarned = minutes * basePointsPerMin * premiumMultiplier;
+      // Only award points for sessions longer than 30 seconds
+      let pointsEarned = 0;
+      if (duration >= 30) {
+        const premiumMultiplier = user.isPremium ? 3 : 1;
+        const minutes = Math.floor(duration / 60); // Floor instead of ceil to prevent abuse
+        pointsEarned = minutes * station.pointsPerMinute * premiumMultiplier;
+        
+        // Add partial minute points if over 30 seconds past the minute
+        const remainingSeconds = duration % 60;
+        if (remainingSeconds >= 30) {
+          pointsEarned += Math.floor((station.pointsPerMinute * premiumMultiplier) / 2);
+        }
+      }
       
       // End session
       await storage.endListeningSession(sessionId, duration, pointsEarned);
