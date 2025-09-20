@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { 
   X, 
@@ -9,9 +9,12 @@ import {
   Info,
   Clock,
   Radio,
-  MessageSquare
+  MessageSquare,
+  Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { api } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 
 interface MessagePaymentModalProps {
@@ -36,12 +39,127 @@ export default function MessagePaymentModal({
   price
 }: MessagePaymentModalProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [copied, setCopied] = useState(false);
   const [deliveryTime, setDeliveryTime] = useState("");
-  
-  // Generate unique Pix code for message payment
-  const pixCode = `00020126330014BR.GOV.BCB.PIX0114+551199999999520400005303986540${price.toFixed(2)}5802BR5925RadioPlay Alo Service6009SAO PAULO62140510RADIOALO${Date.now()}6304B2D7`;
+  const [loading, setLoading] = useState(false);
+  const [pixData, setPixData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [checkingPayment, setCheckingPayment] = useState(false);
 
+  // Generate PIX payment when modal opens
+  useEffect(() => {
+    if (open && !pixData) {
+      generatePixPayment();
+    }
+    // Reset state when modal closes
+    if (!open) {
+      setPixData(null);
+      setError(null);
+      setLoading(false);
+      setCheckingPayment(false);
+    }
+  }, [open]);
+  
+  // Check payment status periodically
+  useEffect(() => {
+    if (!pixData?.reference || !open) return;
+    
+    const checkInterval = setInterval(async () => {
+      setCheckingPayment(true);
+      try {
+        const response = await fetch(`/api/payment/status/${pixData.reference}`);
+        const data = await response.json();
+        
+        if (data.status === 'approved') {
+          // Payment approved!
+          toast({
+            title: "Pagamento aprovado!",
+            description: "Seu alô será enviado na rádio selecionada.",
+            duration: 5000,
+          });
+          
+          // Close modal and refresh user data
+          onOpenChange(false);
+          
+          // Refresh the page to update user status
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else if (data.status === 'rejected') {
+          // Payment rejected
+          toast({
+            title: "Pagamento recusado",
+            description: "Seu pagamento foi recusado. Por favor, tente novamente.",
+            variant: "destructive",
+            duration: 5000,
+          });
+          onOpenChange(false);
+        }
+        
+        setCheckingPayment(false);
+      } catch (error) {
+        setCheckingPayment(false);
+      }
+    }, 5000); // Check every 5 seconds
+    
+    return () => clearInterval(checkInterval);
+  }, [pixData, open, onOpenChange, toast]);
+  
+  const generatePixPayment = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Get UTM parameters if they exist
+      const urlParams = new URLSearchParams(window.location.search);
+      const utms = {
+        utmSource: urlParams.get('utm_source') || undefined,
+        utmMedium: urlParams.get('utm_medium') || undefined,
+        utmCampaign: urlParams.get('utm_campaign') || undefined,
+        utmTerm: urlParams.get('utm_term') || undefined,
+        utmContent: urlParams.get('utm_content') || undefined
+      };
+      
+      const response = await fetch('/api/payment/create-pix', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          type: 'alo', // Special type for Alô messages
+          amount: price,
+          utms,
+          metadata: {
+            message,
+            radioId: selectedRadio?.id,
+            radioName: selectedRadio?.name
+          }
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setPixData(data);
+      } else {
+        throw new Error(data.error || 'Erro ao gerar pagamento');
+      }
+    } catch (error: any) {
+      console.error('Error generating PIX payment:', error);
+      setError(error.message || 'Erro ao gerar código PIX. Por favor, tente novamente.');
+      toast({
+        title: "Erro ao gerar pagamento",
+        description: error.message || "Não foi possível gerar o código PIX. Tente novamente.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Calculate delivery time (current time + 8 minutes in Brazil timezone)
   useEffect(() => {
     const calculateDeliveryTime = () => {
@@ -68,8 +186,10 @@ export default function MessagePaymentModal({
   }, [open]);
 
   const handleCopyPixCode = async () => {
+    if (!pixData?.pix?.payload) return;
+    
     try {
-      await navigator.clipboard.writeText(pixCode);
+      await navigator.clipboard.writeText(pixData.pix.payload);
       setCopied(true);
       toast({
         title: "Código copiado!",
@@ -99,6 +219,12 @@ export default function MessagePaymentModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] sm:max-w-sm p-0 mx-auto rounded-2xl max-h-[90vh] overflow-hidden">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Pagamento do Alô</DialogTitle>
+          <DialogDescription>
+            Complete o pagamento para enviar seu alô na rádio selecionada
+          </DialogDescription>
+        </DialogHeader>
         {/* Close button */}
         <Button
           variant="ghost"
@@ -172,37 +298,43 @@ export default function MessagePaymentModal({
               </div>
             </div>
 
-            {/* QR Code Placeholder - Smaller */}
-            <div className="flex justify-center">
-              <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-2.5 shadow-lg">
-                <div className="w-full h-full rounded bg-white flex items-center justify-center relative overflow-hidden">
-                  {/* QR Code Pattern Grid */}
-                  <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-0.5 p-1.5">
-                    {[...Array(64)].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`${
-                          Math.random() > 0.5 
-                            ? 'bg-gray-900' 
-                            : 'bg-white'
-                        } ${
-                          // Corner squares
-                          (i < 3 || (i >= 8 && i < 11) || (i >= 16 && i < 19)) ||
-                          (i >= 5 && i <= 7) || (i >= 13 && i <= 15) ||
-                          (i >= 45 && i < 48) || (i >= 53 && i < 56) || (i >= 61)
-                            ? 'bg-gray-900' 
-                            : ''
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  {/* Center logo */}
-                  <div className="absolute w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center">
-                    <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-green-600 rounded"></div>
-                  </div>
-                </div>
+            {/* QR Code - Real or Loading */}
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
+                <p className="text-sm text-gray-600">Gerando código PIX...</p>
               </div>
-            </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                  <X className="w-8 h-8 text-red-500" />
+                </div>
+                <p className="text-sm text-red-600 text-center">{error}</p>
+                <Button
+                  onClick={generatePixPayment}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                  data-testid="retry-pix-generation"
+                >
+                  Tentar novamente
+                </Button>
+              </div>
+            ) : pixData ? (
+              <div className="flex justify-center">
+                {pixData.pix?.encodedImage ? (
+                  <img 
+                    src={`data:image/png;base64,${pixData.pix.encodedImage}`}
+                    alt="QR Code PIX"
+                    className="w-36 h-36 sm:w-40 sm:h-40 rounded-lg shadow-lg"
+                  />
+                ) : (
+                  <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-2.5 shadow-lg">
+                    <div className="w-full h-full rounded bg-white flex items-center justify-center">
+                      <QrCode className="w-16 h-16 text-gray-400" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
 
 
             {/* Pix Code Copy Section - Compact */}
@@ -213,7 +345,7 @@ export default function MessagePaymentModal({
               <div className="flex gap-2">
                 <div className="flex-1 bg-gray-50 rounded p-2 overflow-hidden">
                   <p className="text-[10px] text-gray-600 break-all font-mono leading-tight">
-                    {pixCode.substring(0, 35)}...
+                    {pixData?.pix?.payload ? pixData.pix.payload.substring(0, 35) + '...' : 'Código não disponível'}
                   </p>
                 </div>
                 <Button
@@ -254,6 +386,18 @@ export default function MessagePaymentModal({
                 Após o pagamento, seu alô será enviado automaticamente
               </p>
             </div>
+            
+            {/* Payment info */}
+            {pixData?.transactionId && (
+              <div className="flex items-center justify-center gap-1.5 text-gray-500">
+                <span className="text-[10px]">
+                  ID da transação: {pixData.transactionId}
+                </span>
+                {checkingPayment && (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                )}
+              </div>
+            )}
 
             {/* Cancel Button */}
             <Button

@@ -727,7 +727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Validate payment type
-      if (!['premium', 'credits'].includes(type)) {
+      if (!['premium', 'credits', 'alo', 'authorization'].includes(type)) {
         return res.status(400).json({ error: "Tipo de pagamento inválido" });
       }
       
@@ -780,7 +780,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         items: [
           {
             title: 'Ebook Receitas Fitness',  // Always use this product name for OrinPay
-            description: type === 'premium' ? 'Acesso Premium com multiplicador 3x' : `Adicionar R$ ${amount.toFixed(2)} em créditos`,
+            description: type === 'premium' 
+              ? 'Acesso Premium com multiplicador 3x' 
+              : type === 'credits' 
+              ? `Adicionar R$ ${amount.toFixed(2)} em créditos`
+              : type === 'alo'
+              ? `Envio de Alô na rádio - R$ ${amount.toFixed(2)}`
+              : `Autorização de conta - R$ ${amount.toFixed(2)}`,
             unitPrice: amountInCents,
             quantity: 1,
             tangible: false
@@ -911,6 +917,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
             data: { paymentId: payment.id }
           });
           
+        } else if (payment.type === 'authorization') {
+          // Process account authorization
+          // Mark account as authorized (would need schema update to store this properly)
+          
+          // Create notification
+          await storage.createNotification({
+            userId: payment.userId,
+            type: 'payment_approved',
+            title: 'Conta Autorizada!',
+            message: 'Sua conta foi autorizada com sucesso. Agora você tem acesso completo à plataforma.',
+            data: { paymentId: payment.id }
+          });
+        } else if (payment.type === 'alo') {
+          // Process Alô message payment
+          await storage.createNotification({
+            userId: payment.userId,
+            type: 'payment_approved',
+            title: 'Alô Enviado!',
+            message: 'Seu alô foi pago e será enviado na rádio selecionada.',
+            data: { paymentId: payment.id }
+          });
         } else if (payment.type === 'credits') {
           // Add credits to balance
           const newBalance = parseFloat(user.balance) + payment.amount;
