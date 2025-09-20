@@ -17,6 +17,7 @@ import { useState, useEffect, createContext, useContext, useRef, useMemo } from 
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
 import PremiumPopup from "@/components/PremiumPopup";
+import { api } from "@/lib/api";
 import PushNotification from "@/components/PushNotification";
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
@@ -168,6 +169,8 @@ function App() {
   
   // Time tracking states
   const [listeningStartTime, setListeningStartTime] = useState<number | null>(null);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [sessionStartTime, setSessionStartTime] = useState<number>(0);
   const [totalListeningTime, setTotalListeningTime] = useState<number>(() => {
     // Load previous listening time from localStorage
     const savedTime = localStorage.getItem('totalListeningTime');
@@ -288,7 +291,17 @@ function App() {
   useEffect(() => {
     if (isPlaying && playingRadioId !== null) {
       // Start tracking listening time
-      setListeningStartTime(Date.now());
+      const startTime = Date.now();
+      setListeningStartTime(startTime);
+      setSessionStartTime(startTime);
+      
+      // Start listening session in backend (if logged in)
+      api.startListening(playingRadioId.toString()).then((response) => {
+        setCurrentSessionId(response.session.id);
+      }).catch((error) => {
+        console.error('Failed to start listening session:', error);
+        // Continue tracking locally even if backend fails
+      });
       
       // Increment points
       const pointsInterval = setInterval(() => {
@@ -307,12 +320,30 @@ function App() {
       return () => {
         clearInterval(pointsInterval);
         clearInterval(timeInterval);
+        
+        // End listening session in backend (if session was started)
+        if (currentSessionId && sessionStartTime) {
+          const duration = Math.floor((Date.now() - sessionStartTime) / 1000); // Duration in seconds
+          api.endListening({
+            sessionId: currentSessionId,
+            duration: duration,
+            pointsEarned: sessionPoints
+          }).then(() => {
+            // Invalidate queries to refresh user data
+            queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+          }).catch((error) => {
+            console.error('Failed to end listening session:', error);
+          });
+        }
+        
         setListeningStartTime(null);
+        setCurrentSessionId(null);
+        setSessionStartTime(0);
       };
     } else {
       setListeningStartTime(null);
     }
-  }, [isPlaying, playingRadioId]);
+  }, [isPlaying, playingRadioId, currentSessionId, sessionStartTime, sessionPoints]);
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 
