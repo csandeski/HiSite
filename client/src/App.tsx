@@ -21,6 +21,7 @@ import { api } from "@/lib/api";
 import PushNotification from "@/components/PushNotification";
 import { useUTMTracking } from "@/hooks/useUTMTracking";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
 import hitsFmLogo from '@/assets/hits-fm-logo.png';
@@ -726,6 +727,13 @@ function App({ user }: { user: any }) {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* PWA Install Button in Header */}
+            {(location === "/dashboard" || location === "/resgatar" || location === "/perfil") && (
+              <div className="fixed top-4 right-4 z-50">
+                <PWAInstallButton />
               </div>
             )}
 
