@@ -162,7 +162,7 @@ function App() {
   const [balance, setBalance] = useState(0); // Will be synced with user data via useEffect
   const [activeTab, setActiveTab] = useState("radio");
   const [location, setLocation] = useLocation();
-  const [hasReached15Points, setHasReached15Points] = useState(false);
+  const [hasReached25Points, setHasReached25Points] = useState(false);
   const [showPremiumPopup, setShowPremiumPopup] = useState(false);
   const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -308,18 +308,18 @@ function App() {
     }
   }, [location]);
 
-  // Detect when user reaches 15 points for the first time
+  // Detect when user reaches 25 points for the first time
   useEffect(() => {
-    if (sessionPoints >= 15 && !hasReached15Points) {
-      setHasReached15Points(true);
+    if (sessionPoints >= 25 && !hasReached25Points) {
+      setHasReached25Points(true);
       setShowPremiumPopup(true);
       setLastPopupTime(Date.now());
     }
-  }, [sessionPoints, hasReached15Points]);
+  }, [sessionPoints, hasReached25Points]);
 
-  // Show popup every 15 seconds after reaching 15 points
+  // Show popup every 75 seconds (1:15 min) after reaching 25 points
   useEffect(() => {
-    if (hasReached15Points && !showPremiumPopup) {
+    if (hasReached25Points && !showPremiumPopup) {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -329,7 +329,7 @@ function App() {
       intervalRef.current = setInterval(() => {
         setShowPremiumPopup(true);
         setLastPopupTime(Date.now());
-      }, 50000); // 50 seconds
+      }, 75000); // 75 seconds (1:15 min)
 
       return () => {
         if (intervalRef.current) {
@@ -337,7 +337,7 @@ function App() {
         }
       };
     }
-  }, [hasReached15Points, showPremiumPopup]);
+  }, [hasReached25Points, showPremiumPopup]);
 
   const handlePremiumPopupClose = (open: boolean) => {
     setShowPremiumPopup(open);
