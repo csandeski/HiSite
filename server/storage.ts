@@ -269,6 +269,103 @@ export class SupabaseStorage implements IStorage {
       .where(eq(schema.userAchievements.userId, userId));
   }
 
+  async getUserAchievementsWithDetails(userId: string): Promise<any[]> {
+    const userAchievements = await db
+      .select({
+        achievementId: schema.userAchievements.achievementId,
+        progress: schema.userAchievements.progress,
+        progressMax: schema.userAchievements.progressMax,
+        isCompleted: schema.userAchievements.isCompleted,
+        completedAt: schema.userAchievements.completedAt,
+        name: schema.achievements.name,
+        description: schema.achievements.description,
+        icon: schema.achievements.icon,
+        category: schema.achievements.category,
+        rewardPoints: schema.achievements.rewardPoints
+      })
+      .from(schema.userAchievements)
+      .innerJoin(schema.achievements, eq(schema.userAchievements.achievementId, schema.achievements.id))
+      .where(eq(schema.userAchievements.userId, userId))
+      .orderBy(desc(schema.userAchievements.isCompleted), schema.achievements.sortOrder);
+    
+    return userAchievements;
+  }
+
+  async checkAndUpdateUserAchievements(userId: string): Promise<void> {
+    // Get user data
+    const user = await this.getUser(userId);
+    if (!user) return;
+
+    // Get all achievements
+    const achievements = await this.getAchievements();
+    
+    for (const achievement of achievements) {
+      let progress = 0;
+      let progressMax = 0;
+      const requirement = JSON.parse(achievement.requirement as string);
+      
+      switch (requirement.type) {
+        case 'listening_hours':
+          progress = Math.floor(user.totalListeningTime / 3600);
+          progressMax = requirement.value;
+          break;
+        case 'points':
+          progress = user.points;
+          progressMax = requirement.value;
+          break;
+        case 'listening_sessions':
+          const sessions = await db.select()
+            .from(schema.listeningSessions)
+            .where(eq(schema.listeningSessions.userId, userId));
+          progress = sessions.length;
+          progressMax = requirement.value;
+          break;
+        case 'login_streak':
+          progress = user.loginStreak;
+          progressMax = requirement.value;
+          break;
+        case 'premium':
+          progress = user.isPremium ? 1 : 0;
+          progressMax = 1;
+          break;
+      }
+      
+      // Update or create user achievement
+      const existing = await db.select()
+        .from(schema.userAchievements)
+        .where(and(
+          eq(schema.userAchievements.userId, userId),
+          eq(schema.userAchievements.achievementId, achievement.id)
+        ))
+        .limit(1);
+      
+      const isCompleted = progress >= progressMax;
+      
+      if (existing.length > 0) {
+        // Update existing
+        if (progress !== existing[0].progress || isCompleted !== existing[0].isCompleted) {
+          await db.update(schema.userAchievements)
+            .set({
+              progress: Math.min(progress, progressMax),
+              isCompleted,
+              completedAt: isCompleted && !existing[0].isCompleted ? new Date() : existing[0].completedAt
+            })
+            .where(eq(schema.userAchievements.id, existing[0].id));
+        }
+      } else {
+        // Create new
+        await db.insert(schema.userAchievements).values([{
+          userId,
+          achievementId: achievement.id,
+          progress: Math.min(progress, progressMax),
+          progressMax,
+          isCompleted,
+          completedAt: isCompleted ? new Date() : null
+        }]);
+      }
+    }
+  }
+
   async updateUserAchievement(userId: string, achievementId: string, progress: number): Promise<void> {
     const existing = await db.select().from(schema.userAchievements)
       .where(and(

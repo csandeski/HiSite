@@ -192,7 +192,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User profile routes
   app.patch("/api/user/profile", requireAuth, async (req, res) => {
     try {
-      const updates = req.body;
+      // Validate the updates - only allow certain fields to be updated
+      const profileSchema = z.object({
+        fullName: z.string().min(1).optional(),
+        phoneNumber: z.string().optional(),
+        cpf: z.string().optional(),
+        location: z.string().optional(),
+        bio: z.string().max(200).optional() // Status/bio field
+      });
+
+      const updates = profileSchema.parse(req.body);
       const user = await storage.updateUser(req.session.userId!, updates);
       
       if (!user) {
@@ -201,6 +210,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ user });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
       console.error("Update profile error:", error);
       res.status(500).json({ error: "Erro ao atualizar perfil" });
     }
@@ -414,7 +426,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/user/achievements", requireAuth, async (req, res) => {
     try {
-      const userAchievements = await storage.getUserAchievements(req.session.userId!);
+      // First check and update user achievements based on their current stats
+      await storage.checkAndUpdateUserAchievements(req.session.userId!);
+      
+      // Then get the updated achievements with details
+      const userAchievements = await storage.getUserAchievementsWithDetails(req.session.userId!);
       res.json({ achievements: userAchievements });
     } catch (error) {
       console.error("Get user achievements error:", error);
