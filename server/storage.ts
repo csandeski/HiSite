@@ -584,6 +584,8 @@ export class SupabaseStorage implements IStorage {
   }
 
   // Payment methods (OrinPay)
+  private static payments: any[] = [];
+
   async createPayment(data: {
     userId: string;
     transactionId: string;
@@ -602,26 +604,17 @@ export class SupabaseStorage implements IStorage {
     };
     
     // Store in a temporary in-memory store
-    if (!global.payments) {
-      global.payments = [];
-    }
-    global.payments.push(payment);
+    SupabaseStorage.payments.push(payment);
     
     return payment;
   }
 
   async getPaymentByReference(reference: string): Promise<any | undefined> {
-    if (!global.payments) {
-      return undefined;
-    }
-    return global.payments.find((p: any) => p.reference === reference);
+    return SupabaseStorage.payments.find(p => p.reference === reference);
   }
 
   async updatePaymentStatus(paymentId: string, status: string): Promise<void> {
-    if (!global.payments) {
-      return;
-    }
-    const payment = global.payments.find((p: any) => p.id === paymentId);
+    const payment = SupabaseStorage.payments.find(p => p.id === paymentId);
     if (payment) {
       payment.status = status;
       payment.updatedAt = new Date();
