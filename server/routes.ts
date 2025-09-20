@@ -253,15 +253,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // End any existing active sessions for this user
       const existingSessions = await storage.getUserListeningSessions(req.session.userId!, 1);
       if (existingSessions.length > 0 && !existingSessions[0].endedAt) {
+        const existingSession = existingSessions[0];
         const now = new Date();
-        const sessionStart = new Date(existingSessions[0].startedAt);
+        const sessionStart = new Date(existingSession.startedAt);
         const duration = Math.floor((now.getTime() - sessionStart.getTime()) / 1000);
         
-        await storage.endListeningSession(
-          existingSessions[0].id, 
-          duration, 
-          0 // Points will be recalculated
-        );
+        // Get user and station for point calculation
+        const user = await storage.getUser(req.session.userId!);
+        const existingStation = await storage.getRadioStation(existingSession.radioStationId!);
+        
+        if (user && existingStation && duration >= 30) {
+          const premiumMultiplier = user.isPremium ? 3 : 1;
+          const baseIntervalSeconds = Math.max(1, Math.round(60 / existingStation.pointsPerMinute));
+          const intervalWithPremium = Math.max(1, Math.round(baseIntervalSeconds / premiumMultiplier));
+          const pointsEarned = Math.floor(duration / intervalWithPremium);
+          
+          // End session with calculated points
+          await storage.endListeningSession(existingSession.id, duration, pointsEarned);
+          
+          // Update user points and daily stats
+          if (pointsEarned > 0) {
+            await storage.updateUser(req.session.userId!, {
+              points: user.points + pointsEarned,
+              totalListeningTime: user.totalListeningTime + duration
+            });
+            await storage.updateDailyStats(req.session.userId!, duration, pointsEarned);
+          }
+        } else {
+          // End session without points if conditions not met
+          await storage.endListeningSession(existingSession.id, duration, 0);
+        }
       }
       
       const session = await storage.createListeningSession(req.session.userId!, radioId);
@@ -312,18 +333,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Calculate points based on duration and premium status
-      // Only award points for sessions longer than 30 seconds
+      // Points are always awarded as integers (1 point at a time)
       let pointsEarned = 0;
       if (duration >= 30) {
         const premiumMultiplier = user.isPremium ? 3 : 1;
-        const minutes = Math.floor(duration / 60); // Floor instead of ceil to prevent abuse
-        pointsEarned = minutes * station.pointsPerMinute * premiumMultiplier;
         
-        // Add partial minute points if over 30 seconds past the minute
-        const remainingSeconds = duration % 60;
-        if (remainingSeconds >= 30) {
-          pointsEarned += Math.floor((station.pointsPerMinute * premiumMultiplier) / 2);
-        }
+        // Calculate interval in seconds for earning 1 point
+        // For example: if pointsPerMinute is 50, then interval is 60/50 = 1.2 seconds per point
+        // But we round to ensure integer intervals
+        const baseIntervalSeconds = Math.max(1, Math.round(60 / station.pointsPerMinute));
+        const intervalWithPremium = Math.max(1, Math.round(baseIntervalSeconds / premiumMultiplier));
+        
+        // Calculate how many points earned based on duration
+        pointsEarned = Math.floor(duration / intervalWithPremium);
       }
       
       // End session
