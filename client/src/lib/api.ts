@@ -182,7 +182,13 @@ class ApiClient {
     sessionId: string;
     duration: number;
     pointsEarned: number;
-  }): Promise<{ success: boolean }> {
+  }): Promise<{ 
+    success: boolean;
+    pointsEarned: number;
+    duration: number;
+    updatedPoints: number;
+    totalListeningTime: number;
+  }> {
     return this.request('/listening/end', {
       method: 'POST',
       body: JSON.stringify(data)

@@ -207,14 +207,20 @@ function App() {
 
   // Initialize balance and points only once when user logs in/out
   useEffect(() => {
-    if (user) {
-      // Only set balance, not points (points are managed by listening sessions)
+    if (user && user.id) {
+      // Only set balance
       setBalance(user.balance ? parseFloat(user.balance) : 0);
       
-      // Only set points if they are currently 0 (initial load or after logout)
-      setSessionPoints(prev => prev === 0 ? (user.points || 0) : prev);
-    } else {
-      // Reset values when user is logged out
+      // Only set points on initial login (when they were 0)
+      setSessionPoints(prev => {
+        if (prev === 0) {
+          return user.points || 0;
+        }
+        // Otherwise keep current session points
+        return prev;
+      });
+    } else if (!user) {
+      // Only reset when user is actually logged out (not during loading)
       setSessionPoints(0);
       setBalance(0);
     }
@@ -326,13 +332,15 @@ function App() {
         sessionId,
         duration,
         pointsEarned: pointsEarnedThisSession
-      }).then(() => {
-        // Refresh user data to get updated points from backend
-        // But preserve local session points if they're higher
-        api.getCurrentUser().then(({ user }) => {
-          setSessionPoints(prev => Math.max(prev, user.points || 0));
-          queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-        });
+      }).then((result) => {
+        // Use the updated points from the server response
+        if (result && result.updatedPoints !== undefined) {
+          setSessionPoints(result.updatedPoints);
+          // Update sessionInfoRef to match new server value
+          sessionInfoRef.current.sessionPoints = result.updatedPoints;
+        }
+        // Invalidate queries to update other components
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
       }).catch((error) => {
         console.error('Failed to end listening session:', error);
       });
