@@ -16,19 +16,26 @@ export function PWAInstallPrompt() {
 
     // Check if can show prompt after a delay (user engagement)
     const timer = setTimeout(() => {
-      const hasSeenPrompt = localStorage.getItem('pwa-prompt-seen');
+      const promptSeenTime = localStorage.getItem('pwa-prompt-seen');
       const canInstall = pwaManager.canPromptInstall();
       
+      // Check if prompt was dismissed more than 7 days ago
+      const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      const shouldShowPrompt = !promptSeenTime || parseInt(promptSeenTime) < sevenDaysAgo;
+      
       // Show prompt if can install and user hasn't dismissed it recently
-      if (canInstall && !hasSeenPrompt) {
+      if (canInstall && shouldShowPrompt) {
         setShowPrompt(true);
       }
     }, 30000); // Show after 30 seconds of engagement
 
     // Listen for install available event
     const handleInstallAvailable = () => {
-      const hasSeenPrompt = localStorage.getItem('pwa-prompt-seen');
-      if (!hasSeenPrompt) {
+      const promptSeenTime = localStorage.getItem('pwa-prompt-seen');
+      const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      const shouldShowPrompt = !promptSeenTime || parseInt(promptSeenTime) < sevenDaysAgo;
+      
+      if (shouldShowPrompt) {
         setShowPrompt(true);
       }
     };

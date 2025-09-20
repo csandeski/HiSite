@@ -4,8 +4,11 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/offline.html',
   '/icon-192x192.png',
-  '/icon-512x512.png'
+  '/icon-512x512.png',
+  '/icon-144x144.png',
+  '/icon-96x96.png'
 ];
 
 // Install event - cache essential files
