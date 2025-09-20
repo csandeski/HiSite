@@ -47,13 +47,42 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
   
   // Check payment status periodically
   useEffect(() => {
-    if (!pixData || !open) return;
+    if (!pixData?.reference || !open) return;
     
     const checkInterval = setInterval(async () => {
       setCheckingPayment(true);
       try {
-        // Here we could check payment status via webhook or polling
-        // For now, we'll let the webhook handle it
+        const response = await fetch(`/api/payment/status/${pixData.reference}`);
+        const data = await response.json();
+        
+        if (data.status === 'approved') {
+          // Payment approved!
+          toast({
+            title: type === 'premium' ? "Premium ativado!" : "Créditos adicionados!",
+            description: type === 'premium' 
+              ? "Sua assinatura Premium foi ativada com sucesso. Aproveite o multiplicador 3x!" 
+              : `R$ ${amount.toFixed(2)} foram adicionados ao seu saldo.`,
+            duration: 5000,
+          });
+          
+          // Close modal and refresh user data
+          onOpenChange(false);
+          
+          // Refresh the page to update user status
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else if (data.status === 'rejected') {
+          // Payment rejected
+          toast({
+            title: "Pagamento recusado",
+            description: "Seu pagamento foi recusado. Por favor, tente novamente.",
+            variant: "destructive",
+            duration: 5000,
+          });
+          onOpenChange(false);
+        }
+        
         setCheckingPayment(false);
       } catch (error) {
         setCheckingPayment(false);
@@ -61,7 +90,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
     }, 5000); // Check every 5 seconds
     
     return () => clearInterval(checkInterval);
-  }, [pixData, open]);
+  }, [pixData, open, type, amount, onOpenChange, toast]);
   
   const generatePixPayment = async () => {
     setLoading(true);

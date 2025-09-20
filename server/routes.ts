@@ -659,7 +659,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // OrinPay Payment Routes
   app.post("/api/payment/create-pix", requireAuth, async (req, res) => {
     try {
-      const { type, amount, utms } = req.body;
+      const { type, amount, utms: clientUtms } = req.body;
+      
+      // Normalize UTM parameters to snake_case as expected by OrinPay
+      const utms = clientUtms ? {
+        utm_source: clientUtms.utmSource,
+        utm_medium: clientUtms.utmMedium,
+        utm_campaign: clientUtms.utmCampaign,
+        utm_term: clientUtms.utmTerm,
+        utm_content: clientUtms.utmContent
+      } : {};
+      
+      // Validate amount on server side - never trust client
+      if (!amount || amount <= 0 || amount > 999.99) {
+        return res.status(400).json({ error: "Valor inválido" });
+      }
+      
+      // Validate payment type
+      if (!['premium', 'credits'].includes(type)) {
+        return res.status(400).json({ error: "Tipo de pagamento inválido" });
+      }
       
       // Get user info
       const user = await storage.getUser(req.session.userId!);
@@ -749,10 +768,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // OrinPay Webhook
+  // Payment status check endpoint
+  app.get("/api/payment/status/:reference", async (req, res) => {
+    try {
+      const { reference } = req.params;
+      
+      if (!reference) {
+        return res.status(400).json({ error: 'Reference is required' });
+      }
+      
+      const payment = await storage.getPaymentByReference(reference);
+      
+      if (!payment) {
+        return res.status(404).json({ error: 'Payment not found' });
+      }
+      
+      // Only return necessary information
+      res.json({
+        status: payment.status,
+        reference: payment.reference,
+        type: payment.type,
+        amount: payment.amount,
+        createdAt: payment.createdAt,
+        updatedAt: payment.updatedAt
+      });
+      
+    } catch (error) {
+      console.error('Check payment status error:', error);
+      res.status(500).json({ error: 'Error checking payment status' });
+    }
+  });
+  
+  // OrinPay Webhook - NO authentication required as it comes from external service
   app.post("/api/webhook/orinpay", async (req, res) => {
     try {
       const webhookData = req.body;
+      const signature = req.headers['x-webhook-signature'] as string;
       
       // Log webhook for debugging
       console.log('OrinPay Webhook received:', webhookData.event, webhookData.status);

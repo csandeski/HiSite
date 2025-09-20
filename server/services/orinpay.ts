@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 const ORINPAY_API_URL = 'https://www.orinpay.com.br/api/v1';
-const ORINPAY_TOKEN = '73526b4a19efa9aa29d71956fcd2bc0ea27a1486d23de173f8b3ad20d7740bed';
+
+// Use environment variable for API key - NEVER hardcode tokens
+if (!process.env.ORINPAY_API_KEY) {
+  console.error('WARNING: ORINPAY_API_KEY environment variable is not set');
+}
 
 export interface PixTransaction {
   paymentMethod: 'pix';
@@ -111,11 +115,15 @@ export interface WebhookPayload {
 
 class OrinPayService {
   private headers = {
-    'Authorization': ORINPAY_TOKEN,
+    'Authorization': process.env.ORINPAY_API_KEY || '',
     'Content-Type': 'application/json'
   };
 
   async createPixTransaction(data: PixTransaction): Promise<PixResponse> {
+    if (!process.env.ORINPAY_API_KEY) {
+      throw new Error('ORINPAY_API_KEY não está configurada');
+    }
+    
     try {
       const response = await axios.post(
         `${ORINPAY_API_URL}/transactions/pix`,
@@ -203,7 +211,15 @@ class OrinPayService {
   // Gera uma referência única para o pedido
   generateReference(userId: string, type: string): string {
     const timestamp = Date.now();
-    return `${type.toUpperCase()}-${userId}-${timestamp}`;
+    const random = Math.random().toString(36).substring(2, 8);
+    return `${type.toUpperCase()}-${userId}-${timestamp}-${random}`.substring(0, 50);
+  }
+  
+  // Verifica assinatura do webhook (quando OrinPay fornecer)
+  verifyWebhookSignature(payload: any, signature?: string): boolean {
+    // TODO: Implementar verificação de assinatura quando OrinPay fornecer secret
+    // Por enquanto, verificaremos se a referência existe no nosso banco
+    return true;
   }
 
   // Valida se o valor está dentro do limite permitido
