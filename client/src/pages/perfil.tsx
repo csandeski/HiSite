@@ -22,7 +22,16 @@ import {
   TrendingUp,
   X,
   Lock,
-  FileText
+  FileText,
+  Camera,
+  Smile,
+  Heart,
+  Star,
+  Zap,
+  Music,
+  Gamepad2,
+  Rocket,
+  Upload
 } from "lucide-react";
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
@@ -43,6 +52,9 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
   const [showFAQModal, setShowFAQModal] = useState(false);
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [highlightPremium, setHighlightPremium] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   
   // Check for highlight parameter in URL
   useEffect(() => {
@@ -73,12 +85,54 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
+  // Avatar options
+  const avatarIcons = [
+    { id: 'smile', icon: Smile, color: 'from-yellow-400 to-orange-500' },
+    { id: 'heart', icon: Heart, color: 'from-pink-400 to-red-500' },
+    { id: 'star', icon: Star, color: 'from-purple-400 to-indigo-500' },
+    { id: 'zap', icon: Zap, color: 'from-blue-400 to-cyan-500' },
+    { id: 'music', icon: Music, color: 'from-green-400 to-teal-500' },
+    { id: 'gamepad', icon: Gamepad2, color: 'from-indigo-400 to-purple-500' },
+    { id: 'rocket', icon: Rocket, color: 'from-orange-400 to-red-500' },
+    { id: 'user', icon: User, color: 'from-gray-400 to-slate-500' },
+  ];
+
   // Get member since date
   const memberSince = "Set 2025";
 
   const handleLogout = () => {
     localStorage.removeItem('userName');
     setLocation('/');
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result as string);
+        setSelectedAvatar(null);
+        setShowAvatarModal(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarSelect = (avatarId: string) => {
+    setSelectedAvatar(avatarId);
+    setUploadedImage(null);
+    setShowAvatarModal(false);
+  };
+
+  const getCurrentAvatar = () => {
+    if (uploadedImage) {
+      return { type: 'image' as const, content: uploadedImage };
+    }
+    if (selectedAvatar) {
+      const avatar = avatarIcons.find(a => a.id === selectedAvatar);
+      return { type: 'icon' as const, content: avatar };
+    }
+    return { type: 'initials' as const, content: getInitials(userName || '') };
   };
 
   return (
@@ -107,30 +161,86 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-4 max-w-lg pb-24">
-        {/* Compact Profile Header */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 mb-4">
-          <div className="flex items-center gap-4">
-            {/* Avatar */}
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg">
-              {userName ? (
-                <span className="text-white text-xl font-bold">{getInitials(userName)}</span>
-              ) : (
-                <User className="w-8 h-8 text-white" />
-              )}
+        {/* Enhanced Profile Header */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-4">
+          {/* Cover Background */}
+          <div className="h-24 bg-gradient-to-r from-primary via-blue-500 to-purple-600"></div>
+          
+          <div className="px-5 pb-5">
+            {/* Avatar Section */}
+            <div className="flex items-end -mt-12 mb-4">
+              <div className="relative">
+                {(() => {
+                  const avatar = getCurrentAvatar();
+                  if (avatar.type === 'image') {
+                    return (
+                      <div className="w-20 h-20 rounded-full border-4 border-white shadow-xl overflow-hidden">
+                        <img src={avatar.content} alt="Avatar" className="w-full h-full object-cover" />
+                      </div>
+                    );
+                  } else if (avatar.type === 'icon' && avatar.content) {
+                    const Icon = avatar.content.icon;
+                    return (
+                      <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${avatar.content.color} flex items-center justify-center shadow-xl border-4 border-white`}>
+                        <Icon className="w-10 h-10 text-white" />
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-xl border-4 border-white">
+                        <span className="text-white text-2xl font-bold">{String(avatar.content)}</span>
+                      </div>
+                    );
+                  }
+                })()}
+                
+                {/* Edit Avatar Button */}
+                <button
+                  onClick={() => setShowAvatarModal(true)}
+                  className="absolute bottom-0 right-0 w-7 h-7 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-200 hover:bg-gray-50 transition-colors"
+                  aria-label="Editar avatar"
+                >
+                  <Camera className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+              
+              {/* Online Status */}
+              <div className="ml-auto">
+                <div className="px-3 py-1.5 bg-green-100 rounded-full flex items-center gap-1.5">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-medium text-green-700">Online</span>
+                </div>
+              </div>
             </div>
             
             {/* User Info */}
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900">
-                {userName || 'Usuário'}
-              </h1>
-              <p className="text-sm text-gray-600">
-                Membro desde {memberSince}
+            <div className="space-y-2">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {userName || 'Usuário'}
+                </h1>
+                <p className="text-sm text-gray-500 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" />
+                  Membro desde {memberSince}
+                </p>
+              </div>
+              
+              {/* Bio/Status */}
+              <p className="text-sm text-gray-600 italic">
+                "Ouvindo rádio e ganhando pontos! 🎵"
               </p>
-              <div className="flex items-center gap-1 mt-1">
-                <div className="px-2.5 py-1 bg-green-100 rounded-full">
-                  <span className="text-xs font-medium text-green-700">Ativo</span>
-                </div>
+              
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mt-3">
+                <span className="text-xs px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
+                  Ouvinte Ativo
+                </span>
+                <span className="text-xs px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
+                  Top Ganhos
+                </span>
+                <span className="text-xs px-2.5 py-1 bg-orange-100 text-orange-700 rounded-full font-medium">
+                  Membro Gold
+                </span>
               </div>
             </div>
           </div>
@@ -685,6 +795,121 @@ export default function Perfil({ userName, sessionPoints, balance }: PerfilProps
             <div className="flex items-center justify-center gap-1.5 pt-1">
               <ShieldCheck className="w-3.5 h-3.5 text-gray-400" />
               <span className="text-[10px] text-gray-500">Pagamento seguro • Garantia de 7 dias</span>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Avatar Selection Modal */}
+      <Dialog open={showAvatarModal} onOpenChange={setShowAvatarModal}>
+        <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Camera className="w-5 h-5" />
+              Escolher Avatar
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 pt-4">
+            {/* Upload Image Section */}
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="avatar-upload"
+              />
+              <label
+                htmlFor="avatar-upload"
+                className="cursor-pointer flex flex-col items-center gap-2"
+              >
+                <Upload className="w-8 h-8 text-gray-400" />
+                <span className="text-sm font-medium text-gray-700">
+                  Fazer upload de imagem
+                </span>
+                <span className="text-xs text-gray-500">
+                  JPG, PNG ou GIF (máx. 2MB)
+                </span>
+              </label>
+            </div>
+            
+            {/* Or Divider */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-gray-200"></div>
+              <span className="text-sm text-gray-500 font-medium">ou escolha um ícone</span>
+              <div className="flex-1 h-px bg-gray-200"></div>
+            </div>
+            
+            {/* Avatar Icons Grid */}
+            <div className="grid grid-cols-4 gap-3">
+              {avatarIcons.map((avatar) => {
+                const Icon = avatar.icon;
+                return (
+                  <button
+                    key={avatar.id}
+                    onClick={() => handleAvatarSelect(avatar.id)}
+                    className={`relative p-3 rounded-lg border-2 transition-all hover:scale-105 ${
+                      selectedAvatar === avatar.id 
+                        ? 'border-primary shadow-lg' 
+                        : 'border-transparent hover:border-gray-300'
+                    }`}
+                  >
+                    <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${avatar.color} flex items-center justify-center`}>
+                      <Icon className="w-8 h-8 text-white" />
+                    </div>
+                    {selectedAvatar === avatar.id && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Current Avatar Preview */}
+            {(selectedAvatar || uploadedImage) && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-600 mb-2 text-center">Avatar atual:</p>
+                <div className="flex justify-center">
+                  {(() => {
+                    const avatar = getCurrentAvatar();
+                    if (avatar.type === 'image') {
+                      return (
+                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-lg">
+                          <img src={avatar.content} alt="Avatar" className="w-full h-full object-cover" />
+                        </div>
+                      );
+                    } else if (avatar.type === 'icon' && avatar.content) {
+                      const Icon = avatar.content.icon;
+                      return (
+                        <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${avatar.content.color} flex items-center justify-center border-2 border-white shadow-lg`}>
+                          <Icon className="w-8 h-8 text-white" />
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+              </div>
+            )}
+            
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowAvatarModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="flex-1 bg-primary hover:bg-primary/90"
+                onClick={() => setShowAvatarModal(false)}
+              >
+                Confirmar
+              </Button>
             </div>
           </div>
         </DialogContent>
