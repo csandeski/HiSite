@@ -55,7 +55,7 @@ export const radios = [
     description: "Hits e esportes",
     pointsPerMin: 60,
     isPremium: false,
-    streamUrl: "https://wz7.servidoresbrasil.com:8162/stream",
+    streamUrl: "https://wz7.servidoresbrasil.com:9984/stream",
   },
   {
     id: 4,
