@@ -802,6 +802,9 @@ function App({ user }: { user: any }) {
                 onOpenChange={handlePremiumPopupClose}
               />
             )}
+            
+            {/* PWA Install Prompt */}
+            <PWAInstallPrompt />
           </div>
         </PlayerContext.Provider>
       </TooltipProvider>

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock } from "lucide-react";
+import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
@@ -17,6 +17,7 @@ import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
+import { PWAInstallButton } from '@/components/PWAInstallButton';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -150,8 +151,9 @@ export default function Dashboard({
               />
             </div>
 
-            {/* Balance and Settings */}
-            <div className="flex items-center gap-3">
+            {/* Balance, Install and Settings */}
+            <div className="flex items-center gap-2 md:gap-3">
+              <PWAInstallButton />
               <div 
                 className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-semibold text-sm md:text-base"
                 data-testid="balance-display"
