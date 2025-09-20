@@ -38,7 +38,7 @@ import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import PixPaymentModal from '@/components/PixPaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
-import api from '@/lib/api';
+import { api } from '@/lib/api';
 
 interface Achievement {
   achievementId: string;
@@ -105,7 +105,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   // Fetch user achievements
   useEffect(() => {
     if (user) {
-      api.request('/api/user/achievements')
+      api.getUserAchievements()
         .then((data) => {
           setUserAchievements(data.achievements || []);
         })
@@ -118,10 +118,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   // Handle save bio
   const handleSaveBio = async () => {
     try {
-      await api.request('/api/user/profile', {
-        method: 'PATCH',
-        body: JSON.stringify({ bio: bioText })
-      });
+      await api.updateProfile({ bio: bioText });
       setEditingBio(false);
     } catch (error) {
       console.error('Failed to save bio:', error);
