@@ -24,12 +24,7 @@ class PWAManager {
   }
 
   private init() {
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        this.registerServiceWorker();
-      });
-    }
+    // Service worker registration moved to main.tsx to avoid duplicate registration
 
     // Listen for beforeinstallprompt event
     window.addEventListener('beforeinstallprompt', (e) => {

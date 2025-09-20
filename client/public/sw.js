@@ -2,7 +2,6 @@
 const CACHE_NAME = 'radioplay-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
   '/manifest.json',
   '/offline.html',
   '/icon-192x192.png',
