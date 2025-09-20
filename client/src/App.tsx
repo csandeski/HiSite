@@ -155,8 +155,12 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
   const [lastVolume, setLastVolume] = useState(50);
-  const [sessionPoints, setSessionPoints] = useState(0); // Starting with 0 to allow reaching 15 points
-  const [balance, setBalance] = useState(0);
+  const [sessionPoints, setSessionPoints] = useState(() => {
+    return user?.points || 0;
+  }); // Starting with user points or 0
+  const [balance, setBalance] = useState(() => {
+    return user?.balance ? parseFloat(user.balance) : 0;
+  });
   const [activeTab, setActiveTab] = useState("radio");
   const [location, setLocation] = useLocation();
   const [hasReached15Points, setHasReached15Points] = useState(false);
@@ -203,6 +207,14 @@ function App() {
     localStorage.setItem('memberSince', formatted);
     return formatted;
   });
+
+  // Sync balance and points with authenticated user
+  useEffect(() => {
+    if (user) {
+      setSessionPoints(user.points || 0);
+      setBalance(user.balance ? parseFloat(user.balance) : 0);
+    }
+  }, [user]);
 
   // Initialize audio element
   useEffect(() => {
@@ -482,7 +494,7 @@ function App() {
               <Route path="/perfil">
                 <Perfil 
                   userName={userName} 
-                  sessionPoints={user?.points || 0} 
+                  sessionPoints={sessionPoints} 
                   balance={balance}
                   totalListeningTime={totalListeningTime}
                   memberSince={memberSince}
