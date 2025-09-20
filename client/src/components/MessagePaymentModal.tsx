@@ -261,7 +261,7 @@ export default function MessagePaymentModal({
                 <MessageSquare className="w-4 h-4" />
                 <span>Seu recado:</span>
               </div>
-              <p className="text-sm text-gray-600 italic">
+              <p className="text-sm text-gray-600 italic break-all overflow-wrap-anywhere">
                 "{truncateMessage(message)}"
               </p>
             </div>
