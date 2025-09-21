@@ -17,7 +17,6 @@ import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
-import { PWAInstallButton } from '@/components/PWAInstallButton';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -151,9 +150,8 @@ export default function Dashboard({
               />
             </div>
 
-            {/* Balance, Install and Settings */}
+            {/* Balance and Settings */}
             <div className="flex items-center gap-2 md:gap-3">
-              <PWAInstallButton />
               <div 
                 className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-semibold text-sm md:text-base"
                 data-testid="balance-display"
