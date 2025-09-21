@@ -3,6 +3,14 @@
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
 ## Recent Updates (21/09/2025)
+- **Sistema de Notificações Push Completo**:
+  - ✅ Firebase Cloud Messaging (FCM) configurado para iOS, Android e Desktop
+  - ✅ Service Worker atualizado para receber notificações em background
+  - ✅ NotificationManager criado para gerenciar permissões e tokens
+  - ✅ Componente UI de configurações de notificações no perfil do usuário
+  - ✅ Backend com endpoints para registrar dispositivos e enviar notificações
+  - ✅ Tabela push_tokens no banco de dados para rastreamento
+  - ✅ Suporte completo para PWA offline com notificações
 - **Corrigido erro de autenticação em produção (Railway)**:
   - ✅ Adicionado trust proxy para Railway HTTPS
   - ✅ Configurado CORS com credentials para cookies
