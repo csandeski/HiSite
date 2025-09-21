@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -9,6 +10,19 @@ const app = express();
 // Trust proxy - REQUIRED for Railway and other HTTPS proxies
 // This ensures Express knows it's behind a proxy and handles secure cookies correctly
 app.set('trust proxy', 1);
+
+// CORS configuration for production
+// This allows the frontend to communicate with the API from different domains
+const corsOptions: cors.CorsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? (process.env.FRONTEND_URL || true) // Set FRONTEND_URL in production or allow all origins
+    : true, // Allow all origins in development
+  credentials: true, // Allow cookies to be sent
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
