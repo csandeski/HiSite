@@ -5,6 +5,11 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Trust proxy - REQUIRED for Railway and other HTTPS proxies
+// This ensures Express knows it's behind a proxy and handles secure cookies correctly
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -26,7 +31,8 @@ app.use(
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      sameSite: 'lax'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-site in production
+      domain: process.env.COOKIE_DOMAIN || undefined // Optional: set if you need specific domain
     }
   })
 );
