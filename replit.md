@@ -2,6 +2,14 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
+## Recent Updates (21/09/2025)
+- **Corrigido erro de autenticação em produção (Railway)**:
+  - ✅ Adicionado trust proxy para Railway HTTPS
+  - ✅ Configurado CORS com credentials para cookies
+  - ✅ Ajustado cookies seguros com SameSite=none em produção
+  - ✅ Criado guia de deploy RAILWAY_DEPLOY.md
+  - ✅ Testado login e conversão de pontos funcionando
+
 ## Recent Updates (20/09/2025)
 - **PWA Implementation (100% Complete)**:
   - ✅ Service Worker with offline caching strategy

@@ -1,22 +1,30 @@
-# Guia de Deploy no Railway - RádioPlay
+# 🚀 Guia de Deploy no Railway - RádioPlay
 
-## Variáveis de Ambiente Necessárias
+## ✅ PROBLEMA RESOLVIDO!
+
+O erro "Autenticação necessária" ao converter pontos foi **CORRIGIDO**. As seguintes configurações foram adicionadas ao código:
+
+1. **Trust Proxy** - Configurado para Railway HTTPS
+2. **CORS** - Habilitado com credenciais 
+3. **Cookies Seguros** - Configurados para produção
+
+## 📋 Variáveis de Ambiente no Railway
 
 Configure as seguintes variáveis no painel do Railway:
 
-### 1. Variáveis Obrigatórias
+### 1. Variáveis Obrigatórias ⚠️
 
 ```env
 # Banco de Dados (Railway provisiona automaticamente)
 DATABASE_URL=postgresql://user:password@host:port/database
 
-# Segurança da Sessão (IMPORTANTE: mude para um valor seguro)
-SESSION_SECRET=sua-chave-secreta-super-segura-aqui-mudeme
+# CRÍTICO: Use uma chave forte e única!
+SESSION_SECRET=mude-isto-para-uma-chave-super-segura-com-64-caracteres-aleatorios
 
-# Ambiente
+# Ambiente - OBRIGATÓRIO
 NODE_ENV=production
 
-# Porta (Railway configura automaticamente)
+# Porta (Railway configura automaticamente) 
 PORT=5000
 ```
 
