@@ -166,7 +166,7 @@ function App({ user }: { user: any }) {
   const [balance, setBalance] = useState(0); // Will be synced with user data via useEffect
   const [activeTab, setActiveTab] = useState("radio");
   const [location, setLocation] = useLocation();
-  const [hasReached25Points, setHasReached25Points] = useState(false);
+  const [hasReachedPointsThreshold, setHasReachedPointsThreshold] = useState(false);
   const [showPremiumPopup, setShowPremiumPopup] = useState(false);
   const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
   const [initialPointsLoaded, setInitialPointsLoaded] = useState(false);
@@ -227,7 +227,7 @@ function App({ user }: { user: any }) {
       setSessionPoints(0);
       setBalance(0);
       setInitialPointsLoaded(false);
-      setHasReached25Points(false);
+      setHasReachedPointsThreshold(false);
     }
   }, [user?.id]); // Only run when user ID changes (login/logout)
 
@@ -315,21 +315,21 @@ function App({ user }: { user: any }) {
     // Only show popup if:
     // 1. User is logged in
     // 2. We've already loaded initial points (not first load)
-    // 3. User has earned points during this session (not just loaded with 25+ points)
+    // 3. User has earned points during this session (not just loaded with 330+ points)
     // 4. User hasn't seen the popup yet in this session
     // 5. User is on dashboard/resgatar/perfil (not on home page)
     const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
-    if (user && initialPointsLoaded && sessionPoints >= 25 && !hasReached25Points && isPlaying && protectedRoutes.includes(location)) {
-      setHasReached25Points(true);
+    if (user && initialPointsLoaded && sessionPoints >= 330 && !hasReachedPointsThreshold && isPlaying && protectedRoutes.includes(location)) {
+      setHasReachedPointsThreshold(true);
       setShowPremiumPopup(true);
       setLastPopupTime(Date.now());
     }
-  }, [user, initialPointsLoaded, sessionPoints, hasReached25Points, isPlaying, location]);
+  }, [user, initialPointsLoaded, sessionPoints, hasReachedPointsThreshold, isPlaying, location]);
 
-  // Show popup every 75 seconds (1:15 min) after reaching 25 points (only if logged in and playing)
+  // Show popup every 75 seconds (1:15 min) after reaching 330 points (only if logged in and playing)
   useEffect(() => {
     const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
-    if (user && hasReached25Points && !showPremiumPopup && isPlaying && protectedRoutes.includes(location)) {
+    if (user && hasReachedPointsThreshold && !showPremiumPopup && isPlaying && protectedRoutes.includes(location)) {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -355,7 +355,7 @@ function App({ user }: { user: any }) {
         clearInterval(intervalRef.current);
       }
     }
-  }, [user, hasReached25Points, showPremiumPopup, isPlaying, location]);
+  }, [user, hasReachedPointsThreshold, showPremiumPopup, isPlaying, location]);
 
   const handlePremiumPopupClose = (open: boolean) => {
     setShowPremiumPopup(open);
