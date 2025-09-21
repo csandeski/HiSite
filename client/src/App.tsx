@@ -324,16 +324,19 @@ function App({ user }: { user: any }) {
     // 2. We've already loaded initial points (not first load)
     // 3. User has earned points during this session (not just loaded with 25+ points)
     // 4. User hasn't seen the popup yet in this session
-    if (user && initialPointsLoaded && sessionPoints >= 25 && !hasReached25Points && isPlaying) {
+    // 5. User is on dashboard/resgatar/perfil (not on home page)
+    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
+    if (user && initialPointsLoaded && sessionPoints >= 25 && !hasReached25Points && isPlaying && protectedRoutes.includes(location)) {
       setHasReached25Points(true);
       setShowPremiumPopup(true);
       setLastPopupTime(Date.now());
     }
-  }, [user, initialPointsLoaded, sessionPoints, hasReached25Points, isPlaying]);
+  }, [user, initialPointsLoaded, sessionPoints, hasReached25Points, isPlaying, location]);
 
   // Show popup every 75 seconds (1:15 min) after reaching 25 points (only if logged in and playing)
   useEffect(() => {
-    if (user && hasReached25Points && !showPremiumPopup && isPlaying) {
+    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
+    if (user && hasReached25Points && !showPremiumPopup && isPlaying && protectedRoutes.includes(location)) {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -341,8 +344,8 @@ function App({ user }: { user: any }) {
 
       // Set up new interval
       intervalRef.current = setInterval(() => {
-        // Only show if still playing
-        if (isPlaying) {
+        // Only show if still playing and not on home page
+        if (isPlaying && protectedRoutes.includes(location)) {
           setShowPremiumPopup(true);
           setLastPopupTime(Date.now());
         }
@@ -354,12 +357,12 @@ function App({ user }: { user: any }) {
         }
       };
     } else {
-      // Clear interval if not playing or not logged in
+      // Clear interval if not playing or not logged in or on home page
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     }
-  }, [user, hasReached25Points, showPremiumPopup, isPlaying]);
+  }, [user, hasReached25Points, showPremiumPopup, isPlaying, location]);
 
   const handlePremiumPopupClose = (open: boolean) => {
     setShowPremiumPopup(open);
@@ -813,8 +816,8 @@ function App({ user }: { user: any }) {
               </nav>
             )}
             
-            {/* Premium Popup - Only show when logged in */}
-            {user && (
+            {/* Premium Popup - Only show when logged in AND not on home page */}
+            {user && location !== "/" && location !== "/login" && location !== "/register" && (
               <PremiumPopup 
                 open={showPremiumPopup} 
                 onOpenChange={handlePremiumPopupClose}
