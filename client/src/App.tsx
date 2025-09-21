@@ -17,6 +17,7 @@ import { useState, useEffect, createContext, useContext, useRef, useMemo, useCal
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
 import PremiumPopup from "@/components/PremiumPopup";
+import CelebrationModal from "@/components/CelebrationModal";
 import { api } from "@/lib/api";
 import PushNotification from "@/components/PushNotification";
 import { useUTMTracking } from "@/hooks/useUTMTracking";
@@ -171,6 +172,11 @@ function App({ user }: { user: any }) {
   const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
   const [initialPointsLoaded, setInitialPointsLoaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Celebration modal states
+  const [hasReached20Points, setHasReached20Points] = useState(false);
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
+  const celebrationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [userName, setUserName] = useState(() => {
     return localStorage.getItem('userName') || '';
@@ -228,6 +234,11 @@ function App({ user }: { user: any }) {
       setBalance(0);
       setInitialPointsLoaded(false);
       setHasReachedPointsThreshold(false);
+      setHasReached20Points(false);
+      setShowCelebrationModal(false);
+      if (celebrationIntervalRef.current) {
+        clearInterval(celebrationIntervalRef.current);
+      }
     }
   }, [user?.id]); // Only run when user ID changes (login/logout)
 
@@ -363,6 +374,49 @@ function App({ user }: { user: any }) {
       // Reset the timer when popup is closed
       setLastPopupTime(Date.now());
     }
+  };
+
+  // Celebration Modal - Show when user reaches 20 points for the first time
+  useEffect(() => {
+    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
+    if (user && initialPointsLoaded && sessionPoints >= 20 && !hasReached20Points && isPlaying && protectedRoutes.includes(location)) {
+      setHasReached20Points(true);
+      setShowCelebrationModal(true);
+    }
+  }, [user, initialPointsLoaded, sessionPoints, hasReached20Points, isPlaying, location]);
+
+  // Show celebration modal every 3 minutes after reaching 20 points
+  useEffect(() => {
+    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
+    if (user && hasReached20Points && !showCelebrationModal && isPlaying && protectedRoutes.includes(location)) {
+      // Clear any existing interval
+      if (celebrationIntervalRef.current) {
+        clearInterval(celebrationIntervalRef.current);
+      }
+
+      // Set up new interval for 3 minutes
+      celebrationIntervalRef.current = setInterval(() => {
+        // Only show if still playing and not on home page
+        if (isPlaying && protectedRoutes.includes(location)) {
+          setShowCelebrationModal(true);
+        }
+      }, 180000); // 3 minutes (180 seconds)
+
+      return () => {
+        if (celebrationIntervalRef.current) {
+          clearInterval(celebrationIntervalRef.current);
+        }
+      };
+    } else {
+      // Clear interval if not playing or not logged in or on home page
+      if (celebrationIntervalRef.current) {
+        clearInterval(celebrationIntervalRef.current);
+      }
+    }
+  }, [user, hasReached20Points, showCelebrationModal, isPlaying, location]);
+
+  const handleCelebrationModalClose = (open: boolean) => {
+    setShowCelebrationModal(open);
   };
 
   // Helper function to end listening session
