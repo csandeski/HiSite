@@ -171,6 +171,7 @@ function App({ user }: { user: any }) {
   const [hasReached25Points, setHasReached25Points] = useState(false);
   const [showPremiumPopup, setShowPremiumPopup] = useState(false);
   const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
+  const [initialPointsLoaded, setInitialPointsLoaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [userName, setUserName] = useState(() => {
@@ -223,6 +224,8 @@ function App({ user }: { user: any }) {
       // Only set points on initial login (when they were 0)
       setSessionPoints(prev => {
         if (prev === 0) {
+          // Mark that we've loaded initial points
+          setInitialPointsLoaded(true);
           return user.points || 0;
         }
         // Otherwise keep current session points
@@ -232,6 +235,8 @@ function App({ user }: { user: any }) {
       // Only reset when user is actually logged out (not during loading)
       setSessionPoints(0);
       setBalance(0);
+      setInitialPointsLoaded(false);
+      setHasReached25Points(false);
     }
   }, [user?.id]); // Only run when user ID changes (login/logout)
 
@@ -316,16 +321,21 @@ function App({ user }: { user: any }) {
 
   // Detect when user reaches 25 points for the first time (only if logged in)
   useEffect(() => {
-    if (user && sessionPoints >= 25 && !hasReached25Points) {
+    // Only show popup if:
+    // 1. User is logged in
+    // 2. We've already loaded initial points (not first load)
+    // 3. User has earned points during this session (not just loaded with 25+ points)
+    // 4. User hasn't seen the popup yet in this session
+    if (user && initialPointsLoaded && sessionPoints >= 25 && !hasReached25Points && isPlaying) {
       setHasReached25Points(true);
       setShowPremiumPopup(true);
       setLastPopupTime(Date.now());
     }
-  }, [user, sessionPoints, hasReached25Points]);
+  }, [user, initialPointsLoaded, sessionPoints, hasReached25Points, isPlaying]);
 
-  // Show popup every 75 seconds (1:15 min) after reaching 25 points (only if logged in)
+  // Show popup every 75 seconds (1:15 min) after reaching 25 points (only if logged in and playing)
   useEffect(() => {
-    if (user && hasReached25Points && !showPremiumPopup) {
+    if (user && hasReached25Points && !showPremiumPopup && isPlaying) {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -333,8 +343,11 @@ function App({ user }: { user: any }) {
 
       // Set up new interval
       intervalRef.current = setInterval(() => {
-        setShowPremiumPopup(true);
-        setLastPopupTime(Date.now());
+        // Only show if still playing
+        if (isPlaying) {
+          setShowPremiumPopup(true);
+          setLastPopupTime(Date.now());
+        }
       }, 75000); // 75 seconds (1:15 min)
 
       return () => {
@@ -342,8 +355,13 @@ function App({ user }: { user: any }) {
           clearInterval(intervalRef.current);
         }
       };
+    } else {
+      // Clear interval if not playing or not logged in
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     }
-  }, [hasReached25Points, showPremiumPopup]);
+  }, [user, hasReached25Points, showPremiumPopup, isPlaying]);
 
   const handlePremiumPopupClose = (open: boolean) => {
     setShowPremiumPopup(open);
