@@ -68,10 +68,10 @@ export default function Dashboard({
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
     const initial: { [key: number]: number } = {};
     radios.forEach(radio => {
-      // Gerar números iniciais baseados na popularidade da rádio
-      const base = radio.isPremium ? 2000 : 800;
-      const variance = radio.isPremium ? 1500 : 500;
-      initial[radio.id] = base + Math.floor(Math.random() * variance);
+      // Gerar números iniciais entre 266 e 761
+      const min = 266;
+      const max = 761;
+      initial[radio.id] = min + Math.floor(Math.random() * (max - min + 1));
     });
     return initial;
   });
@@ -82,12 +82,12 @@ export default function Dashboard({
       setListeners(prev => {
         const updated = { ...prev };
         radios.forEach(radio => {
-          // Variação aleatória de -50 a +50 ouvintes
-          const change = Math.floor(Math.random() * 101) - 50;
+          // Variação aleatória de -30 a +30 ouvintes
+          const change = Math.floor(Math.random() * 61) - 30;
           const newValue = updated[radio.id] + change;
-          // Manter dentro de limites razoáveis
-          const min = radio.isPremium ? 1500 : 500;
-          const max = radio.isPremium ? 5000 : 2000;
+          // Manter entre 266 e 761
+          const min = 266;
+          const max = 761;
           updated[radio.id] = Math.max(min, Math.min(max, newValue));
         });
         return updated;
