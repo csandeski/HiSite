@@ -456,6 +456,15 @@ export default function Home({ setUserName }: HomeProps) {
       <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
         <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl border-0 shadow-2xl p-0">
           <DialogHeader className="p-6 pb-2">
+            {/* Logo no topo */}
+            <div className="flex justify-center mb-4">
+              <img 
+                src={logoUrl} 
+                alt="RádioPlay" 
+                className="h-10 w-auto object-contain" 
+                data-testid="login-modal-logo" 
+              />
+            </div>
             <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
               Entrar
             </DialogTitle>
@@ -566,6 +575,15 @@ export default function Home({ setUserName }: HomeProps) {
       <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
         <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl border-0 shadow-2xl p-0">
           <DialogHeader className="p-6 pb-2">
+            {/* Logo no topo */}
+            <div className="flex justify-center mb-4">
+              <img 
+                src={logoUrl} 
+                alt="RádioPlay" 
+                className="h-10 w-auto object-contain" 
+                data-testid="register-modal-logo" 
+              />
+            </div>
             <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
               Criar Conta
             </DialogTitle>
