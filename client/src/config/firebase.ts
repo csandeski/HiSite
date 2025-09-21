@@ -1,0 +1,28 @@
+// Firebase configuration for push notifications
+import { initializeApp } from 'firebase/app';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+
+// Firebase configuration - Replace with your Firebase project config
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDummy-Key",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "radioplay-app.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "radioplay-app",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "radioplay-app.appspot.com",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789:web:dummy",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-DUMMY"
+};
+
+// VAPID Key for Web Push - Replace with your key from Firebase Console
+const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY || "BKagOny0KF_dummy_vapid_key";
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase Cloud Messaging
+let messaging: any;
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  messaging = getMessaging(app);
+}
+
+export { app, messaging, getToken, onMessage, VAPID_KEY };

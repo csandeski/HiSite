@@ -1,3 +1,7 @@
+// Import Firebase scripts for push notifications
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+
 // Service Worker for RádioPlay PWA
 const CACHE_VERSION = 'v2';
 const CACHE_NAME = `radioplay-${CACHE_VERSION}`;
@@ -115,3 +119,77 @@ async function syncPoints() {
     console.error('Failed to sync points:', error);
   }
 }
+
+// Initialize Firebase in Service Worker
+try {
+  firebase.initializeApp({
+    apiKey: "AIzaSyDummy-Key",
+    authDomain: "radioplay-app.firebaseapp.com",
+    projectId: "radioplay-app",
+    storageBucket: "radioplay-app.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:dummy"
+  });
+
+  const messaging = firebase.messaging();
+
+  // Handle background messages
+  messaging.onBackgroundMessage((payload) => {
+    console.log('Received background message:', payload);
+
+    const notificationTitle = payload.notification?.title || 'RádioPlay';
+    const notificationOptions = {
+      body: payload.notification?.body || 'Nova notificação',
+      icon: '/icon-192x192.png',
+      badge: '/icon-96x96.png',
+      vibrate: [200, 100, 200],
+      tag: payload.data?.tag || 'radioplay-notification',
+      data: payload.data || {},
+      requireInteraction: false,
+      actions: payload.data?.actions ? JSON.parse(payload.data.actions) : [],
+      image: payload.notification?.image || null
+    };
+
+    return self.registration.showNotification(notificationTitle, notificationOptions);
+  });
+} catch (error) {
+  console.error('Failed to initialize Firebase in Service Worker:', error);
+}
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+  console.log('Notification clicked:', event);
+  event.notification.close();
+
+  // Handle action buttons
+  if (event.action) {
+    if (event.action === 'open') {
+      event.waitUntil(clients.openWindow(event.notification.data.url || '/'));
+    }
+    return;
+  }
+
+  // Default click - open the app or focus existing window
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Focus existing window if available
+      for (const client of clientList) {
+        if ('focus' in client) {
+          return client.focus().then(() => {
+            if (event.notification.data.url) {
+              return client.navigate(event.notification.data.url);
+            }
+          });
+        }
+      }
+      // Open new window if no existing window
+      return clients.openWindow(event.notification.data.url || '/');
+    })
+  );
+});
+
+// Handle notification close
+self.addEventListener('notificationclose', (event) => {
+  console.log('Notification closed:', event);
+  // Track notification dismissal if needed
+});
