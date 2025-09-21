@@ -887,6 +887,14 @@ function App({ user }: { user: any }) {
               />
             )}
             
+            {/* Celebration Modal - Only show when logged in AND not on home page */}
+            {user && location !== "/" && location !== "/login" && location !== "/register" && (
+              <CelebrationModal 
+                open={showCelebrationModal} 
+                onOpenChange={handleCelebrationModalClose}
+              />
+            )}
+            
           </div>
         </PlayerContext.Provider>
       </TooltipProvider>
