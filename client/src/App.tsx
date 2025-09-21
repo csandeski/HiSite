@@ -414,6 +414,22 @@ function App({ user }: { user: any }) {
     };
   }, [isPlaying, endListeningSession]);
 
+  // Handle logout event to save points
+  useEffect(() => {
+    const handleAuthLogout = () => {
+      // Save listening session if active
+      if (isPlaying) {
+        endListeningSession();
+      }
+    };
+    
+    window.addEventListener('auth-logout', handleAuthLogout);
+    
+    return () => {
+      window.removeEventListener('auth-logout', handleAuthLogout);
+    };
+  }, [isPlaying, endListeningSession]);
+
   // Track previous radio ID to detect radio changes
   const [prevRadioId, setPrevRadioId] = useState<number | null>(null);
   

@@ -72,6 +72,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const logout = async () => {
+    // Call any registered logout handlers before logging out
+    const event = new CustomEvent('auth-logout');
+    window.dispatchEvent(event);
+    
     await api.logout();
     setUser(null);
     // Clear all cached data
