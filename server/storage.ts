@@ -91,6 +91,13 @@ export interface IStorage {
   getUserSettings(userId: string): Promise<UserSettings | undefined>;
   updateUserSettings(userId: string, settings: Partial<UserSettings>): Promise<UserSettings>;
   
+  // Push token methods
+  registerPushToken(userId: string, token: string, platform: string, userAgent?: string): Promise<void>;
+  unregisterPushToken(token: string): Promise<void>;
+  getUserPushTokens(userId: string): Promise<any[]>;
+  getAllActivePushTokens(): Promise<any[]>;
+  updatePushTokenLastUsed(token: string): Promise<void>;
+  
   // Payment methods (OrinPay)
   createPayment(data: {
     userId: string;
@@ -581,6 +588,63 @@ export class SupabaseStorage implements IStorage {
         .returning();
       return result[0];
     }
+  }
+
+  // Push token methods
+  async registerPushToken(userId: string, token: string, platform: string, userAgent?: string): Promise<void> {
+    // Check if token already exists
+    const existing = await db.select().from(schema.pushTokens)
+      .where(eq(schema.pushTokens.token, token))
+      .limit(1);
+    
+    if (existing.length > 0) {
+      // Update existing token
+      await db.update(schema.pushTokens)
+        .set({ 
+          userId,
+          platform,
+          userAgent,
+          isActive: true,
+          lastUsedAt: new Date(),
+          updatedAt: new Date()
+        })
+        .where(eq(schema.pushTokens.token, token));
+    } else {
+      // Insert new token
+      await db.insert(schema.pushTokens)
+        .values({
+          userId,
+          token,
+          platform,
+          userAgent,
+          isActive: true
+        });
+    }
+  }
+
+  async unregisterPushToken(token: string): Promise<void> {
+    await db.update(schema.pushTokens)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(schema.pushTokens.token, token));
+  }
+
+  async getUserPushTokens(userId: string): Promise<any[]> {
+    return await db.select().from(schema.pushTokens)
+      .where(and(
+        eq(schema.pushTokens.userId, userId),
+        eq(schema.pushTokens.isActive, true)
+      ));
+  }
+
+  async getAllActivePushTokens(): Promise<any[]> {
+    return await db.select().from(schema.pushTokens)
+      .where(eq(schema.pushTokens.isActive, true));
+  }
+
+  async updatePushTokenLastUsed(token: string): Promise<void> {
+    await db.update(schema.pushTokens)
+      .set({ lastUsedAt: new Date(), updatedAt: new Date() })
+      .where(eq(schema.pushTokens.token, token));
   }
 
   // Payment methods (OrinPay)

@@ -1121,6 +1121,197 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Push Notification Routes
+  
+  // Register push token
+  app.post("/api/notifications/register", requireAuth, async (req, res) => {
+    try {
+      const { token, platform, userAgent } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Token é obrigatório" });
+      }
+      
+      await storage.registerPushToken(req.session.userId!, token, platform, userAgent);
+      
+      res.json({ success: true, message: "Token registrado com sucesso" });
+    } catch (error) {
+      console.error("Register push token error:", error);
+      res.status(500).json({ error: "Erro ao registrar token" });
+    }
+  });
+  
+  // Unregister push token
+  app.post("/api/notifications/unregister", requireAuth, async (req, res) => {
+    try {
+      const { token } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Token é obrigatório" });
+      }
+      
+      await storage.unregisterPushToken(token);
+      
+      res.json({ success: true, message: "Token removido com sucesso" });
+    } catch (error) {
+      console.error("Unregister push token error:", error);
+      res.status(500).json({ error: "Erro ao remover token" });
+    }
+  });
+  
+  // Get user notification settings
+  app.get("/api/notifications/settings", requireAuth, async (req, res) => {
+    try {
+      const settings = await storage.getUserSettings(req.session.userId!);
+      const tokens = await storage.getUserPushTokens(req.session.userId!);
+      
+      res.json({ 
+        pushNotificationsEnabled: settings?.pushNotifications ?? true,
+        registeredDevices: tokens.length,
+        tokens: tokens.map(t => ({
+          platform: t.platform,
+          lastUsed: t.lastUsedAt,
+          active: t.isActive
+        }))
+      });
+    } catch (error) {
+      console.error("Get notification settings error:", error);
+      res.status(500).json({ error: "Erro ao buscar configurações" });
+    }
+  });
+  
+  // Update notification settings
+  app.patch("/api/notifications/settings", requireAuth, async (req, res) => {
+    try {
+      const { pushNotificationsEnabled } = req.body;
+      
+      await storage.updateUserSettings(req.session.userId!, {
+        pushNotifications: pushNotificationsEnabled
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Update notification settings error:", error);
+      res.status(500).json({ error: "Erro ao atualizar configurações" });
+    }
+  });
+
+  // Admin: Send notification to specific user
+  app.post("/api/admin/notifications/send-to-user", requireAdmin, async (req, res) => {
+    try {
+      const { notificationService } = await import('./services/notification');
+      
+      const { userId, title, body, data, imageUrl } = req.body;
+      
+      if (!userId || !title || !body) {
+        return res.status(400).json({ error: "userId, title e body são obrigatórios" });
+      }
+      
+      const result = await notificationService.sendToUser(userId, {
+        title,
+        body,
+        data,
+        imageUrl
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Send notification to user error:", error);
+      res.status(500).json({ error: "Erro ao enviar notificação" });
+    }
+  });
+  
+  // Admin: Send notification to all users
+  app.post("/api/admin/notifications/send-to-all", requireAdmin, async (req, res) => {
+    try {
+      const { notificationService } = await import('./services/notification');
+      
+      const { title, body, data, imageUrl } = req.body;
+      
+      if (!title || !body) {
+        return res.status(400).json({ error: "title e body são obrigatórios" });
+      }
+      
+      const result = await notificationService.sendToAll({
+        title,
+        body,
+        data,
+        imageUrl
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Send notification to all error:", error);
+      res.status(500).json({ error: "Erro ao enviar notificação" });
+    }
+  });
+  
+  // Public endpoint for testing notifications (Development only)
+  if (process.env.NODE_ENV === 'development') {
+    app.post("/api/send-notification", async (req, res) => {
+      try {
+        const { notificationService } = await import('./services/notification');
+        
+        const { userId, userIds, title, body, data, imageUrl, sendToAll } = req.body;
+        
+        if (!title || !body) {
+          return res.status(400).json({ error: "title e body são obrigatórios" });
+        }
+        
+        let result;
+        
+        if (sendToAll) {
+          result = await notificationService.sendToAll({ title, body, data, imageUrl });
+        } else if (userIds && Array.isArray(userIds)) {
+          result = await notificationService.sendToUsers(userIds, { title, body, data, imageUrl });
+        } else if (userId) {
+          result = await notificationService.sendToUser(userId, { title, body, data, imageUrl });
+        } else {
+          return res.status(400).json({ error: "Especifique userId, userIds ou sendToAll: true" });
+        }
+        
+        res.json({
+          ...result,
+          message: "Notificação enviada",
+          documentation: {
+            description: "Endpoint de teste para enviar notificações push",
+            usage: {
+              singleUser: {
+                method: "POST /api/send-notification",
+                body: {
+                  userId: "user-id-here",
+                  title: "Título da Notificação",
+                  body: "Corpo da mensagem",
+                  data: { url: "/dashboard" },
+                  imageUrl: "https://example.com/image.png"
+                }
+              },
+              multipleUsers: {
+                method: "POST /api/send-notification",
+                body: {
+                  userIds: ["user1", "user2"],
+                  title: "Título",
+                  body: "Mensagem"
+                }
+              },
+              allUsers: {
+                method: "POST /api/send-notification",
+                body: {
+                  sendToAll: true,
+                  title: "Título",
+                  body: "Mensagem para todos"
+                }
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error("Send notification error:", error);
+        res.status(500).json({ error: "Erro ao enviar notificação" });
+      }
+    });
+  }
+
   const httpServer = createServer(app);
   return httpServer;
 }
