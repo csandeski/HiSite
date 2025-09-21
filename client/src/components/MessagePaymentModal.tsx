@@ -17,6 +17,7 @@ import { useUTMTracking } from "@/hooks/useUTMTracking";
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
+import PixQRCode from '@/components/PixQRCode';
 
 interface MessagePaymentModalProps {
   open: boolean;
@@ -314,20 +315,13 @@ export default function MessagePaymentModal({
                 </Button>
               </div>
             ) : pixData ? (
-              <div className="flex justify-center">
-                {pixData.pix?.encodedImage ? (
-                  <img 
-                    src={`data:image/png;base64,${pixData.pix.encodedImage}`}
-                    alt="QR Code PIX"
-                    className="w-36 h-36 sm:w-40 sm:h-40 rounded-lg shadow-lg"
-                  />
-                ) : (
-                  <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-2.5 shadow-lg">
-                    <div className="w-full h-full rounded bg-white flex items-center justify-center">
-                      <QrCode className="w-16 h-16 text-gray-400" />
-                    </div>
-                  </div>
-                )}
+              <div className="flex justify-center py-4">
+                <PixQRCode 
+                  pixCode={pixData?.pix?.payload}
+                  encodedImage={pixData?.pix?.encodedImage}
+                  size={180}
+                  color="#10B981"
+                />
               </div>
             ) : null}
 

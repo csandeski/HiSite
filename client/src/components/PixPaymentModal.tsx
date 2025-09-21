@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useUTMTracking } from "@/hooks/useUTMTracking";
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import PixQRCode from '@/components/PixQRCode';
 
 interface PixPaymentModalProps {
   open: boolean;
@@ -246,21 +247,14 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
               </div>
             ) : pixData ? (
               <>
-                {/* QR Code Image */}
-                <div className="flex justify-center">
-                  {pixData.pix?.encodedImage ? (
-                    <img 
-                      src={`data:image/png;base64,${pixData.pix.encodedImage}`}
-                      alt="QR Code PIX"
-                      className="w-48 h-48 sm:w-56 sm:h-56 rounded-lg shadow-lg"
-                    />
-                  ) : (
-                    <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-2.5 shadow-lg">
-                      <div className="w-full h-full rounded bg-white flex items-center justify-center">
-                        <QrCode className="w-16 h-16 text-gray-400" />
-                      </div>
-                    </div>
-                  )}
+                {/* QR Code Image - Beautiful and animated */}
+                <div className="flex justify-center py-4">
+                  <PixQRCode 
+                    pixCode={pixData?.pix?.payload}
+                    encodedImage={pixData?.pix?.encodedImage}
+                    size={200}
+                    color={type === 'authorization' ? '#3B82F6' : '#A855F7'}
+                  />
                 </div>
 
                 {/* Instructions - Compact */}
