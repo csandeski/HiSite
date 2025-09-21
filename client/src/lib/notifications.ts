@@ -69,20 +69,35 @@ class NotificationManager {
       
       if (permission === 'granted') {
         console.log('Notification permission granted');
-        
-        // Get FCM token
-        const token = await this.getToken();
-        
-        if (token) {
-          // Save token to backend
-          await this.saveTokenToBackend(token);
-          return true;
-        }
+        return true;
       }
       
       return false;
     } catch (error) {
       console.error('Error requesting notification permission:', error);
+      return false;
+    }
+  }
+  
+  public async register(): Promise<boolean> {
+    if (!this.isSupported || Notification.permission !== 'granted') {
+      console.error('Notifications not supported or permission not granted');
+      return false;
+    }
+    
+    try {
+      // Get FCM token
+      const token = await this.getToken();
+      
+      if (token) {
+        // Save token to backend
+        await this.saveTokenToBackend(token);
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error registering for push notifications:', error);
       return false;
     }
   }
@@ -157,6 +172,10 @@ class NotificationManager {
     return Notification.permission;
   }
 
+  public async isSupported(): Promise<boolean> {
+    return this.isSupported;
+  }
+  
   public isNotificationsSupported(): boolean {
     return this.isSupported;
   }
@@ -186,6 +205,31 @@ class NotificationManager {
     }
     
     return 'unknown';
+  }
+  
+  public async showLocal(title: string, body: string, data?: any): Promise<void> {
+    if (!this.isSupported || Notification.permission !== 'granted') {
+      console.error('Cannot show notification: not supported or permission not granted');
+      return;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(title, {
+        body,
+        icon: '/icon-192x192.png',
+        badge: '/icon-96x96.png',
+        vibrate: [200, 100, 200],
+        tag: data?.tag || 'radioplay-notification',
+        requireInteraction: false,
+        data: {
+          url: data?.url || '/',
+          ...data
+        }
+      });
+    } catch (error) {
+      console.error('Error showing notification:', error);
+    }
   }
 
   public async checkAndRefreshToken(): Promise<void> {

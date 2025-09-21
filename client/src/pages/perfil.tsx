@@ -32,13 +32,15 @@ import {
   Music,
   Gamepad2,
   Rocket,
-  Upload
+  Upload,
+  Bell
 } from "lucide-react";
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import PixPaymentModal from '@/components/PixPaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
+import { NotificationSettings } from '@/components/NotificationSettings';
 
 interface Achievement {
   achievementId: string;
@@ -84,6 +86,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   const [showEditModal, setShowEditModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showFAQModal, setShowFAQModal] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [highlightPremium, setHighlightPremium] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
@@ -456,6 +459,17 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
           
           <Card 
             className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+            onClick={() => setShowNotificationModal(true)}
+            data-testid="card-notification-action"
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Bell className="w-6 h-6 text-purple-500" />
+              <span className="text-sm font-medium text-gray-700">Notificações</span>
+            </div>
+          </Card>
+          
+          <Card 
+            className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
             onClick={() => setShowHistoryModal(true)}
           >
             <div className="flex flex-col items-center gap-2">
@@ -469,8 +483,18 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
             onClick={() => setShowFAQModal(true)}
           >
             <div className="flex flex-col items-center gap-2">
-              <HelpCircle className="w-6 h-6 text-purple-500" />
+              <HelpCircle className="w-6 h-6 text-orange-500" />
               <span className="text-sm font-medium text-gray-700">Ajuda</span>
+            </div>
+          </Card>
+          
+          <Card 
+            className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+            onClick={() => setLocation('/settings')}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <Settings className="w-6 h-6 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Configurações</span>
             </div>
           </Card>
           
@@ -1056,6 +1080,19 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Notification Settings Modal */}
+      <Dialog open={showNotificationModal} onOpenChange={setShowNotificationModal}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-purple-500" />
+              Configurações de Notificações
+            </DialogTitle>
+          </DialogHeader>
+          <NotificationSettings />
         </DialogContent>
       </Dialog>
 
