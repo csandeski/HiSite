@@ -4,7 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["imagemagick"]
+packages = ["imagemagick", "libuuid", "cairo", "pango", "libpng", "libjpeg", "giflib"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -24,6 +24,10 @@ localPort = 34425
 externalPort = 3002
 
 [[ports]]
+localPort = 34993
+externalPort = 4200
+
+[[ports]]
 localPort = 40289
 externalPort = 3003
 
@@ -32,12 +36,8 @@ localPort = 42943
 externalPort = 3001
 
 [[ports]]
-localPort = 43971
-externalPort = 5173
-
-[[ports]]
 localPort = 44381
-externalPort = 4200
+externalPort = 5173
 
 [[ports]]
 localPort = 46181
