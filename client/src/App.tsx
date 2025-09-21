@@ -216,19 +216,12 @@ function App({ user }: { user: any }) {
   // Initialize balance and points only once when user logs in/out
   useEffect(() => {
     if (user && user.id) {
-      // Only set balance
+      // ALWAYS load balance and points from database when user logs in
       setBalance(user.balance ? parseFloat(user.balance) : 0);
       
-      // Only set points on initial login (when they were 0)
-      setSessionPoints(prev => {
-        if (prev === 0) {
-          // Mark that we've loaded initial points
-          setInitialPointsLoaded(true);
-          return user.points || 0;
-        }
-        // Otherwise keep current session points
-        return prev;
-      });
+      // ALWAYS load points from database - don't keep old session points
+      setSessionPoints(user.points || 0);
+      setInitialPointsLoaded(true);
     } else if (!user) {
       // Only reset when user is actually logged out (not during loading)
       setSessionPoints(0);
