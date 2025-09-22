@@ -34,6 +34,9 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
   const [error, setError] = useState<string | null>(null);
   const [checkingPayment, setCheckingPayment] = useState(false);
   
+  // Force authorization to always be R$ 29.99
+  const finalAmount = type === 'authorization' ? 29.99 : amount;
+  
   // Generate PIX payment when modal opens
   useEffect(() => {
     if (open && !pixData) {
@@ -68,13 +71,13 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
             toastDescription = "Sua assinatura Premium foi ativada com sucesso. Aproveite o multiplicador 3x!";
           } else if (type === 'credits') {
             toastTitle = "Créditos adicionados!";
-            toastDescription = `R$ ${amount.toFixed(2)} foram adicionados ao seu saldo.`;
+            toastDescription = `R$ ${finalAmount.toFixed(2)} foram adicionados ao seu saldo.`;
           } else if (type === 'authorization') {
             toastTitle = "Conta autorizada!";
             toastDescription = "Sua conta foi autorizada com sucesso. Agora você tem acesso completo à plataforma.";
           } else if (type === 'pix_key_auth') {
             toastTitle = "Chave PIX Autenticada!";
-            toastDescription = `Sua chave PIX foi autenticada com sucesso. R$ ${amount.toFixed(2)} foram adicionados ao seu saldo como reembolso.`;
+            toastDescription = `Sua chave PIX foi autenticada com sucesso. R$ ${finalAmount.toFixed(2)} foram adicionados ao seu saldo como reembolso.`;
           }
           
           toast({
@@ -108,7 +111,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
     }, 5000); // Check every 5 seconds
     
     return () => clearInterval(checkInterval);
-  }, [pixData, open, type, amount, onOpenChange, toast]);
+  }, [pixData, open, type, finalAmount, onOpenChange, toast]);
   
   const generatePixPayment = async () => {
     setLoading(true);
@@ -131,7 +134,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
         credentials: 'include',
         body: JSON.stringify({
           type,
-          amount,
+          amount: finalAmount,
           utms
         })
       });
@@ -217,12 +220,12 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
                 <h2 className="text-base font-bold">Pagamento via Pix</h2>
                 <p className="text-[11px] opacity-90">
                   {type === 'premium' 
-                    ? `Premium Vitalício - R$ ${amount.toFixed(2)}` 
+                    ? `Premium Vitalício - R$ ${finalAmount.toFixed(2)}` 
                     : type === 'credits'
-                    ? `Adicionar R$ ${amount.toFixed(2)} em créditos`
+                    ? `Adicionar R$ ${finalAmount.toFixed(2)} em créditos`
                     : type === 'pix_key_auth'
-                    ? `Autenticação de Chave PIX - R$ ${amount.toFixed(2)} (Reembolsável)`
-                    : `Autorização de Conta - R$ ${amount.toFixed(2)}`}
+                    ? `Autenticação de Chave PIX - R$ ${finalAmount.toFixed(2)} (Reembolsável)`
+                    : `Autorização de Conta - R$ ${finalAmount.toFixed(2)}`}
                 </p>
               </div>
             </div>
