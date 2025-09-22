@@ -17,6 +17,7 @@ import { radios } from "../App";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
+import WelcomeModal from '@/components/WelcomeModal';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -64,6 +65,21 @@ export default function Dashboard({
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  
+  // Check if it's the first visit
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+    if (!hasSeenWelcome) {
+      setShowWelcomeModal(true);
+    }
+  }, []);
+  
+  const handleWelcomeComplete = () => {
+    localStorage.setItem('hasSeenWelcome', 'true');
+    setShowWelcomeModal(false);
+  };
+  
   // Estado para rastrear ouvintes por rádio
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
     const initial: { [key: number]: number } = {};
@@ -444,6 +460,13 @@ export default function Dashboard({
           </div>
         </div>
       </main>
+      
+      {/* Welcome Modal */}
+      <WelcomeModal
+        open={showWelcomeModal}
+        onOpenChange={setShowWelcomeModal}
+        onComplete={handleWelcomeComplete}
+      />
     </div>
   );
 }
