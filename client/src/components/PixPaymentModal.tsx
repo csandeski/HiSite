@@ -175,7 +175,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90%] max-w-sm p-0 mx-auto rounded-2xl max-h-[95vh] overflow-hidden">
+      <DialogContent className="w-[90%] max-w-sm p-0 mx-auto rounded-2xl overflow-hidden fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] max-h-[90vh]">
         <DialogHeader className="sr-only">
           <DialogTitle>Pagamento via Pix</DialogTitle>
           <DialogDescription>
@@ -194,7 +194,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
         </Button>
 
         {/* Scrollable content wrapper */}
-        <div className="max-h-[95vh] overflow-y-auto">
+        <div className="max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {/* Header with gradient - Blue for authorization, Purple for others */}
           <div className={`px-4 py-3 sticky top-0 z-10 ${
             type === 'authorization' 
@@ -252,7 +252,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
                   <PixQRCode 
                     pixCode={pixData?.pix?.payload}
                     encodedImage={pixData?.pix?.encodedImage}
-                    size={200}
+                    size={180}
                     color={type === 'authorization' ? '#3B82F6' : '#A855F7'}
                   />
                 </div>
@@ -276,7 +276,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
                 {/* Pix Code Field - Compact */}
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-gray-700">Código Pix copia e cola</label>
-                  <div className="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                  <div className="bg-gray-50 rounded-lg p-2.5 border border-gray-200 max-h-20 overflow-y-auto">
                     <p className="font-mono text-[10px] text-gray-700 break-all leading-relaxed select-all">
                       {pixData?.pix?.payload || 'Código não disponível'}
                     </p>

@@ -69,17 +69,42 @@ export default function PixQRCode({
     );
   }
 
-  // Fallback beautiful placeholder
+  // Fallback beautiful placeholder with generated QR pattern
+  const placeholderData = "00020126330014BR.GOV.BCB.PIX0111placeholder52040000530398654040.015802BR5913RADIOPLAY APP6009SAO PAULO62140510placeholder6304";
+  
   return (
     <div className="relative inline-block">
+      {/* Decorative frame */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl blur-xl opacity-30 animate-pulse"></div>
-      <div className="relative bg-white p-4 rounded-2xl shadow-xl border border-gray-100" style={{ width: size + 32, height: size + 32 }}>
-        <div className="w-full h-full rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 flex flex-col items-center justify-center space-y-3">
-          <QrCode className="w-20 h-20 text-purple-400" />
-          <p className="text-sm font-medium text-purple-600">QR Code PIX</p>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <Shield className="w-3 h-3" />
-            <span>Pagamento Seguro</span>
+      <div className="relative bg-white p-4 rounded-2xl shadow-xl border border-gray-100">
+        <div className="relative">
+          {/* Generate a placeholder QR code */}
+          <QRCodeSVG 
+            value={placeholderData}
+            size={size}
+            bgColor="#ffffff"
+            fgColor="#000000"
+            level="M"
+            includeMargin={false}
+            imageSettings={{
+              src: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTExMi41NyAzOTEuMTljMjAuMDU2IDAgMzguOTI4LTcuODA4IDUzLjEyLTIybDc2LjY5My03Ni42OTJjNS4zODUtNS40MDQgMTQuNzY1LTUuMzg0IDIwLjE1IDBsNzYuOTg5IDc2Ljk4OWMxNC4xOTEgMTQuMTcyIDMzLjA0NSAyMS45OCA1My4xMiAyMS45OGgxNS4wOThsLTk3LjEzOCA5Ny4xMzljLTMwLjMyNiAzMC4zNDQtNzkuNTA1IDMwLjM0NC0xMDkuODUgMGwtOTcuNDE1LTk3LjQxNmg5LjIzMnptMjgwLjA2OC0yNzEuMjk0Yy0yMC4wNTYgMC0zOC45MjkgNy44MDktNTMuMTIgMjJsLTc2Ljk3IDc2Ljk5Yy01LjU1MSA1LjUzLTE0LjYgNS41NjgtMjAuMTUtLjAybC03Ni43MTEtNzYuNjkzYy0xNC4xOTItMTQuMTkxLTMzLjA0Ni0yMS45OTktNTMuMTItMjEuOTk5aC05LjIzNGw5Ny40MTYtOTcuNDE2YzMwLjM0NC0zMC4zNDQgNzkuNTIzLTMwLjM0NCAxMDkuODY3IDBsOTcuMTM4IDk3LjEzOGgtMTUuMTE2eiIgZmlsbD0iIzMyQkNBRCIvPgo8cGF0aCBkPSJNMjIuNzU4IDIwMC43NTNsNTguMDI0LTU4LjAyNGgzMS43ODdjMTMuODQgMCAyNy4zODQgNS42MDUgMzcuMTcyIDE1LjM5NGw3Ni42OTQgNzYuNjkzYzcuMTc4IDcuMTc5IDE2LjU5NiAxMC43NjggMjYuMDMzIDEwLjc2OCA5LjQxNyAwIDE4Ljg1NC0zLjU5IDI2LjAxNC0xMC43NWw3Ni45ODktNzYuOTljOS43ODctOS43ODcgMjMuMzMxLTE1LjM5MyAzNy4xNzEtMTUuMzkzaDM3LjY1NGw1OC4zIDU4LjMwMmMzMC4zNDMgMzAuMzQ0IDMwLjM0MyA3OS41MjMgMCAxMDkuODY3bC01OC4zIDU4LjMwM0gzOTIuNjRjLTEzLjg0IDAtMjcuMzg0LTUuNjA1LTM3LjE3MS0xNS4zOTRsLTc2Ljk3LTc2Ljk5Yy0xMy45MTQtMTMuODk0LTM4LjE3Mi0xMy44OTQtNTIuMDY2LjAybC03Ni42OTMgNzYuNjc0Yy05Ljc4OCA5Ljc4OC0yMy4zMzIgMTUuNDEzLTM3LjE3MiAxNS40MTNIODAG4ujIuNzU4IDMxMC42MmMtMzAuMzQ0LTMwLjM0NS0zMC4zNDQtNzkuNTI0IDAtMTA5Ljg2OHoiIGZpbGw9IiMzMkJDQUQiLz4KPC9zdmc+",
+              x: undefined,
+              y: undefined,
+              height: 40,
+              width: 40,
+              excavate: true,
+            }}
+          />
+          
+          {/* Overlay text indicating this is a placeholder */}
+          <div className="absolute inset-0 bg-white/95 rounded-lg flex items-center justify-center">
+            <div className="text-center space-y-2">
+              <p className="text-sm font-medium text-purple-600">QR Code PIX</p>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Shield className="w-3 h-3" />
+                <span>Aguardando geração...</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
