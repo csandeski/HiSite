@@ -410,25 +410,25 @@ export function AdminPage() {
                           <span className="text-sm">{formatTime(user.totalListeningTime)}</span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="min-w-[600px]">
                         <div className="flex flex-wrap gap-2">
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => openEditModal(user, "points")}
                             data-testid={`button-edit-points-${user.id}`}
+                            className="whitespace-nowrap"
                           >
-                            <Trophy className="h-3 w-3 mr-1" />
-                            Pontos
+                            Editar Pontos
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => openEditModal(user, "balance")}
                             data-testid={`button-edit-balance-${user.id}`}
+                            className="whitespace-nowrap"
                           >
-                            <DollarSign className="h-3 w-3 mr-1" />
-                            Saldo
+                            Editar Saldo
                           </Button>
                           <Button
                             size="sm"
@@ -436,8 +436,8 @@ export function AdminPage() {
                             onClick={() => togglePremiumMutation.mutate(user.id)}
                             disabled={togglePremiumMutation.isPending}
                             data-testid={`button-toggle-premium-${user.id}`}
+                            className="whitespace-nowrap bg-purple-600 hover:bg-purple-700 text-white"
                           >
-                            <Zap className="h-3 w-3 mr-1" />
                             {user.isPremium ? "Remover" : "Ativar"} Premium
                           </Button>
                           <Button
@@ -446,8 +446,8 @@ export function AdminPage() {
                             onClick={() => toggleAccountAuthMutation.mutate(user.id)}
                             disabled={toggleAccountAuthMutation.isPending}
                             data-testid={`button-toggle-account-${user.id}`}
+                            className="whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white"
                           >
-                            <Shield className="h-3 w-3 mr-1" />
                             {user.accountAuthorized ? "Desautorizar" : "Autorizar"} Conta
                           </Button>
                           <Button
@@ -456,8 +456,8 @@ export function AdminPage() {
                             onClick={() => togglePixAuthMutation.mutate(user.id)}
                             disabled={togglePixAuthMutation.isPending}
                             data-testid={`button-toggle-pix-${user.id}`}
+                            className="whitespace-nowrap bg-green-600 hover:bg-green-700 text-white"
                           >
-                            <CreditCard className="h-3 w-3 mr-1" />
                             {user.pixKeyAuthenticated ? "Desautenticar" : "Autenticar"} PIX
                           </Button>
                         </div>
