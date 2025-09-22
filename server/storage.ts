@@ -131,104 +131,51 @@ export class SupabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    try {
-      console.log('👤 Creating new user:', insertUser.username);
-      
-      // Hash password before storing
-      const hashedPassword = await bcrypt.hash(insertUser.password, 10);
-      const userWithHashedPassword = { ...insertUser, password: hashedPassword };
-      
-      const result = await db.insert(schema.users).values(userWithHashedPassword).returning();
-      
-      if (!result || result.length === 0) {
-        throw new Error('Failed to create user - no result returned');
-      }
-      
-      console.log('✅ User created with ID:', result[0].id);
-      
-      // Create default user settings
-      await db.insert(schema.userSettings).values({
-        userId: result[0].id
-      });
-      
-      console.log('🔧 User settings created for:', result[0].id);
-      
-      // Initialize default achievements for the user
-      const achievements = await this.getAchievements();
-      if (achievements.length > 0) {
-        const userAchievements = achievements.map(achievement => ({
-          userId: result[0].id,
-          achievementId: achievement.id,
-          progress: 0,
-          progressMax: 100, // Default max progress
-          isCompleted: false
-        }));
-        await db.insert(schema.userAchievements).values(userAchievements);
-      }
-      
-      console.log('✨ User creation complete for:', result[0].username);
-      return result[0];
-    } catch (error) {
-      console.error('❌ Error creating user:', error);
-      throw error;
+    // Hash password before storing
+    const hashedPassword = await bcrypt.hash(insertUser.password, 10);
+    const userWithHashedPassword = { ...insertUser, password: hashedPassword };
+    
+    const result = await db.insert(schema.users).values(userWithHashedPassword).returning();
+    
+    // Create default user settings
+    await db.insert(schema.userSettings).values({
+      userId: result[0].id
+    });
+    
+    // Initialize default achievements for the user
+    const achievements = await this.getAchievements();
+    if (achievements.length > 0) {
+      const userAchievements = achievements.map(achievement => ({
+        userId: result[0].id,
+        achievementId: achievement.id,
+        progress: 0,
+        progressMax: 100, // Default max progress
+        isCompleted: false
+      }));
+      await db.insert(schema.userAchievements).values(userAchievements);
     }
+    
+    return result[0];
   }
 
   async updateUser(id: string, data: Partial<User>): Promise<User | undefined> {
-    try {
-      console.log(`🔄 Updating user ${id}:`, Object.keys(data));
-      
-      const result = await db.update(schema.users)
-        .set({ ...data, updatedAt: new Date() })
-        .where(eq(schema.users.id, id))
-        .returning();
-      
-      if (result && result[0]) {
-        console.log(`✅ User ${id} updated successfully`);
-      } else {
-        console.error(`❌ Failed to update user ${id} - no result returned`);
-      }
-      
-      return result[0];
-    } catch (error) {
-      console.error('❌ Error updating user:', error);
-      throw error;
-    }
+    const result = await db.update(schema.users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(schema.users.id, id))
+      .returning();
+    return result[0];
   }
 
   async incrementUserPoints(userId: string, points: number): Promise<User | undefined> {
-    try {
-      console.log(`🎯 Incrementing ${points} points for user: ${userId}`);
-      
-      // First, get current user to verify they exist
-      const currentUser = await this.getUser(userId);
-      if (!currentUser) {
-        console.error('❌ User not found for point increment:', userId);
-        return undefined;
-      }
-      
-      console.log(`📊 Current points: ${currentUser.points}, Adding: ${points}`);
-      
-      // Atomic increment of user points
-      const result = await db.update(schema.users)
-        .set({ 
-          points: sql`${schema.users.points} + ${points}`,
-          updatedAt: new Date() 
-        })
-        .where(eq(schema.users.id, userId))
-        .returning();
-      
-      if (result && result[0]) {
-        console.log(`✅ Points updated successfully. New total: ${result[0].points}`);
-      } else {
-        console.error('❌ Failed to update points - no result returned');
-      }
-      
-      return result[0];
-    } catch (error) {
-      console.error('❌ Error incrementing points:', error);
-      throw error;
-    }
+    // Atomic increment of user points
+    const result = await db.update(schema.users)
+      .set({ 
+        points: sql`${schema.users.points} + ${points}`,
+        updatedAt: new Date() 
+      })
+      .where(eq(schema.users.id, userId))
+      .returning();
+    return result[0];
   }
 
   async getAllUsers(): Promise<User[]> {
