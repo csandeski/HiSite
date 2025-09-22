@@ -35,36 +35,28 @@ export default function PushNotification({ sessionPoints = 0 }: PushNotification
   const [hasShownFirstNotification, setHasShownFirstNotification] = useState(false);
 
   useEffect(() => {
-    console.log('PushNotification: sessionPoints =', sessionPoints);
-    
     // Só exibir notificações se o usuário tiver 200 pontos ou mais
     if (sessionPoints >= 200) {
-      console.log('PushNotification: Points >= 200, setting up timers');
-      
       // Show first notification after 3 seconds if not shown yet
       if (!hasShownFirstNotification) {
         const initialTimeout = setTimeout(() => {
-          console.log('PushNotification: Showing first notification');
           setIsVisible(true);
           setHasShownFirstNotification(true);
         }, 3000);
 
-        // Show notification every 180 seconds (3 minutes)
+        // Show notification every 90 seconds (1:30 minutes)
         const interval = setInterval(() => {
           if (sessionPoints >= 200) {
-            console.log('PushNotification: Showing periodic notification');
             setIsVisible(true);
             setCurrentMessageIndex(prev => (prev + 1) % messages.length);
           }
-        }, 180000); // 180 seconds
+        }, 90000); // 90 seconds (1:30 min)
 
         return () => {
           clearTimeout(initialTimeout);
           clearInterval(interval);
         };
       }
-    } else {
-      console.log('PushNotification: Points < 200, not showing notification');
     }
   }, [sessionPoints, hasShownFirstNotification]);
 
