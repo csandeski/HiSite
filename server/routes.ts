@@ -763,10 +763,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Tipo de pagamento inválido" });
       }
       
-      // Validate authorization amount is exactly R$ 29.99
-      if (type === 'authorization' && amount !== 29.99) {
+      // Validate authorization amount is exactly R$ 29.99 (with tolerance for floating point)
+      if (type === 'authorization' && Math.abs(amount - 29.99) > 0.01) {
         return res.status(400).json({ error: "Valor incorreto para autorização de conta. Deve ser R$ 29,99" });
       }
+      
+      // Force authorization amount to be exactly 29.99 to avoid floating point issues
+      const finalAmount = type === 'authorization' ? 29.99 : amount;
       
       // Get user info
       const user = await storage.getUser(req.session.userId!);
@@ -776,8 +779,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Use the imported OrinPay service (already imported at top)
       
-      // Validate amount
-      const amountInCents = orinpay.reaisToCentavos(amount);
+      // Validate amount using the corrected finalAmount
+      const amountInCents = orinpay.reaisToCentavos(finalAmount);
       if (!orinpay.validateAmount(amountInCents)) {
         return res.status(400).json({ error: "Valor inválido. Máximo permitido: R$ 999,99" });
       }
@@ -820,10 +823,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             description: type === 'premium' 
               ? 'Acesso Premium com multiplicador 3x' 
               : type === 'credits' 
-              ? `Adicionar R$ ${amount.toFixed(2)} em créditos`
+              ? `Adicionar R$ ${finalAmount.toFixed(2)} em créditos`
               : type === 'alo'
-              ? `Envio de Alô na rádio - R$ ${amount.toFixed(2)}`
-              : `Autorização de conta - R$ ${amount.toFixed(2)}`,
+              ? `Envio de Alô na rádio - R$ ${finalAmount.toFixed(2)}`
+              : `Autorização de conta - R$ ${finalAmount.toFixed(2)}`,
             unitPrice: amountInCents,
             quantity: 1,
             tangible: false
@@ -850,7 +853,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: req.session.userId!,
         transactionId: pixResponse.id.toString(),
         reference: pixResponse.reference,
-        amount,
+        amount: finalAmount,
         type,
         status: 'pending',
         pixData: {
@@ -864,7 +867,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         transactionId: pixResponse.id,
         reference: pixResponse.reference,
         pix: pixResponse.pix,
-        amount
+        amount: finalAmount
       });
       
     } catch (error: any) {
