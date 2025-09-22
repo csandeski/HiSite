@@ -35,7 +35,8 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
   const [checkingPayment, setCheckingPayment] = useState(false);
   
   // Force authorization to always be R$ 29.99
-  const finalAmount = type === 'authorization' ? 29.99 : amount;
+  // If type is authorization, ALWAYS use 29.99 regardless of what amount is passed
+  const finalAmount = type === 'authorization' ? 29.99 : (type === 'pix_key_auth' ? 19.90 : amount);
   
   // Generate PIX payment when modal opens
   useEffect(() => {
