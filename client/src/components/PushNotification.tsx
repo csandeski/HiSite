@@ -24,28 +24,49 @@ const messages = [
   }
 ];
 
-export default function PushNotification() {
+interface PushNotificationProps {
+  sessionPoints?: number;
+}
+
+export default function PushNotification({ sessionPoints = 0 }: PushNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [showSendMessageModal, setShowSendMessageModal] = useState(false);
+  const [hasShownFirstNotification, setHasShownFirstNotification] = useState(false);
 
   useEffect(() => {
-    // Initial delay of 3 seconds before first notification
-    const initialTimeout = setTimeout(() => {
-      setIsVisible(true);
-    }, 3000);
+    console.log('PushNotification: sessionPoints =', sessionPoints);
+    
+    // Só exibir notificações se o usuário tiver 200 pontos ou mais
+    if (sessionPoints >= 200) {
+      console.log('PushNotification: Points >= 200, setting up timers');
+      
+      // Show first notification after 3 seconds if not shown yet
+      if (!hasShownFirstNotification) {
+        const initialTimeout = setTimeout(() => {
+          console.log('PushNotification: Showing first notification');
+          setIsVisible(true);
+          setHasShownFirstNotification(true);
+        }, 3000);
 
-    // Show notification every 180 seconds (3 minutes)
-    const interval = setInterval(() => {
-      setIsVisible(true);
-      setCurrentMessageIndex(prev => (prev + 1) % messages.length);
-    }, 180000); // 180 seconds
+        // Show notification every 180 seconds (3 minutes)
+        const interval = setInterval(() => {
+          if (sessionPoints >= 200) {
+            console.log('PushNotification: Showing periodic notification');
+            setIsVisible(true);
+            setCurrentMessageIndex(prev => (prev + 1) % messages.length);
+          }
+        }, 180000); // 180 seconds
 
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-    };
-  }, []);
+        return () => {
+          clearTimeout(initialTimeout);
+          clearInterval(interval);
+        };
+      }
+    } else {
+      console.log('PushNotification: Points < 200, not showing notification');
+    }
+  }, [sessionPoints, hasShownFirstNotification]);
 
   useEffect(() => {
     if (isVisible) {

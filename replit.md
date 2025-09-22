@@ -10,6 +10,7 @@ RádioPlay - A Portuguese-language platform about earning money by listening to 
   - ✅ Badge visual "⭐ Premium" no cabeçalho do modal para usuários premium
   - ✅ Lista de benefícios premium apresentada no modal de restrição
   - ✅ Redirecionamento automático para página de perfil com destaque no plano premium
+  - ✅ Notificação de "Alô" agora aparece apenas após usuário atingir 200 pontos
 
 ## Recent Updates (21/09/2025)
 - **Sistema de Notificações Push Completo**:
