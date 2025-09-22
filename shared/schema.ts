@@ -32,6 +32,7 @@ export const users = pgTable("users", {
   phoneNumber: text("phone_number"),
   cpf: text("cpf"),
   pixKey: text("pix_key"),
+  pixKeyAuthenticated: boolean("pix_key_authenticated").notNull().default(false),
   avatarType: text("avatar_type").default('initials'), // 'initials', 'icon', 'image'
   avatarData: text("avatar_data"), // icon ID or base64 image
   bio: text("bio"),
