@@ -16,7 +16,7 @@ export default function PixQRCode({
   color = "#7c3aed"
 }: PixQRCodeProps) {
   // If we have an encoded image from backend, use it
-  if (encodedImage) {
+  if (encodedImage && encodedImage.length > 0) {
     return (
       <div className="relative inline-block">
         {/* Decorative frame */}
