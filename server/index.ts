@@ -30,22 +30,42 @@ app.use(express.urlencoded({ extended: false }));
 // Configure session store
 const PgSession = connectPgSimple(session);
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Log session configuration
+if (isProduction) {
+  console.log('🔐 Session Configuration:', {
+    environment: 'production',
+    secure: true,
+    sameSite: 'none',
+    secretSet: !!process.env.SESSION_SECRET,
+    dbUrlSet: !!process.env.DATABASE_URL
+  });
+}
+
+// Session store with better error handling
+const sessionStore = new PgSession({
+  conString: process.env.DATABASE_URL,
+  tableName: 'user_sessions',
+  createTableIfMissing: true,
+  pruneSessionInterval: 60, // Prune expired sessions every 60 seconds
+  errorLog: console.error.bind(console) // Log session store errors
+});
+
 // Session configuration
 app.use(
   session({
-    store: new PgSession({
-      conString: process.env.DATABASE_URL,
-      tableName: 'user_sessions',
-      createTableIfMissing: true,
-    }),
+    store: sessionStore,
     secret: process.env.SESSION_SECRET || 'radioplay-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Reset expiry on activity
+    proxy: isProduction, // Trust the reverse proxy
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-site in production
+      sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-site in production
       domain: process.env.COOKIE_DOMAIN || undefined // Optional: set if you need specific domain
     }
   })

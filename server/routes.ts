@@ -108,8 +108,42 @@ const updateBalanceSchema = z.object({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check
-  app.get("/api/health", (_req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  app.get("/api/health", async (_req, res) => {
+    const health: any = { 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    };
+    
+    // Check database connectivity
+    try {
+      const testUser = await storage.getAllUsers();
+      health.database = {
+        connected: true,
+        userCount: testUser.length
+      };
+    } catch (error) {
+      health.database = {
+        connected: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+      health.status = 'degraded';
+    }
+    
+    // Check session configuration
+    health.session = {
+      secretConfigured: !!process.env.SESSION_SECRET,
+      databaseUrlConfigured: !!process.env.DATABASE_URL
+    };
+    
+    // Check if critical environment variables are set
+    health.config = {
+      nodeEnv: process.env.NODE_ENV || 'not set',
+      port: process.env.PORT || '5000',
+      trustProxy: app.get('trust proxy')
+    };
+    
+    res.json(health);
   });
 
   // Auth routes
