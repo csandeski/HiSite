@@ -756,7 +756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Validate payment type
-      if (!['premium', 'credits', 'alo', 'authorization'].includes(type)) {
+      if (!['premium', 'credits', 'alo', 'authorization', 'pix_key_auth'].includes(type)) {
         return res.status(400).json({ error: "Tipo de pagamento inválido" });
       }
       
@@ -865,6 +865,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Dedicated PIX key authentication payment endpoint
+  app.post("/api/payment/pix-key-auth", requireAuth, async (req, res) => {
+    try {
+      const { utms: clientUtms } = req.body;
+      
+      // Fixed amount for PIX key authentication
+      const FIXED_AMOUNT = 19.90;
+      const type = 'pix_key_auth';
+      
+      // Check if user already has PIX key authenticated
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      if (user.pixKeyAuthenticated) {
+        return res.status(400).json({ error: "Chave PIX já está autenticada" });
+      }
+      
+      // Normalize UTM parameters to snake_case as expected by OrinPay
+      const utms = clientUtms ? {
+        utm_source: clientUtms.utmSource,
+        utm_medium: clientUtms.utmMedium,
+        utm_campaign: clientUtms.utmCampaign,
+        utm_term: clientUtms.utmTerm,
+        utm_content: clientUtms.utmContent
+      } : {};
+      
+      // Validate amount
+      const amountInCents = orinpay.reaisToCentavos(FIXED_AMOUNT);
+      if (!orinpay.validateAmount(amountInCents)) {
+        return res.status(400).json({ error: "Erro na configuração do valor" });
+      }
+      
+      // Generate reference
+      const reference = orinpay.generateReference(req.session.userId!, type);
+      
+      // Generate fake user data for OrinPay testing (never use real user data)
+      const fakeUser = generateFakeUserData();
+      
+      // Create PIX transaction
+      const pixData = {
+        paymentMethod: 'pix' as const,
+        reference,
+        customer: {
+          name: fakeUser.name,
+          email: fakeUser.email,
+          phone: orinpay.formatPhone(fakeUser.phone),
+          document: {
+            number: orinpay.formatCPF(fakeUser.cpf),
+            type: 'cpf' as const
+          }
+        },
+        shipping: {
+          fee: 0,
+          address: {
+            street: "Rua Virtual",
+            streetNumber: "100",
+            zipCode: "00000000",
+            neighborhood: "Centro",
+            city: "São Paulo",
+            state: "SP",
+            country: "Brasil",
+            complement: ""
+          }
+        },
+        items: [
+          {
+            title: 'Autenticação de Chave PIX',
+            description: 'Taxa de autenticação de chave PIX com reembolso integral',
+            unitPrice: amountInCents,
+            quantity: 1,
+            tangible: false
+          }
+        ],
+        isInfoProducts: true,
+        utms: utms
+      };
+      
+      console.log('Creating PIX key authentication payment:', {
+        userId: req.session.userId,
+        amount: FIXED_AMOUNT,
+        type: type,
+        reference
+      });
+      
+      // Call OrinPay API
+      const pixResponse = await orinpay.createPixTransaction(pixData);
+      
+      console.log('PIX key auth payment created successfully:', {
+        transactionId: pixResponse.id,
+        hasEncodedImage: !!pixResponse.pix?.encodedImage,
+        hasPayload: !!pixResponse.pix?.payload,
+        reference: pixResponse.reference,
+        status: pixResponse.status
+      });
+      
+      // Store payment record in database
+      await storage.createPayment({
+        userId: req.session.userId!,
+        transactionId: pixResponse.id.toString(),
+        reference: pixResponse.reference,
+        amount: FIXED_AMOUNT,
+        type,
+        status: 'pending',
+        pixData: {
+          encodedImage: pixResponse.pix.encodedImage,
+          payload: pixResponse.pix.payload
+        }
+      });
+      
+      res.json({
+        success: true,
+        transactionId: pixResponse.id,
+        reference: pixResponse.reference,
+        pix: pixResponse.pix,
+        amount: FIXED_AMOUNT
+      });
+      
+    } catch (error: any) {
+      console.error("Create PIX key auth payment error:", error);
+      res.status(500).json({ error: error.message || "Erro ao criar pagamento de autenticação PIX" });
+    }
+  });
+  
+  // Check PIX key authentication status for current user
+  app.get("/api/user/pix-key-status", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      res.json({
+        pixKeyAuthenticated: user.pixKeyAuthenticated || false,
+        pixKey: user.pixKey || null
+      });
+    } catch (error) {
+      console.error("Get PIX key status error:", error);
+      res.status(500).json({ error: "Erro ao verificar status da chave PIX" });
+    }
+  });
+  
   // Payment status check endpoint
   app.get("/api/payment/status/:reference", async (req, res) => {
     try {
@@ -956,6 +1099,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
             type: 'payment_approved',
             title: 'Conta Autorizada!',
             message: 'Sua conta foi autorizada com sucesso. Agora você tem acesso completo à plataforma.',
+            data: { paymentId: payment.id }
+          });
+        } else if (payment.type === 'pix_key_auth') {
+          // Process PIX key authentication payment
+          // Update user's PIX key authentication status
+          await storage.updateUser(payment.userId, { 
+            pixKeyAuthenticated: true 
+          });
+          
+          // Add R$ 19.90 to user's balance as reimbursement
+          const reimbursementAmount = 19.90;
+          const newBalance = parseFloat(user.balance) + reimbursementAmount;
+          await storage.updateUser(payment.userId, { 
+            balance: newBalance.toString() 
+          });
+          
+          // Create transaction record for the reimbursement
+          await storage.createTransaction({
+            userId: payment.userId,
+            type: 'bonus',
+            amount: reimbursementAmount,
+            points: 0,
+            description: 'Reembolso pela autenticação da chave PIX'
+          });
+          
+          // Create notification
+          await storage.createNotification({
+            userId: payment.userId,
+            type: 'payment_approved',
+            title: 'Chave PIX Autenticada!',
+            message: `Sua chave PIX foi autenticada com sucesso. R$ ${reimbursementAmount.toFixed(2)} foram adicionados ao seu saldo como reembolso.`,
             data: { paymentId: payment.id }
           });
         } else if (payment.type === 'alo') {
