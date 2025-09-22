@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,10 +14,13 @@ import {
   X, 
   Radio, 
   AlertCircle,
-  Rocket
+  Rocket,
+  Lock
 } from "lucide-react";
 import { radios } from '../App';
 import MessagePaymentModal from './MessagePaymentModal';
+import PremiumAloModal from './PremiumAlôModal';
+import { useAuth } from '@/contexts/AuthContext';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 
 interface SendMessageModalProps {
@@ -26,10 +29,21 @@ interface SendMessageModalProps {
 }
 
 export default function SendMessageModal({ open, onOpenChange }: SendMessageModalProps) {
+  const { user } = useAuth();
   const [selectedRadio, setSelectedRadio] = useState<string>("");
   const [message, setMessage] = useState("");
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [errors, setErrors] = useState({ radio: false, message: false });
+
+  // Verificar se usuário é premium quando o modal abrir
+  useEffect(() => {
+    if (open && user && !user.isPremium) {
+      // Se não for premium, fecha o modal de mensagem e abre o de premium
+      onOpenChange(false);
+      setShowPremiumModal(true);
+    }
+  }, [open, user]);
 
   const characterCount = message.length;
   const isExtended = characterCount > 100;
@@ -82,7 +96,7 @@ export default function SendMessageModal({ open, onOpenChange }: SendMessageModa
       <Dialog open={open} onOpenChange={handleModalClose}>
         <DialogContent className="w-[90%] max-w-md p-0 mx-auto rounded-2xl">
           {/* Header */}
-          <div className="bg-gradient-to-r from-green-500 to-green-600 px-4 py-4 rounded-t-2xl">
+          <div className="bg-gradient-to-r from-green-500 to-green-600 px-4 py-4 rounded-t-2xl relative">
             <Button
               variant="ghost"
               size="icon"
@@ -96,6 +110,13 @@ export default function SendMessageModal({ open, onOpenChange }: SendMessageModa
               <h2 className="text-lg font-bold mb-1">📢 Envie seu Alô!</h2>
               <p className="text-sm opacity-90">Seu recado na rádio favorita</p>
             </div>
+            {user && user.isPremium && (
+              <div className="absolute right-12 top-3">
+                <div className="bg-yellow-400 text-xs font-bold text-gray-900 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  ⭐ Premium
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Content */}
@@ -223,6 +244,11 @@ export default function SendMessageModal({ open, onOpenChange }: SendMessageModa
         selectedRadio={selectedRadioData}
         message={message}
         price={price}
+      />
+
+      <PremiumAloModal
+        open={showPremiumModal}
+        onOpenChange={setShowPremiumModal}
       />
     </>
   );

@@ -2,6 +2,15 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
+## Recent Updates (22/09/2025)
+- **Sistema de Alôs Restrito a Usuários Premium**:
+  - ✅ Modificado fluxo de envio de "Alôs" para exigir assinatura Premium
+  - ✅ Criado novo modal PremiumAloModal específico para informar restrição
+  - ✅ Verificação automática de status premium ao abrir modal de mensagem
+  - ✅ Badge visual "⭐ Premium" no cabeçalho do modal para usuários premium
+  - ✅ Lista de benefícios premium apresentada no modal de restrição
+  - ✅ Redirecionamento automático para página de perfil com destaque no plano premium
+
 ## Recent Updates (21/09/2025)
 - **Sistema de Notificações Push Completo**:
   - ✅ Firebase Cloud Messaging (FCM) configurado para iOS, Android e Desktop

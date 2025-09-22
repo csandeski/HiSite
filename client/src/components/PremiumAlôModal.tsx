@@ -1,0 +1,110 @@
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Lock, Zap, X, MessageSquare } from "lucide-react";
+import { useLocation } from "wouter";
+
+interface PremiumAloModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export default function PremiumAloModal({ open, onOpenChange }: PremiumAloModalProps) {
+  const [, setLocation] = useLocation();
+
+  const handleUnlockPremium = () => {
+    onOpenChange(false);
+    // Navegar para perfil com parâmetro para destacar o card premium
+    setLocation("/perfil?highlight=premium");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full p-0 overflow-hidden mx-auto rounded-2xl">
+        {/* Close button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-2 top-2 z-10 rounded-full w-8 h-8 hover:bg-gray-100"
+          onClick={() => onOpenChange(false)}
+          data-testid="close-premium-alo-modal"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+
+        {/* Header with gradient background */}
+        <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-4">
+          <div className="flex items-center justify-center">
+            <Lock className="w-6 h-6 text-white mr-2" />
+            <h2 className="text-xl font-bold text-white">Recurso Premium</h2>
+          </div>
+        </div>
+
+        <div className="p-6 text-center space-y-6">
+          {/* Icon */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                <MessageSquare className="w-12 h-12 text-purple-600" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center shadow-lg">
+                <Lock className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
+
+          {/* Title and Description */}
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Envie Alôs Ilimitados!
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Apenas membros <span className="font-semibold text-purple-600">Premium</span> podem enviar mensagens para as rádios. 
+              Além disso, você ganha:
+            </p>
+          </div>
+
+          {/* Benefits list */}
+          <ul className="text-left space-y-2 max-w-xs mx-auto">
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 mt-0.5">✓</span>
+              <span className="text-sm text-gray-700">Ganhe <strong>3x mais pontos</strong> por minuto</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 mt-0.5">✓</span>
+              <span className="text-sm text-gray-700">Envie quantos <strong>Alôs quiser</strong></span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 mt-0.5">✓</span>
+              <span className="text-sm text-gray-700">Acesso a <strong>todas as rádios premium</strong></span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 mt-0.5">✓</span>
+              <span className="text-sm text-gray-700"><strong>Prioridade</strong> no atendimento</span>
+            </li>
+          </ul>
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-3 pt-2">
+            <Button
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 shadow-lg flex items-center justify-center gap-2"
+              onClick={handleUnlockPremium}
+              data-testid="button-become-premium"
+            >
+              <Zap className="w-5 h-5" />
+              Seja Premium Agora
+            </Button>
+            
+            <Button
+              variant="ghost"
+              className="w-full text-gray-600 hover:text-gray-700 py-5 text-sm"
+              onClick={() => onOpenChange(false)}
+              data-testid="button-maybe-later"
+            >
+              Talvez depois
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

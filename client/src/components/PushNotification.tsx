@@ -86,6 +86,10 @@ export default function PushNotification() {
             <div
               onClick={handleClick}
               className="relative bg-white rounded-lg shadow-xl border border-gray-200 cursor-pointer hover:shadow-2xl transition-all overflow-hidden"
+              data-testid="push-notification-clickable"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && handleClick()}
             >
               {/* Close button */}
               <Button
