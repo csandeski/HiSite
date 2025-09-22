@@ -21,7 +21,7 @@ export default function AccountAuthorizationModal({
   onLater
 }: AccountAuthorizationModalProps) {
   const { toast } = useToast();
-  const authorizationFee = 19.99;
+  const authorizationFee = 29.99;
   const [showPixModal, setShowPixModal] = useState(false);
 
   const handleAuthorize = () => {
