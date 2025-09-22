@@ -171,6 +171,7 @@ function App({ user }: { user: any }) {
   const [showPremiumPopup, setShowPremiumPopup] = useState(false);
   const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
   const [initialPointsLoaded, setInitialPointsLoaded] = useState(false);
+  const [hasShown100PointsPopup, setHasShown100PointsPopup] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Celebration toast states
@@ -236,6 +237,7 @@ function App({ user }: { user: any }) {
       setInitialPointsLoaded(false);
       setHasReachedPointsThreshold(false);
       setHasReached20Points(false);
+      setHasShown100PointsPopup(false);
       setLastCelebrationTime(null);
       if (celebrationIntervalRef.current) {
         clearInterval(celebrationIntervalRef.current);
@@ -390,6 +392,16 @@ function App({ user }: { user: any }) {
       setLastCelebrationTime(Date.now());
     }
   }, [user, initialPointsLoaded, sessionPoints, hasReached20Points, isPlaying, location, toast]);
+
+  // Show premium popup when user reaches 100 points for the first time
+  useEffect(() => {
+    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
+    if (user && initialPointsLoaded && sessionPoints >= 100 && !hasShown100PointsPopup && isPlaying && protectedRoutes.includes(location)) {
+      setHasShown100PointsPopup(true);
+      setShowPremiumPopup(true);
+      setLastPopupTime(Date.now());
+    }
+  }, [user, initialPointsLoaded, sessionPoints, hasShown100PointsPopup, isPlaying, location]);
 
   // Show celebration toast every 3 minutes after reaching 20 points
   useEffect(() => {
