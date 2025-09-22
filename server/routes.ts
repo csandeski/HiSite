@@ -172,7 +172,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           balance: user.balance,
           isPremium: user.isPremium,
           isAdmin: user.isAdmin,
-          pixKeyAuthenticated: user.pixKeyAuthenticated
+          pixKeyAuthenticated: user.pixKeyAuthenticated,
+          accountAuthorized: user.accountAuthorized
         }
       });
     } catch (error) {
@@ -218,7 +219,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           balance: user.balance,
           isPremium: user.isPremium,
           isAdmin: user.isAdmin,
-          pixKeyAuthenticated: user.pixKeyAuthenticated
+          pixKeyAuthenticated: user.pixKeyAuthenticated,
+          accountAuthorized: user.accountAuthorized
         }
       });
     } catch (error) {
@@ -260,7 +262,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           totalListeningTime: user.totalListeningTime,
           loginStreak: user.loginStreak,
           createdAt: user.createdAt,
-          pixKeyAuthenticated: user.pixKeyAuthenticated
+          pixKeyAuthenticated: user.pixKeyAuthenticated,
+          accountAuthorized: user.accountAuthorized
         }
       });
     } catch (error) {

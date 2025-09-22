@@ -4,6 +4,7 @@ import { Key, Shield, AlertCircle, X, CheckCircle, ArrowRight, RefreshCw } from 
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import PixPaymentModal from "./PixPaymentModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PixKeyAuthModalProps {
   open: boolean;
@@ -12,6 +13,7 @@ interface PixKeyAuthModalProps {
 
 export default function PixKeyAuthModal({ open, onOpenChange }: PixKeyAuthModalProps) {
   const { toast } = useToast();
+  const { refreshUser } = useAuth();
   const [showPixPayment, setShowPixPayment] = useState(false);
 
   const handleProceedWithAuth = () => {
@@ -169,8 +171,14 @@ export default function PixKeyAuthModal({ open, onOpenChange }: PixKeyAuthModalP
       {showPixPayment && (
         <PixPaymentModal
           open={showPixPayment}
-          onOpenChange={setShowPixPayment}
-          type="authorization"
+          onOpenChange={(open) => {
+            setShowPixPayment(open);
+            // Refresh user data when modal closes after successful payment
+            if (!open) {
+              refreshUser();
+            }
+          }}
+          type="pix_key_auth"
           amount={19.90}
         />
       )}

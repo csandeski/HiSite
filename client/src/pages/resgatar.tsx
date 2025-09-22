@@ -3,6 +3,8 @@ import ConversionModal from '@/components/ConversionModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import WithdrawProcessingModal from '@/components/WithdrawProcessingModal';
 import AccountAuthorizationModal from '@/components/AccountAuthorizationModal';
+import PixKeyAuthModal from '@/components/PixKeyAuthModal';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +49,7 @@ interface ResgatarProps {
 
 export default function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(() => {
     const saved = localStorage.getItem('resgatar-showOnlyAvailable');
@@ -63,6 +66,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showWithdrawProcessing, setShowWithdrawProcessing] = useState(false);
   const [showAuthorizationModal, setShowAuthorizationModal] = useState(false);
+  const [showPixKeyAuthModal, setShowPixKeyAuthModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
@@ -83,7 +87,16 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     if (balance < minimumWithdrawal) {
       setShowInsufficientModal(true);
     } else {
-      setShowWithdrawModal(true);
+      // Check authorization status first
+      if (!user?.accountAuthorized) {
+        setShowAuthorizationModal(true);
+      } else if (!user?.pixKeyAuthenticated) {
+        // Account is authorized but PIX key not authenticated
+        setShowPixKeyAuthModal(true);
+      } else {
+        // Both are authorized, proceed with withdrawal
+        setShowWithdrawModal(true);
+      }
     }
   };
   
@@ -95,20 +108,30 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     // Simulate processing time
     setTimeout(() => {
       setShowWithdrawProcessing(false);
-      setShowAuthorizationModal(true);
+      // Process the withdrawal after showing processing
+      setBalance(prev => prev - amount);
+      // Show success notification
+      toast({
+        title: "Saque realizado com sucesso!",
+        description: `R$ ${amount.toFixed(2)} foi transferido para sua conta.`,
+        duration: 5000,
+      });
     }, 2000);
   };
   
   const handleAuthorizeAccount = () => {
     setShowAuthorizationModal(false);
-    // Process the withdrawal after authorization
-    setBalance(prev => prev - withdrawAmount);
-    // Show success notification
-    toast({
-      title: "Saque realizado com sucesso!",
-      description: `R$ ${withdrawAmount.toFixed(2)} foi transferido para sua conta.`,
-      duration: 5000,
-    });
+    // After account authorization, check if PIX key needs authentication
+    if (!user?.pixKeyAuthenticated) {
+      toast({
+        title: "Conta autorizada!",
+        description: "Agora você precisa autenticar sua chave PIX para realizar saques.",
+        duration: 5000,
+      });
+      setTimeout(() => {
+        setShowPixKeyAuthModal(true);
+      }, 500);
+    }
   };
   
   const handleAuthorizeLater = () => {
@@ -689,6 +712,12 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
         amount={withdrawAmount}
         onAuthorize={handleAuthorizeAccount}
         onLater={handleAuthorizeLater}
+      />
+
+      {/* PIX Key Authentication Modal */}
+      <PixKeyAuthModal
+        open={showPixKeyAuthModal}
+        onOpenChange={setShowPixKeyAuthModal}
       />
     </div>
   );

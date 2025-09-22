@@ -20,7 +20,7 @@ import PixQRCode from '@/components/PixQRCode';
 interface PixPaymentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  type?: 'premium' | 'credits' | 'authorization';
+  type?: 'premium' | 'credits' | 'authorization' | 'pix_key_auth';
   amount?: number;
 }
 
@@ -72,6 +72,9 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
           } else if (type === 'authorization') {
             toastTitle = "Conta autorizada!";
             toastDescription = "Sua conta foi autorizada com sucesso. Agora você tem acesso completo à plataforma.";
+          } else if (type === 'pix_key_auth') {
+            toastTitle = "Chave PIX Autenticada!";
+            toastDescription = `Sua chave PIX foi autenticada com sucesso. R$ ${amount.toFixed(2)} foram adicionados ao seu saldo como reembolso.`;
           }
           
           toast({
@@ -115,7 +118,12 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
       // Get stored UTM parameters from localStorage (or fallback to URL)
       const utms = getStoredUTMs();
       
-      const response = await fetch('/api/payment/create-pix', {
+      // Use dedicated endpoint for PIX key authentication
+      const endpoint = type === 'pix_key_auth' 
+        ? '/api/payment/pix-key-auth'
+        : '/api/payment/create-pix';
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -195,9 +203,9 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
 
         {/* Scrollable content wrapper */}
         <div className="max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-          {/* Header with gradient - Blue for authorization, Purple for others */}
+          {/* Header with gradient - Blue for authorization/pix_key_auth, Purple for others */}
           <div className={`px-4 py-3 sticky top-0 z-10 ${
-            type === 'authorization' 
+            type === 'authorization' || type === 'pix_key_auth'
               ? 'bg-gradient-to-r from-blue-500 to-blue-600'
               : 'bg-gradient-to-r from-purple-500 to-pink-500'
           }`}>
@@ -212,6 +220,8 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
                     ? `Premium Vitalício - R$ ${amount.toFixed(2)}` 
                     : type === 'credits'
                     ? `Adicionar R$ ${amount.toFixed(2)} em créditos`
+                    : type === 'pix_key_auth'
+                    ? `Autenticação de Chave PIX - R$ ${amount.toFixed(2)} (Reembolsável)`
                     : `Autorização de Conta - R$ ${amount.toFixed(2)}`}
                 </p>
               </div>
@@ -223,7 +233,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
             {loading ? (
               <div className="flex flex-col items-center justify-center py-8 space-y-4">
                 <Loader2 className={`w-8 h-8 animate-spin ${
-                  type === 'authorization' ? 'text-blue-500' : 'text-purple-500'
+                  type === 'authorization' || type === 'pix_key_auth' ? 'text-blue-500' : 'text-purple-500'
                 }`} />
                 <p className="text-sm text-gray-600">Gerando código PIX...</p>
               </div>
@@ -236,7 +246,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
                 <Button
                   onClick={generatePixPayment}
                   className={`text-white ${
-                    type === 'authorization'
+                    type === 'authorization' || type === 'pix_key_auth'
                       ? 'bg-blue-500 hover:bg-blue-600'
                       : 'bg-purple-500 hover:bg-purple-600'
                   }`}
@@ -253,7 +263,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
                     pixCode={pixData?.pix?.payload}
                     encodedImage={pixData?.pix?.encodedImage}
                     size={180}
-                    color={type === 'authorization' ? '#3B82F6' : '#A855F7'}
+                    color={type === 'authorization' || type === 'pix_key_auth' ? '#3B82F6' : '#A855F7'}
                   />
                 </div>
 
@@ -319,25 +329,27 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
             {/* Benefits reminder - Compact */}
             {!loading && !error && (
               <div className={`rounded-lg p-2.5 border ${
-                type === 'authorization'
+                type === 'authorization' || type === 'pix_key_auth'
                   ? 'bg-blue-50 border-blue-200'
                   : 'bg-purple-50 border-purple-200'
               }`}>
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <ShieldCheck className={`w-3.5 h-3.5 ${
-                    type === 'authorization' ? 'text-blue-600' : 'text-purple-600'
+                    type === 'authorization' || type === 'pix_key_auth' ? 'text-blue-600' : 'text-purple-600'
                   }`} />
                   <span className={`text-[11px] font-semibold ${
-                    type === 'authorization' ? 'text-blue-900' : 'text-purple-900'
+                    type === 'authorization' || type === 'pix_key_auth' ? 'text-blue-900' : 'text-purple-900'
                   }`}>
                     Ativação automática
                   </span>
                 </div>
                 <p className={`text-[10px] leading-relaxed ${
-                  type === 'authorization' ? 'text-blue-700' : 'text-purple-700'
+                  type === 'authorization' || type === 'pix_key_auth' ? 'text-blue-700' : 'text-purple-700'
                 }`}>
                   {type === 'authorization' 
                     ? "Após a confirmação do pagamento, sua conta será autorizada automaticamente em até 5 minutos."
+                    : type === 'pix_key_auth'
+                    ? "Após a confirmação do pagamento, sua chave PIX será autenticada e o valor será reembolsado ao seu saldo."
                     : type === 'premium'
                     ? "Após a confirmação do pagamento, seu plano Premium será ativado automaticamente em até 5 minutos."
                     : "Após a confirmação do pagamento, os créditos serão adicionados automaticamente em até 5 minutos."}

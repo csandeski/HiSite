@@ -19,6 +19,7 @@ export interface User {
   loginStreak?: number;
   createdAt?: string;
   pixKeyAuthenticated?: boolean;
+  accountAuthorized?: boolean;
 }
 
 export interface RadioStation {
