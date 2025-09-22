@@ -9,17 +9,17 @@ export interface NotificationSettings {
 }
 
 class NotificationManager {
-  private isSupported: boolean = false;
+  private supported: boolean = false;
   private currentToken: string | null = null;
   private unsubscribeOnMessage: (() => void) | null = null;
 
   constructor() {
     // Check if notifications are supported
-    this.isSupported = 'Notification' in window && 
-                       'serviceWorker' in navigator && 
-                       'PushManager' in window;
+    this.supported = 'Notification' in window && 
+                     'serviceWorker' in navigator && 
+                     'PushManager' in window;
     
-    if (this.isSupported && messaging) {
+    if (this.supported && messaging) {
       this.setupMessageHandlers();
     }
   }
@@ -58,7 +58,7 @@ class NotificationManager {
   }
 
   public async requestPermission(): Promise<boolean> {
-    if (!this.isSupported) {
+    if (!this.supported) {
       console.warn('Push notifications are not supported on this device');
       return false;
     }
@@ -80,7 +80,7 @@ class NotificationManager {
   }
   
   public async register(): Promise<boolean> {
-    if (!this.isSupported || Notification.permission !== 'granted') {
+    if (!this.supported || Notification.permission !== 'granted') {
       console.error('Notifications not supported or permission not granted');
       return false;
     }
@@ -103,7 +103,7 @@ class NotificationManager {
   }
 
   public async getToken(): Promise<string | null> {
-    if (!this.isSupported || !messaging) {
+    if (!this.supported || !messaging) {
       return null;
     }
 
@@ -166,18 +166,18 @@ class NotificationManager {
   }
 
   public getPermissionStatus(): NotificationPermission {
-    if (!this.isSupported) {
+    if (!this.supported) {
       return 'denied';
     }
     return Notification.permission;
   }
 
   public async isSupported(): Promise<boolean> {
-    return this.isSupported;
+    return this.supported;
   }
   
   public isNotificationsSupported(): boolean {
-    return this.isSupported;
+    return this.supported;
   }
 
   public getCurrentToken(): string | null {
@@ -208,7 +208,7 @@ class NotificationManager {
   }
   
   public async showLocal(title: string, body: string, data?: any): Promise<void> {
-    if (!this.isSupported || Notification.permission !== 'granted') {
+    if (!this.supported || Notification.permission !== 'granted') {
       console.error('Cannot show notification: not supported or permission not granted');
       return;
     }
@@ -233,7 +233,7 @@ class NotificationManager {
   }
 
   public async checkAndRefreshToken(): Promise<void> {
-    if (!this.isSupported || Notification.permission !== 'granted') {
+    if (!this.supported || Notification.permission !== 'granted') {
       return;
     }
 
