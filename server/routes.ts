@@ -171,7 +171,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           points: user.points,
           balance: user.balance,
           isPremium: user.isPremium,
-          isAdmin: user.isAdmin
+          isAdmin: user.isAdmin,
+          pixKeyAuthenticated: user.pixKeyAuthenticated
         }
       });
     } catch (error) {
@@ -216,7 +217,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           points: user.points,
           balance: user.balance,
           isPremium: user.isPremium,
-          isAdmin: user.isAdmin
+          isAdmin: user.isAdmin,
+          pixKeyAuthenticated: user.pixKeyAuthenticated
         }
       });
     } catch (error) {
@@ -257,7 +259,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           location: user.location,
           totalListeningTime: user.totalListeningTime,
           loginStreak: user.loginStreak,
-          createdAt: user.createdAt
+          createdAt: user.createdAt,
+          pixKeyAuthenticated: user.pixKeyAuthenticated
         }
       });
     } catch (error) {

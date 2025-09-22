@@ -18,6 +18,7 @@ export interface User {
   totalListeningTime?: number;
   loginStreak?: number;
   createdAt?: string;
+  pixKeyAuthenticated?: boolean;
 }
 
 export interface RadioStation {
