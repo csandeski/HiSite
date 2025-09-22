@@ -112,6 +112,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
+  // Debug endpoint for session issues (remove in production after fixing)
+  app.get("/api/debug/session", (req, res) => {
+    res.json({
+      hasSession: !!req.session,
+      sessionId: req.sessionID,
+      userId: req.session?.userId || null,
+      isAuthenticated: !!req.session?.userId,
+      cookieSettings: {
+        secure: req.session?.cookie?.secure,
+        sameSite: req.session?.cookie?.sameSite,
+        httpOnly: req.session?.cookie?.httpOnly,
+        domain: req.session?.cookie?.domain
+      },
+      headers: {
+        origin: req.headers.origin,
+        cookie: req.headers.cookie ? 'present' : 'missing',
+        host: req.headers.host
+      },
+      environment: {
+        nodeEnv: process.env.NODE_ENV,
+        hasFrontendUrl: !!process.env.FRONTEND_URL,
+        hasSessionSecret: !!process.env.SESSION_SECRET
+      }
+    });
+  });
+
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {
     try {
