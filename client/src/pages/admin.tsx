@@ -23,7 +23,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Calendar, Clock, User, DollarSign, Trophy, ShoppingCart, Zap } from "lucide-react";
+import { Calendar, Clock, User, DollarSign, Trophy, ShoppingCart, Zap, Shield, CreditCard, CheckCircle, XCircle } from "lucide-react";
 import type { User as UserType } from "@shared/schema";
 
 export function AdminPage() {
@@ -95,6 +95,72 @@ export function AdminPage() {
       toast({
         title: "Erro",
         description: "Erro ao atualizar saldo do usuário.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para toggle premium
+  const togglePremiumMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest("PATCH", `/api/admin/users/${userId}/premium`, {});
+    },
+    onSuccess: (_, userId) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      const user = users.find(u => u.id === userId);
+      toast({
+        title: "Status Premium alterado",
+        description: user?.isPremium 
+          ? "Premium removido com sucesso."
+          : "Premium ativado por 30 dias.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao alterar status premium.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para toggle autorização de conta
+  const toggleAccountAuthMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest("PATCH", `/api/admin/users/${userId}/account-authorization`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "Autorização de conta alterada",
+        description: "Status de autorização atualizado com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao alterar autorização de conta.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para toggle autenticação PIX
+  const togglePixAuthMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest("PATCH", `/api/admin/users/${userId}/pix-authentication`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "Autenticação PIX alterada",
+        description: "Status de autenticação PIX atualizado com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao alterar autenticação PIX.",
         variant: "destructive",
       });
     },
@@ -241,7 +307,9 @@ export function AdminPage() {
                     <TableHead>Usuário</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Cadastro</TableHead>
-                    <TableHead className="text-center">Plano</TableHead>
+                    <TableHead className="text-center">Premium</TableHead>
+                    <TableHead className="text-center">Conta</TableHead>
+                    <TableHead className="text-center">PIX</TableHead>
                     <TableHead className="text-center">Compras</TableHead>
                     <TableHead className="text-right">Pontos</TableHead>
                     <TableHead className="text-right">Saldo</TableHead>
@@ -270,13 +338,46 @@ export function AdminPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
-                        {user.isPremium ? (
-                          <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
-                            <Zap className="h-3 w-3 mr-1" />
-                            Premium
+                        <div className="flex flex-col items-center gap-1">
+                          {user.isPremium ? (
+                            <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
+                              <Zap className="h-3 w-3 mr-1" />
+                              Premium
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary">Gratuito</Badge>
+                          )}
+                          {user.isPremium && user.premiumExpiresAt && (
+                            <span className="text-xs text-muted-foreground">
+                              Expira: {new Date(user.premiumExpiresAt).toLocaleDateString("pt-BR")}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user.accountAuthorized ? (
+                          <Badge variant="default" className="bg-green-600">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Sim
                           </Badge>
                         ) : (
-                          <Badge variant="secondary">Gratuito</Badge>
+                          <Badge variant="outline">
+                            <XCircle className="h-3 w-3 mr-1" />
+                            Não
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {user.pixKeyAuthenticated ? (
+                          <Badge variant="default" className="bg-green-600">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Sim
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">
+                            <XCircle className="h-3 w-3 mr-1" />
+                            Não
+                          </Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-center">
@@ -310,14 +411,15 @@ export function AdminPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => openEditModal(user, "points")}
                             data-testid={`button-edit-points-${user.id}`}
                           >
-                            Editar Pontos
+                            <Trophy className="h-3 w-3 mr-1" />
+                            Pontos
                           </Button>
                           <Button
                             size="sm"
@@ -325,7 +427,38 @@ export function AdminPage() {
                             onClick={() => openEditModal(user, "balance")}
                             data-testid={`button-edit-balance-${user.id}`}
                           >
-                            Editar Saldo
+                            <DollarSign className="h-3 w-3 mr-1" />
+                            Saldo
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={user.isPremium ? "destructive" : "default"}
+                            onClick={() => togglePremiumMutation.mutate(user.id)}
+                            disabled={togglePremiumMutation.isPending}
+                            data-testid={`button-toggle-premium-${user.id}`}
+                          >
+                            <Zap className="h-3 w-3 mr-1" />
+                            {user.isPremium ? "Remover" : "Ativar"} Premium
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={user.accountAuthorized ? "destructive" : "default"}
+                            onClick={() => toggleAccountAuthMutation.mutate(user.id)}
+                            disabled={toggleAccountAuthMutation.isPending}
+                            data-testid={`button-toggle-account-${user.id}`}
+                          >
+                            <Shield className="h-3 w-3 mr-1" />
+                            {user.accountAuthorized ? "Desautorizar" : "Autorizar"} Conta
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={user.pixKeyAuthenticated ? "destructive" : "default"}
+                            onClick={() => togglePixAuthMutation.mutate(user.id)}
+                            disabled={togglePixAuthMutation.isPending}
+                            data-testid={`button-toggle-pix-${user.id}`}
+                          >
+                            <CreditCard className="h-3 w-3 mr-1" />
+                            {user.pixKeyAuthenticated ? "Desautenticar" : "Autenticar"} PIX
                           </Button>
                         </div>
                       </TableCell>
@@ -333,7 +466,7 @@ export function AdminPage() {
                   ))}
                   {users.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">
+                      <TableCell colSpan={11} className="text-center py-10 text-muted-foreground">
                         Nenhum usuário cadastrado ainda
                       </TableCell>
                     </TableRow>

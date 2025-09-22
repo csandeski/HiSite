@@ -1264,6 +1264,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isPremium: user.isPremium,
         premiumExpiresAt: user.premiumExpiresAt,
         isAdmin: user.isAdmin,
+        accountAuthorized: user.accountAuthorized,
+        pixKeyAuthenticated: user.pixKeyAuthenticated,
         loginStreak: user.loginStreak,
         lastLoginDate: user.lastLoginDate,
         lastLoginAt: user.lastLoginAt,
@@ -1329,6 +1331,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get user transactions error:", error);
       res.status(500).json({ error: "Erro ao buscar transações" });
+    }
+  });
+
+  // Admin premium management
+  app.patch("/api/admin/users/:id/premium", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Get current user state
+      const currentUser = await storage.getUser(id);
+      if (!currentUser) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Toggle premium status
+      const isPremium = !currentUser.isPremium;
+      const premiumExpiresAt = isPremium 
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+        : null;
+      
+      const user = await storage.updateUser(id, { 
+        isPremium,
+        premiumExpiresAt
+      });
+      
+      res.json({ user });
+    } catch (error) {
+      console.error("Toggle premium error:", error);
+      res.status(500).json({ error: "Erro ao alterar status premium" });
+    }
+  });
+  
+  // Admin account authorization management
+  app.patch("/api/admin/users/:id/account-authorization", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Get current user state
+      const currentUser = await storage.getUser(id);
+      if (!currentUser) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Toggle account authorization
+      const accountAuthorized = !currentUser.accountAuthorized;
+      
+      const user = await storage.updateUser(id, { accountAuthorized });
+      
+      res.json({ user });
+    } catch (error) {
+      console.error("Toggle account authorization error:", error);
+      res.status(500).json({ error: "Erro ao alterar autorização de conta" });
+    }
+  });
+  
+  // Admin PIX authentication management
+  app.patch("/api/admin/users/:id/pix-authentication", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Get current user state
+      const currentUser = await storage.getUser(id);
+      if (!currentUser) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Toggle PIX authentication
+      const pixKeyAuthenticated = !currentUser.pixKeyAuthenticated;
+      
+      const user = await storage.updateUser(id, { pixKeyAuthenticated });
+      
+      res.json({ user });
+    } catch (error) {
+      console.error("Toggle PIX authentication error:", error);
+      res.status(500).json({ error: "Erro ao alterar autenticação PIX" });
     }
   });
 
