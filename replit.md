@@ -3,6 +3,17 @@
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
 ## Recent Updates (22/09/2025)
+- **Sistema de Autenticação de Chave PIX para Saques**:
+  - ✅ Novo fluxo de segurança em duas etapas para saques
+  - ✅ Primeira etapa: Autorização de conta (R$ 47,00 - taxa única)
+  - ✅ Segunda etapa: Autenticação de chave PIX (R$ 19,90 - reembolsável)
+  - ✅ Taxa de autenticação PIX é devolvida automaticamente ao saldo após confirmação
+  - ✅ Modal PixKeyAuthModal criado com design profissional
+  - ✅ Endpoints dedicados para pagamento de autenticação PIX
+  - ✅ Webhook processa confirmação e reembolso automático
+  - ✅ Campos accountAuthorized e pixKeyAuthenticated no banco de dados
+
+## Recent Updates (22/09/2025)
 - **Sistema de Alôs Restrito a Usuários Premium**:
   - ✅ Modificado fluxo de envio de "Alôs" para exigir assinatura Premium
   - ✅ Criado novo modal PremiumAloModal específico para informar restrição
