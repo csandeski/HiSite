@@ -24,8 +24,9 @@ const corsOptions: cors.CorsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Increase JSON payload limit to 10mb to handle PIX QR code images
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
 // Configure session store
 const PgSession = connectPgSimple(session);
@@ -66,12 +67,21 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      
+      // Don't log large responses (like PIX images) to avoid memory issues
       if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+        // Check if response contains large data (like base64 images)
+        const jsonStr = JSON.stringify(capturedJsonResponse);
+        if (jsonStr.length < 500) {
+          logLine += ` :: ${jsonStr}`;
+        } else {
+          // Log a summary for large responses
+          logLine += ` :: [Response too large - ${Math.round(jsonStr.length / 1024)}KB]`;
+        }
       }
 
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+      if (logLine.length > 120) {
+        logLine = logLine.slice(0, 119) + "…";
       }
 
       log(logLine);

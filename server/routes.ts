@@ -862,13 +862,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      res.json({
+      // Send response with PIX data
+      console.log('Sending response with PIX data...');
+      
+      // Check if pixResponse and pix data exist
+      if (!pixResponse || !pixResponse.pix) {
+        throw new Error('PIX data not received from OrinPay');
+      }
+      
+      const responseData = {
         success: true,
         transactionId: pixResponse.id,
         reference: pixResponse.reference,
-        pix: pixResponse.pix,
+        pix: {
+          encodedImage: pixResponse.pix.encodedImage,
+          payload: pixResponse.pix.payload
+        },
         amount: finalAmount
-      });
+      };
+      
+      console.log('Response data prepared, sending to client...');
+      res.json(responseData);
       
     } catch (error: any) {
       console.error("Create PIX payment error:", error);

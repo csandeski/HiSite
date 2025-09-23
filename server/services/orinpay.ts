@@ -145,6 +145,16 @@ class OrinPayService {
         transactionId: response.data?.id,
         reference: response.data?.reference
       });
+      
+      // Log actual values to debug encodedImage issue
+      if (response.data?.pix) {
+        console.log('PIX Data Details:', {
+          encodedImageLength: response.data.pix.encodedImage?.length,
+          payloadLength: response.data.pix.payload?.length,
+          encodedImageSample: response.data.pix.encodedImage?.substring(0, 50),
+          payloadSample: response.data.pix.payload?.substring(0, 50)
+        });
+      }
 
       return response.data;
     } catch (error: any) {
