@@ -180,11 +180,6 @@ export default function WithdrawModal({
         setPendingWithdrawData({ amount: numAmount, pixType, pixKey });
         // Open PIX key authentication modal
         setShowPixKeyAuthModal(true);
-        toast({
-          title: "Autenticação de chave PIX necessária",
-          description: "Para continuar com o saque, você precisa autenticar sua chave PIX.",
-          duration: 4000,
-        });
       } else {
         // PIX key is already authenticated, proceed with withdrawal
         onConfirm(numAmount, pixType, pixKey);
