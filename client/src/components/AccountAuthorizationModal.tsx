@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, Clock, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PixPaymentModal from "@/components/PixPaymentModal";
+import { AUTHORIZATION_AMOUNT_CENTS, centsToBRL, formatBRL } from "@shared/constants";
 
 interface AccountAuthorizationModalProps {
   open: boolean;
@@ -21,8 +22,8 @@ export default function AccountAuthorizationModal({
   onLater
 }: AccountAuthorizationModalProps) {
   const { toast } = useToast();
-  // Authorization fee is R$ 29.99 (not R$ 19.99)
-  const authorizationFee = 29.99;
+  // Authorization fee is R$ 29,90
+  const authorizationFee = centsToBRL(AUTHORIZATION_AMOUNT_CENTS);
   const [showPixModal, setShowPixModal] = useState(false);
 
   const handleAuthorize = () => {
@@ -107,7 +108,7 @@ export default function AccountAuthorizationModal({
             
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
               <span className="text-sm text-gray-600">Autorização única:</span>
-              <span className="text-sm font-bold text-blue-600">R$ {authorizationFee.toFixed(2)}</span>
+              <span className="text-sm font-bold text-blue-600">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</span>
             </div>
             
             <div className="flex items-center justify-between py-2">
@@ -127,7 +128,7 @@ export default function AccountAuthorizationModal({
               data-testid="button-authorize-account"
             >
               <Shield className="w-4 h-4" />
-              Autorizar Conta - R$ {authorizationFee.toFixed(2)}
+              Autorizar Conta - {formatBRL(AUTHORIZATION_AMOUNT_CENTS)}
             </Button>
             
             <Button
