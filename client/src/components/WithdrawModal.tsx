@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { X, Wallet, Key, AlertCircle } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import PixKeyAuthModal from "./PixKeyAuthModal";
 
 interface WithdrawModalProps {
   open: boolean;
@@ -21,10 +23,13 @@ export default function WithdrawModal({
   onConfirm 
 }: WithdrawModalProps) {
   const { toast } = useToast();
+  const { user, refreshUser } = useAuth();
   const [amount, setAmount] = useState("");
   const [pixType, setPixType] = useState("");
   const [pixKey, setPixKey] = useState("");
   const [errors, setErrors] = useState<{amount?: string, pixKey?: string}>({});
+  const [showPixKeyAuthModal, setShowPixKeyAuthModal] = useState(false);
+  const [pendingWithdrawData, setPendingWithdrawData] = useState<{amount: number, pixType: string, pixKey: string} | null>(null);
   
   const minimumWithdrawal = 150;
   const maxWithdrawal = balance;
@@ -36,8 +41,23 @@ export default function WithdrawModal({
       setPixType("");
       setPixKey("");
       setErrors({});
+      setPendingWithdrawData(null);
     }
   }, [open]);
+
+  // Handle PIX key authentication completion
+  useEffect(() => {
+    // After PIX authentication is done, process the pending withdrawal
+    const processPendingWithdraw = async () => {
+      if (!showPixKeyAuthModal && pendingWithdrawData && user?.pixKeyAuthenticated) {
+        await refreshUser();
+        onConfirm(pendingWithdrawData.amount, pendingWithdrawData.pixType, pendingWithdrawData.pixKey);
+        setPendingWithdrawData(null);
+      }
+    };
+
+    processPendingWithdraw();
+  }, [showPixKeyAuthModal, pendingWithdrawData, user?.pixKeyAuthenticated]);
 
   // Format currency input
   const handleAmountChange = (value: string) => {
@@ -153,7 +173,22 @@ export default function WithdrawModal({
   const handleConfirm = () => {
     if (validateForm()) {
       const numAmount = parseFloat(amount);
-      onConfirm(numAmount, pixType, pixKey);
+      
+      // Check if PIX key is authenticated
+      if (!user?.pixKeyAuthenticated) {
+        // Store withdrawal data to process after authentication
+        setPendingWithdrawData({ amount: numAmount, pixType, pixKey });
+        // Open PIX key authentication modal
+        setShowPixKeyAuthModal(true);
+        toast({
+          title: "Autenticação de chave PIX necessária",
+          description: "Para continuar com o saque, você precisa autenticar sua chave PIX.",
+          duration: 4000,
+        });
+      } else {
+        // PIX key is already authenticated, proceed with withdrawal
+        onConfirm(numAmount, pixType, pixKey);
+      }
     }
   };
 
@@ -180,7 +215,8 @@ export default function WithdrawModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -313,5 +349,23 @@ export default function WithdrawModal({
         </div>
       </DialogContent>
     </Dialog>
+    
+    {/* PIX Key Authentication Modal */}
+    <PixKeyAuthModal 
+      open={showPixKeyAuthModal}
+      onOpenChange={(open) => {
+        setShowPixKeyAuthModal(open);
+        if (!open && pendingWithdrawData) {
+          // If modal was closed without authentication, clear pending data
+          setPendingWithdrawData(null);
+          toast({
+            title: "Autenticação cancelada",
+            description: "Você pode autenticar sua chave PIX a qualquer momento para realizar saques.",
+            duration: 4000,
+          });
+        }
+      }}
+    />
+    </>
   );
 }

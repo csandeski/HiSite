@@ -90,11 +90,9 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       // Check authorization status first
       if (!user?.accountAuthorized) {
         setShowAuthorizationModal(true);
-      } else if (!user?.pixKeyAuthenticated) {
-        // Account is authorized but PIX key not authenticated
-        setShowPixKeyAuthModal(true);
       } else {
-        // Both are authorized, proceed with withdrawal
+        // Account is authorized, proceed to withdrawal modal
+        // PIX key authentication will be checked when user confirms the withdrawal
         setShowWithdrawModal(true);
       }
     }
