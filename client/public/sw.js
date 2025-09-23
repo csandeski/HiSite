@@ -1,6 +1,35 @@
-// Import Firebase scripts for push notifications
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+// Import Firebase scripts for push notifications - only if supported
+// Initialize variables for Firebase
+let firebase = null;
+let messaging = null;
+
+// Check if Firebase should be initialized
+const shouldInitFirebase = () => {
+  try {
+    // Check if we're in a secure context
+    if (self.location.protocol !== 'https:' && 
+        self.location.hostname !== 'localhost' && 
+        self.location.hostname !== '127.0.0.1') {
+      console.log('Firebase Messaging requires HTTPS or localhost');
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.log('Could not check Firebase support:', error);
+    return false;
+  }
+};
+
+// Conditionally import Firebase scripts
+if (shouldInitFirebase()) {
+  try {
+    importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
+    importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+    console.log('Firebase scripts loaded successfully');
+  } catch (error) {
+    console.log('Could not load Firebase scripts:', error);
+  }
+}
 
 // Service Worker for RádioPlay PWA
 const CACHE_VERSION = 'v2';
@@ -120,40 +149,45 @@ async function syncPoints() {
   }
 }
 
-// Initialize Firebase in Service Worker
-try {
-  firebase.initializeApp({
-    apiKey: "AIzaSyDummy-Key",
-    authDomain: "radioplay-app.firebaseapp.com",
-    projectId: "radioplay-app",
-    storageBucket: "radioplay-app.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:dummy"
-  });
+// Initialize Firebase in Service Worker if scripts were loaded
+if (typeof firebase !== 'undefined' && shouldInitFirebase()) {
+  try {
+    firebase.initializeApp({
+      apiKey: "AIzaSyDummy-Key",
+      authDomain: "radioplay-app.firebaseapp.com",
+      projectId: "radioplay-app",
+      storageBucket: "radioplay-app.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:dummy"
+    });
 
-  const messaging = firebase.messaging();
+    messaging = firebase.messaging();
 
-  // Handle background messages
-  messaging.onBackgroundMessage((payload) => {
-    console.log('Received background message:', payload);
+    // Handle background messages
+    if (messaging) {
+      messaging.onBackgroundMessage((payload) => {
+        console.log('Received background message:', payload);
 
-    const notificationTitle = payload.notification?.title || 'RádioPlay';
-    const notificationOptions = {
-      body: payload.notification?.body || 'Nova notificação',
-      icon: '/icon-192x192.png',
-      badge: '/icon-96x96.png',
-      vibrate: [200, 100, 200],
-      tag: payload.data?.tag || 'radioplay-notification',
-      data: payload.data || {},
-      requireInteraction: false,
-      actions: payload.data?.actions ? JSON.parse(payload.data.actions) : [],
-      image: payload.notification?.image || null
-    };
+        const notificationTitle = payload.notification?.title || 'RádioPlay';
+        const notificationOptions = {
+          body: payload.notification?.body || 'Nova notificação',
+          icon: '/icon-192x192.png',
+          badge: '/icon-96x96.png',
+          tag: payload.data?.tag || 'radioplay-notification',
+          data: payload.data || {},
+          requireInteraction: false,
+          actions: payload.data?.actions ? JSON.parse(payload.data.actions) : [],
+          image: payload.notification?.image || null
+        };
 
-    return self.registration.showNotification(notificationTitle, notificationOptions);
-  });
-} catch (error) {
-  console.error('Failed to initialize Firebase in Service Worker:', error);
+        return self.registration.showNotification(notificationTitle, notificationOptions);
+      });
+    }
+  } catch (error) {
+    console.error('Failed to initialize Firebase in Service Worker:', error);
+  }
+} else {
+  console.log('Firebase not initialized in Service Worker - scripts not loaded or not in secure context');
 }
 
 // Handle notification clicks

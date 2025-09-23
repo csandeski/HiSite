@@ -675,6 +675,9 @@ function App({ user }: { user: any }) {
               <Route path="/adm">
                 <AdminPage />
               </Route>
+              <Route path="/admin">
+                <AdminPage />
+              </Route>
               <Route component={NotFound} />
             </Switch>
             

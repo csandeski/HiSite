@@ -172,10 +172,6 @@ class NotificationManager {
     return Notification.permission;
   }
 
-  public async isSupported(): Promise<boolean> {
-    return this.isSupported;
-  }
-  
   public isNotificationsSupported(): boolean {
     return this.isSupported;
   }
@@ -219,7 +215,6 @@ class NotificationManager {
         body,
         icon: '/icon-192x192.png',
         badge: '/icon-96x96.png',
-        vibrate: [200, 100, 200],
         tag: data?.tag || 'radioplay-notification',
         requireInteraction: false,
         data: {

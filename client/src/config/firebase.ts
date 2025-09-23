@@ -19,10 +19,33 @@ const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY || "BKagOny0KF_dummy_v
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Cloud Messaging
-let messaging: any;
-if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-  messaging = getMessaging(app);
+// Initialize Firebase Cloud Messaging with proper browser support check
+let messaging: any = null;
+
+// Check for full browser support before initializing messaging
+const isMessagingSupported = () => {
+  return (
+    typeof window !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    'Notification' in window &&
+    // Check for HTTPS or localhost (required for service workers)
+    (window.location.protocol === 'https:' || 
+     window.location.hostname === 'localhost' ||
+     window.location.hostname === '127.0.0.1')
+  );
+};
+
+// Only initialize messaging if fully supported
+if (isMessagingSupported()) {
+  try {
+    messaging = getMessaging(app);
+  } catch (error) {
+    console.warn('Firebase Messaging could not be initialized:', error);
+    messaging = null;
+  }
+} else {
+  console.warn('Push notifications are not supported in this browser');
 }
 
 export { app, messaging, getToken, onMessage, VAPID_KEY };
