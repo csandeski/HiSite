@@ -763,13 +763,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Tipo de pagamento inválido" });
       }
       
-      // Validate authorization amount is exactly R$ 29.99 (with tolerance for floating point)
-      if (type === 'authorization' && Math.abs(amount - 29.99) > 0.01) {
-        return res.status(400).json({ error: "Valor incorreto para autorização de conta. Deve ser R$ 29,99" });
+      // Validate authorization amount is exactly R$ 29.90 (with tolerance for floating point)
+      if (type === 'authorization' && Math.abs(amount - 29.90) > 0.01) {
+        return res.status(400).json({ error: "Valor incorreto para autorização de conta. Deve ser R$ 29,90" });
       }
       
-      // Force authorization amount to be exactly 29.99 to avoid floating point issues
-      const finalAmount = type === 'authorization' ? 29.99 : amount;
+      // Force authorization amount to be exactly 29.90 to avoid floating point issues
+      const finalAmount = type === 'authorization' ? 29.90 : amount;
       
       // Get user info
       const user = await storage.getUser(req.session.userId!);
