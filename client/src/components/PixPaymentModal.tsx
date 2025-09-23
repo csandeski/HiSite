@@ -16,6 +16,7 @@ import { useUTMTracking } from "@/hooks/useUTMTracking";
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import PixQRCode from '@/components/PixQRCode';
+import { AUTHORIZATION_AMOUNT_CENTS, PIX_AUTH_AMOUNT_CENTS, centsToBRL } from "@shared/constants";
 
 interface PixPaymentModalProps {
   open: boolean;
@@ -34,9 +35,10 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
   const [error, setError] = useState<string | null>(null);
   const [checkingPayment, setCheckingPayment] = useState(false);
   
-  // Force authorization to always be R$ 29.99
-  // If type is authorization, ALWAYS use 29.99 regardless of what amount is passed
-  const finalAmount = type === 'authorization' ? 29.99 : (type === 'pix_key_auth' ? 19.90 : amount);
+  // Use correct amounts from constants
+  // Authorization: R$ 29,90, PIX key auth: R$ 19,90
+  const finalAmount = type === 'authorization' ? centsToBRL(AUTHORIZATION_AMOUNT_CENTS) : 
+                      (type === 'pix_key_auth' ? centsToBRL(PIX_AUTH_AMOUNT_CENTS) : amount);
   
   // Generate PIX payment when modal opens
   useEffect(() => {
