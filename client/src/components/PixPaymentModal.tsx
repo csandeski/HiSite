@@ -137,10 +137,8 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
       // Get stored UTM parameters from localStorage (or fallback to URL)
       const utms = getStoredUTMs();
       
-      // Use dedicated endpoint for PIX key authentication
-      const endpoint = type === 'pix_key_auth' 
-        ? '/api/payment/create-pix-auth'
-        : '/api/payment/create-pix';
+      // Use the same endpoint for all payment types (it handles all types correctly)
+      const endpoint = '/api/payment/create-pix';
       
       // Detailed logging for debugging
       console.log('===== PIX Payment Generation Debug =====');
