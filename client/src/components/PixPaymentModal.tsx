@@ -61,8 +61,21 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
     const checkInterval = setInterval(async () => {
       setCheckingPayment(true);
       try {
+        console.log('Checking payment status for reference:', pixData.reference);
         const response = await fetch(`/api/payment/status/${pixData.reference}`);
+        
+        // Add error handling for status check too
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const responseText = await response.text();
+          console.error('Non-JSON response in status check!');
+          console.error('Response text:', responseText.substring(0, 500));
+          setCheckingPayment(false);
+          return;
+        }
+        
         const data = await response.json();
+        console.log('Payment status response:', data);
         
         if (data.status === 'approved') {
           // Payment approved!
@@ -129,6 +142,18 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
         ? '/api/payment/create-pix-auth'
         : '/api/payment/create-pix';
       
+      // Detailed logging for debugging
+      console.log('===== PIX Payment Generation Debug =====');
+      console.log('Payment type:', type);
+      console.log('Endpoint being called:', endpoint);
+      console.log('Final amount:', finalAmount);
+      console.log('Request body:', JSON.stringify({
+        type,
+        amount: finalAmount,
+        utms
+      }));
+      console.log('Full URL:', window.location.origin + endpoint);
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -142,15 +167,43 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
         })
       });
       
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      console.log('Response content-type:', response.headers.get('content-type'));
+      
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        // Log the actual response text for debugging
+        const responseText = await response.text();
+        console.error('Non-JSON response received!');
+        console.error('Response text (first 500 chars):', responseText.substring(0, 500));
+        console.error('Full response:', responseText);
+        
+        // Check if it's an HTML error page
+        if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+          throw new Error('Servidor retornou uma página HTML ao invés de JSON. Possível erro de rota.');
+        }
+        throw new Error('Resposta inválida do servidor. Por favor, tente novamente.');
+      }
+      
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (data.success) {
+        console.log('PIX payment generated successfully!');
+        console.log('PIX data:', data);
         setPixData(data);
       } else {
+        console.error('Server returned error:', data.error);
         throw new Error(data.error || 'Erro ao gerar pagamento');
       }
     } catch (error: any) {
-      console.error('Error generating PIX payment:', error);
+      console.error('===== PIX Payment Error =====');
+      console.error('Error type:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Full error object:', error);
+      console.error('Stack trace:', error.stack);
       setError(error.message || 'Erro ao gerar código PIX. Por favor, tente novamente.');
       toast({
         title: "Erro ao gerar pagamento",
