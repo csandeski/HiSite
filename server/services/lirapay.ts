@@ -51,6 +51,12 @@ interface LiraPayTransactionResponse {
   hasError: boolean;
 }
 
+interface LiraPayAccountInfo {
+  email: string;
+  name: string;
+  document: string;
+}
+
 interface LiraPayCashoutRequest {
   external_id: string;
   pix_key: string;
@@ -169,6 +175,16 @@ export class LiraPayService {
     } catch (error) {
       console.error('LiraPay createPixPayment error:', error);
       // NEVER use fallback or mock PIX - only real LiraPay integration
+      throw error;
+    }
+  }
+
+  async getAccountInfo(): Promise<LiraPayAccountInfo> {
+    try {
+      const response = await this.makeRequest<LiraPayAccountInfo>('/v1/account-info');
+      return response;
+    } catch (error) {
+      console.error('LiraPay getAccountInfo error:', error);
       throw error;
     }
   }
