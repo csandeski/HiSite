@@ -1653,6 +1653,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   }
 
+  // IMPORTANT: Add catch-all 404 handler for API routes
+  // This MUST come before static file serving but after all API routes
+  app.use('/api/*', (req, res) => {
+    console.error(`404 API route not found: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({ 
+      error: "Endpoint não encontrado",
+      message: `A rota ${req.originalUrl} não existe`,
+      method: req.method
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
