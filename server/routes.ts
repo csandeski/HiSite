@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import type { User } from "@shared/schema";
-import orinpay from "./services/orinpay";
+import { LiraPayService } from "./services/lirapay";
 
 // Session types
 declare module "express-session" {
@@ -47,7 +47,10 @@ function requireAdmin(req: Request, res: Response, next: any) {
   next();
 }
 
-// Generate fake user data for OrinPay testing
+// Initialize LiraPay service
+const liraPayService = new LiraPayService();
+
+// Generate fake user data for LiraPay testing
 function generateFakeUserData() {
   // Generate random CPF (valid format but fake)
   const generateRandomCPF = () => {
@@ -739,12 +742,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // OrinPay Payment Routes
+  // LiraPay Payment Routes
   app.post("/api/payment/create-pix", requireAuth, async (req, res) => {
     try {
       const { type, amount, utms: clientUtms } = req.body;
       
-      // Normalize UTM parameters to snake_case as expected by OrinPay
+      // Normalize UTM parameters for LiraPay
       const utms = clientUtms ? {
         utm_source: clientUtms.utmSource,
         utm_medium: clientUtms.utmMedium,
@@ -777,106 +780,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
       
-      // Use the imported OrinPay service (already imported at top)
-      
-      // Validate amount using the corrected finalAmount
-      const amountInCents = orinpay.reaisToCentavos(finalAmount);
-      if (!orinpay.validateAmount(amountInCents)) {
-        return res.status(400).json({ error: "Valor inválido. Máximo permitido: R$ 999,99" });
-      }
-      
       // Generate reference
-      const reference = orinpay.generateReference(req.session.userId!, type);
+      const reference = `${req.session.userId!}_${type}_${Date.now()}`;
       
-      // Generate fake user data for OrinPay testing (never use real user data)
+      // Generate fake user data for LiraPay testing (never use real user data)
       const fakeUser = generateFakeUserData();
       
-      // Create PIX transaction
-      const pixData = {
-        paymentMethod: 'pix' as const,
+      // Create description based on payment type
+      const description = type === 'premium' 
+        ? 'Acesso Premium com multiplicador 3x' 
+        : type === 'credits' 
+        ? `Adicionar R$ ${finalAmount.toFixed(2)} em créditos`
+        : type === 'alo'
+        ? `Envio de Alô na rádio - R$ ${finalAmount.toFixed(2)}`
+        : `Autorização de conta - R$ ${finalAmount.toFixed(2)}`;
+      
+      // Create webhook URL
+      const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/lirapay`;
+      
+      // Create transaction with LiraPay
+      console.log('Creating PIX transaction with LiraPay...');
+      const pixResponse = await liraPayService.createPixPayment(
+        finalAmount,
+        description,
         reference,
-        customer: {
+        webhookUrl,
+        {
           name: fakeUser.name,
           email: fakeUser.email,
-          phone: orinpay.formatPhone(fakeUser.phone),
-          document: {
-            number: orinpay.formatCPF(fakeUser.cpf),
-            type: 'cpf' as const
-          }
+          phone: fakeUser.phone,
+          document: fakeUser.cpf
         },
-        shipping: {
-          fee: 0,
-          address: {
-            street: "Rua Virtual",
-            streetNumber: "100",
-            zipCode: "00000000",
-            neighborhood: "Centro",
-            city: "São Paulo",
-            state: "SP",
-            country: "Brasil",
-            complement: ""
-          }
-        },
-        items: [
-          {
-            title: 'Ebook Receitas Fitness',  // Always use this product name for OrinPay
-            description: type === 'premium' 
-              ? 'Acesso Premium com multiplicador 3x' 
-              : type === 'credits' 
-              ? `Adicionar R$ ${finalAmount.toFixed(2)} em créditos`
-              : type === 'alo'
-              ? `Envio de Alô na rádio - R$ ${finalAmount.toFixed(2)}`
-              : `Autorização de conta - R$ ${finalAmount.toFixed(2)}`,
-            unitPrice: amountInCents,
-            quantity: 1,
-            tangible: false
-          }
-        ],
-        isInfoProducts: true,
-        utms: utms || {}
-      };
+        utms
+      );
       
-      // Create transaction with OrinPay
-      console.log('Creating PIX transaction with OrinPay...');
-      const pixResponse = await orinpay.createPixTransaction(pixData);
-      
-      // Log response to debug QR Code issue
-      console.log('OrinPay Response:', {
-        hasQRCode: !!pixResponse.pix?.encodedImage,
-        hasPayload: !!pixResponse.pix?.payload,
-        reference: pixResponse.reference,
-        status: pixResponse.status
+      // Log response to debug
+      console.log('LiraPay Response:', {
+        hasPixCode: !!pixResponse.pixCode,
+        reference: pixResponse.reference
       });
       
       // Store payment record in database
       await storage.createPayment({
         userId: req.session.userId!,
-        transactionId: pixResponse.id.toString(),
-        reference: pixResponse.reference,
+        transactionId: pixResponse.reference,
+        reference: reference,
         amount: finalAmount,
         type,
         status: 'pending',
         pixData: {
-          encodedImage: pixResponse.pix.encodedImage,
-          payload: pixResponse.pix.payload
+          encodedImage: null, // LiraPay doesn't provide QR code image
+          payload: pixResponse.pixCode
         }
       });
       
-      // Send response with PIX data
+      // Send response with PIX data (maintain frontend compatibility)
       console.log('Sending response with PIX data...');
       
-      // Check if pixResponse and pix data exist
-      if (!pixResponse || !pixResponse.pix) {
-        throw new Error('PIX data not received from OrinPay');
+      if (!pixResponse || !pixResponse.pixCode) {
+        throw new Error('PIX data not received from LiraPay');
       }
       
       const responseData = {
         success: true,
-        transactionId: pixResponse.id,
-        reference: pixResponse.reference,
+        transactionId: pixResponse.reference,
+        reference: reference,
         pix: {
-          encodedImage: pixResponse.pix.encodedImage,
-          payload: pixResponse.pix.payload
+          encodedImage: null, // LiraPay doesn't provide QR image
+          payload: pixResponse.pixCode
         },
         amount: finalAmount
       };
@@ -891,7 +862,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Dedicated PIX key authentication payment endpoint
-  app.post("/api/payment/pix-key-auth", requireAuth, async (req, res) => {
+  app.post("/api/payment/create-pix-auth", requireAuth, async (req, res) => {
     try {
       const { utms: clientUtms } = req.body;
       
@@ -909,7 +880,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Chave PIX já está autenticada" });
       }
       
-      // Normalize UTM parameters to snake_case as expected by OrinPay
+      // Normalize UTM parameters for LiraPay
       const utms = clientUtms ? {
         utm_source: clientUtms.utmSource,
         utm_medium: clientUtms.utmMedium,
@@ -918,56 +889,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         utm_content: clientUtms.utmContent
       } : {};
       
-      // Validate amount
-      const amountInCents = orinpay.reaisToCentavos(FIXED_AMOUNT);
-      if (!orinpay.validateAmount(amountInCents)) {
-        return res.status(400).json({ error: "Erro na configuração do valor" });
-      }
-      
       // Generate reference
-      const reference = orinpay.generateReference(req.session.userId!, type);
+      const reference = `${req.session.userId!}_${type}_${Date.now()}`;
       
-      // Generate fake user data for OrinPay testing (never use real user data)
+      // Generate fake user data for LiraPay testing (never use real user data)
       const fakeUser = generateFakeUserData();
       
-      // Create PIX transaction
-      const pixData = {
-        paymentMethod: 'pix' as const,
-        reference,
-        customer: {
-          name: fakeUser.name,
-          email: fakeUser.email,
-          phone: orinpay.formatPhone(fakeUser.phone),
-          document: {
-            number: orinpay.formatCPF(fakeUser.cpf),
-            type: 'cpf' as const
-          }
-        },
-        shipping: {
-          fee: 0,
-          address: {
-            street: "Rua Virtual",
-            streetNumber: "100",
-            zipCode: "00000000",
-            neighborhood: "Centro",
-            city: "São Paulo",
-            state: "SP",
-            country: "Brasil",
-            complement: ""
-          }
-        },
-        items: [
-          {
-            title: 'Autenticação de Chave PIX',
-            description: 'Taxa de autenticação de chave PIX com reembolso integral',
-            unitPrice: amountInCents,
-            quantity: 1,
-            tangible: false
-          }
-        ],
-        isInfoProducts: true,
-        utms: utms
-      };
+      // Create description
+      const description = 'Taxa de autenticação de chave PIX com reembolso integral';
+      
+      // Create webhook URL
+      const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/lirapay`;
       
       console.log('Creating PIX key authentication payment:', {
         userId: req.session.userId,
@@ -976,36 +908,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
         reference
       });
       
-      // Call OrinPay API
-      const pixResponse = await orinpay.createPixTransaction(pixData);
+      // Call LiraPay API
+      const pixResponse = await liraPayService.createPixPayment(
+        FIXED_AMOUNT,
+        description,
+        reference,
+        webhookUrl,
+        {
+          name: fakeUser.name,
+          email: fakeUser.email,
+          phone: fakeUser.phone,
+          document: fakeUser.cpf
+        },
+        utms
+      );
       
       console.log('PIX key auth payment created successfully:', {
-        transactionId: pixResponse.id,
-        hasEncodedImage: !!pixResponse.pix?.encodedImage,
-        hasPayload: !!pixResponse.pix?.payload,
-        reference: pixResponse.reference,
-        status: pixResponse.status
+        transactionId: pixResponse.reference,
+        hasPixCode: !!pixResponse.pixCode,
+        reference: reference
       });
       
       // Store payment record in database
       await storage.createPayment({
         userId: req.session.userId!,
-        transactionId: pixResponse.id.toString(),
-        reference: pixResponse.reference,
+        transactionId: pixResponse.reference,
+        reference: reference,
         amount: FIXED_AMOUNT,
         type,
         status: 'pending',
         pixData: {
-          encodedImage: pixResponse.pix.encodedImage,
-          payload: pixResponse.pix.payload
+          encodedImage: null, // LiraPay doesn't provide QR image
+          payload: pixResponse.pixCode
         }
       });
       
       res.json({
         success: true,
-        transactionId: pixResponse.id,
-        reference: pixResponse.reference,
-        pix: pixResponse.pix,
+        transactionId: pixResponse.reference,
+        reference: reference,
+        pix: {
+          encodedImage: null, // LiraPay doesn't provide QR image
+          payload: pixResponse.pixCode
+        },
         amount: FIXED_AMOUNT
       });
       
@@ -1048,6 +993,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: 'Payment not found' });
       }
       
+      // Check real-time status with LiraPay if payment is still pending
+      if (payment.status === 'pending') {
+        try {
+          const liraPayStatus = await liraPayService.getPaymentStatus(payment.transactionId);
+          
+          // Update local payment status if it changed
+          if (liraPayStatus !== payment.status) {
+            await storage.updatePaymentStatus(payment.id, liraPayStatus);
+            payment.status = liraPayStatus;
+          }
+        } catch (error) {
+          console.error('Error checking LiraPay status:', error);
+          // Continue with stored status if LiraPay check fails
+        }
+      }
+      
       // Only return necessary information
       res.json({
         status: payment.status,
@@ -1064,27 +1025,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // OrinPay Webhook - NO authentication required as it comes from external service
-  app.post("/api/webhook/orinpay", async (req, res) => {
+  // LiraPay Webhook - NO authentication required as it comes from external service
+  app.post("/api/webhook/lirapay", async (req, res) => {
     try {
       const webhookData = req.body;
       const signature = req.headers['x-webhook-signature'] as string;
       
       // Log webhook for debugging
-      console.log('OrinPay Webhook received:', webhookData.event, webhookData.status);
+      console.log('LiraPay Webhook received:', webhookData);
       
-      // Get payment by reference
-      const payment = await storage.getPaymentByReference(webhookData.reference);
+      // Extract transaction ID from webhook data (LiraPay format)
+      const transactionId = webhookData.id || webhookData.external_id;
+      const status = webhookData.status;
+      
+      if (!transactionId) {
+        console.error('No transaction ID in webhook data');
+        return res.status(400).json({ error: 'No transaction ID provided' });
+      }
+      
+      // Get payment by transaction ID (using reference since that's what we store)
+      const payment = await storage.getPaymentByReference(transactionId);
+      
       if (!payment) {
-        console.error('Payment not found for reference:', webhookData.reference);
+        console.error('Payment not found for transaction ID:', transactionId);
         return res.status(404).json({ error: 'Payment not found' });
       }
       
+      // Map LiraPay status to our internal status
+      const statusMap: Record<string, string> = {
+        'AUTHORIZED': 'approved',
+        'PENDING': 'pending',
+        'CHARGEBACK': 'refunded',
+        'FAILED': 'rejected',
+        'IN_DISPUTE': 'disputed',
+      };
+      
+      const mappedStatus = statusMap[status] || status.toLowerCase();
+      
       // Update payment status
-      await storage.updatePaymentStatus(payment.id, webhookData.status);
+      await storage.updatePaymentStatus(payment.id, mappedStatus);
       
       // Handle approved payments
-      if (webhookData.event === 'compra_aprovada' && webhookData.status === 'approved') {
+      if (mappedStatus === 'approved') {
         // Get user
         const user = await storage.getUser(payment.userId);
         if (!user) {
@@ -1192,7 +1174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Handle rejected payments
-      if (webhookData.event === 'compra_recusada' && webhookData.status === 'rejected') {
+      if (mappedStatus === 'rejected') {
         await storage.createNotification({
           userId: payment.userId,
           type: 'payment_rejected',
@@ -1203,7 +1185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Handle refunds
-      if (webhookData.event === 'reembolso' && webhookData.status === 'TRANSACTION_REFUNDED') {
+      if (mappedStatus === 'refunded') {
         await storage.createNotification({
           userId: payment.userId,
           type: 'payment_refunded',
@@ -1216,7 +1198,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
       
     } catch (error) {
-      console.error("OrinPay webhook error:", error);
+      console.error("LiraPay webhook error:", error);
       res.status(500).json({ error: "Erro ao processar webhook" });
     }
   });
