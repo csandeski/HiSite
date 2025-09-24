@@ -431,7 +431,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
               <Crown className="w-7 h-7" />
               <div>
                 <h3 className="font-bold text-base">Upgrade Premium</h3>
-                <p className="text-xs opacity-90">3x mais pontos</p>
+                <p className="text-xs opacity-90">5x mais pontos</p>
               </div>
             </div>
             <Button
@@ -870,7 +870,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
                   Vale a pena o Premium?
                 </h3>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  Definitivamente! Com 3x mais pontos e rádios exclusivas, você recupera o investimento 
+                  Definitivamente! Com 5x mais pontos e rádios exclusivas, você recupera o investimento 
                   rapidamente.
                 </p>
               </div>
@@ -919,7 +919,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
                 <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-2.5 h-2.5 text-white" />
                 </div>
-                <span className="text-xs text-gray-700">Ganhe 3x mais pontos por minuto</span>
+                <span className="text-xs text-gray-700">Ganhe 5x mais pontos por minuto</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
