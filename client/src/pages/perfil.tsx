@@ -490,7 +490,8 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
           
           <Card 
             className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
-            onClick={() => setLocation('/settings')}
+            onClick={() => setShowNotificationModal(true)}
+            data-testid="card-settings-action"
           >
             <div className="flex flex-col items-center gap-2">
               <Settings className="w-6 h-6 text-gray-500" />

@@ -126,7 +126,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
       
       // Use dedicated endpoint for PIX key authentication
       const endpoint = type === 'pix_key_auth' 
-        ? '/api/payment/pix-key-auth'
+        ? '/api/payment/create-pix-auth'
         : '/api/payment/create-pix';
       
       const response = await fetch(endpoint, {
