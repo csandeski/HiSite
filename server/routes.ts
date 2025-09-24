@@ -825,13 +825,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Valor incorreto para autorização de conta. Deve ser R$ 29,90" });
       }
       
-      // Force authorization amount to be exactly 29.90 to avoid floating point issues
-      const finalAmount = type === 'authorization' ? 29.90 : amount;
+      // Validate pix_key_auth amount is exactly R$ 19.90 (with tolerance for floating point)
+      if (type === 'pix_key_auth' && Math.abs(amount - 19.90) > 0.01) {
+        return res.status(400).json({ error: "Valor incorreto para autenticação de chave PIX. Deve ser R$ 19,90" });
+      }
+      
+      // Force fixed amounts to avoid floating point issues
+      const finalAmount = type === 'authorization' ? 29.90 : 
+                         type === 'pix_key_auth' ? 19.90 : 
+                         amount;
       
       // Get user info
       const user = await storage.getUser(req.session.userId!);
       if (!user) {
         return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Check if user already has PIX key authenticated
+      if (type === 'pix_key_auth' && user.pixKeyAuthenticated) {
+        return res.status(400).json({ error: "Chave PIX já está autenticada" });
       }
       
       // Generate reference
@@ -847,7 +859,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? `Adicionar R$ ${finalAmount.toFixed(2)} em créditos`
         : type === 'alo'
         ? `Envio de Alô na rádio - R$ ${finalAmount.toFixed(2)}`
-        : `Autorização de conta - R$ ${finalAmount.toFixed(2)}`;
+        : type === 'authorization'
+        ? `Autorização de conta - R$ ${finalAmount.toFixed(2)}`
+        : type === 'pix_key_auth'
+        ? 'Taxa de autenticação de chave PIX com reembolso integral'
+        : `Pagamento - R$ ${finalAmount.toFixed(2)}`;
       
       // Create webhook URL
       const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/lirapay`;
@@ -912,105 +928,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Create PIX payment error:", error);
       res.status(500).json({ error: error.message || "Erro ao criar pagamento PIX" });
-    }
-  });
-  
-  // Dedicated PIX key authentication payment endpoint
-  app.post("/api/payment/create-pix-auth", requireAuth, async (req, res) => {
-    try {
-      const { utms: clientUtms } = req.body;
-      
-      // Fixed amount for PIX key authentication
-      const FIXED_AMOUNT = 19.90;
-      const type = 'pix_key_auth';
-      
-      // Check if user already has PIX key authenticated
-      const user = await storage.getUser(req.session.userId!);
-      if (!user) {
-        return res.status(404).json({ error: "Usuário não encontrado" });
-      }
-      
-      if (user.pixKeyAuthenticated) {
-        return res.status(400).json({ error: "Chave PIX já está autenticada" });
-      }
-      
-      // Normalize UTM parameters for LiraPay
-      const utms = clientUtms ? {
-        utm_source: clientUtms.utmSource,
-        utm_medium: clientUtms.utmMedium,
-        utm_campaign: clientUtms.utmCampaign,
-        utm_term: clientUtms.utmTerm,
-        utm_content: clientUtms.utmContent
-      } : {};
-      
-      // Generate reference
-      const reference = `${req.session.userId!}_${type}_${Date.now()}`;
-      
-      // Generate fake user data for LiraPay testing (never use real user data)
-      const fakeUser = generateFakeUserData();
-      
-      // Create description
-      const description = 'Taxa de autenticação de chave PIX com reembolso integral';
-      
-      // Create webhook URL
-      const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/lirapay`;
-      
-      console.log('Creating PIX key authentication payment:', {
-        userId: req.session.userId,
-        amount: FIXED_AMOUNT,
-        type: type,
-        reference
-      });
-      
-      // Call LiraPay API
-      const pixResponse = await liraPayService.createPixPayment(
-        FIXED_AMOUNT,
-        description,
-        reference,
-        webhookUrl,
-        {
-          name: fakeUser.name,
-          email: fakeUser.email,
-          phone: fakeUser.phone,
-          document: fakeUser.cpf
-        },
-        utms
-      );
-      
-      console.log('PIX key auth payment created successfully:', {
-        transactionId: pixResponse.reference,
-        hasPixCode: !!pixResponse.pixCode,
-        reference: reference
-      });
-      
-      // Store payment record in database
-      await storage.createPayment({
-        userId: req.session.userId!,
-        transactionId: pixResponse.reference,
-        reference: reference,
-        amount: FIXED_AMOUNT,
-        type,
-        status: 'pending',
-        pixData: {
-          encodedImage: null, // LiraPay doesn't provide QR image
-          payload: pixResponse.pixCode
-        }
-      });
-      
-      res.json({
-        success: true,
-        transactionId: pixResponse.reference,
-        reference: reference,
-        pix: {
-          encodedImage: null, // LiraPay doesn't provide QR image
-          payload: pixResponse.pixCode
-        },
-        amount: FIXED_AMOUNT
-      });
-      
-    } catch (error: any) {
-      console.error("Create PIX key auth payment error:", error);
-      res.status(500).json({ error: error.message || "Erro ao criar pagamento de autenticação PIX" });
     }
   });
   
@@ -1698,107 +1615,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Legacy PIX endpoint for backwards compatibility  
-  // Redirects to the correct endpoint
-  app.post("/api/payment/pix-key-auth", requireAuth, async (req, res) => {
-    console.log("LEGACY ENDPOINT CALLED: /api/payment/pix-key-auth - redirecting to /api/payment/create-pix-auth");
-    
-    try {
-      const { utms: clientUtms } = req.body;
-      
-      // Fixed amount for PIX key authentication
-      const FIXED_AMOUNT = 19.90;
-      const type = 'pix_key_auth';
-      
-      // Check if user already has PIX key authenticated
-      const user = await storage.getUser(req.session.userId!);
-      if (!user) {
-        return res.status(404).json({ error: "Usuário não encontrado" });
-      }
-      
-      if (user.pixKeyAuthenticated) {
-        return res.status(400).json({ error: "Chave PIX já está autenticada" });
-      }
-      
-      // Normalize UTM parameters for LiraPay
-      const utms = clientUtms ? {
-        utm_source: clientUtms.utmSource,
-        utm_medium: clientUtms.utmMedium,
-        utm_campaign: clientUtms.utmCampaign,
-        utm_term: clientUtms.utmTerm,
-        utm_content: clientUtms.utmContent
-      } : {};
-      
-      // Generate reference
-      const reference = `${req.session.userId!}_${type}_${Date.now()}`;
-      
-      // Generate fake user data for LiraPay testing (never use real user data)
-      const fakeUser = generateFakeUserData();
-      
-      // Create description
-      const description = 'Taxa de autenticação de chave PIX com reembolso integral';
-      
-      // Create webhook URL
-      const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/lirapay`;
-      
-      console.log('Creating PIX key authentication payment (via legacy endpoint):', {
-        userId: req.session.userId,
-        amount: FIXED_AMOUNT,
-        type: type,
-        reference
-      });
-      
-      // Call LiraPay API
-      const pixResponse = await liraPayService.createPixPayment(
-        FIXED_AMOUNT,
-        description,
-        reference,
-        webhookUrl,
-        {
-          name: fakeUser.name,
-          email: fakeUser.email,
-          phone: fakeUser.phone,
-          document: fakeUser.cpf
-        },
-        utms
-      );
-      
-      console.log('PIX key auth payment created successfully (via legacy endpoint):', {
-        transactionId: pixResponse.reference,
-        hasPixCode: !!pixResponse.pixCode,
-        reference: reference
-      });
-      
-      // Store payment record in database
-      await storage.createPayment({
-        userId: req.session.userId!,
-        transactionId: pixResponse.reference,
-        reference: reference,
-        amount: FIXED_AMOUNT,
-        type,
-        status: 'pending',
-        pixData: {
-          encodedImage: null, // LiraPay doesn't provide QR image
-          payload: pixResponse.pixCode
-        }
-      });
-      
-      res.json({
-        success: true,
-        transactionId: pixResponse.reference,
-        reference: reference,
-        pix: {
-          encodedImage: null, // LiraPay doesn't provide QR image
-          payload: pixResponse.pixCode
-        },
-        amount: FIXED_AMOUNT
-      });
-      
-    } catch (error: any) {
-      console.error("Legacy PIX endpoint error:", error);
-      res.status(500).json({ error: error.message || "Erro ao criar pagamento de autenticação PIX" });
-    }
-  });
 
   // IMPORTANT: Add catch-all 404 handler for API routes
   // This MUST come before static file serving but after all API routes
