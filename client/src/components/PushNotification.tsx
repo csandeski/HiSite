@@ -77,6 +77,7 @@ export default function PushNotification({ sessionPoints = 0 }: PushNotification
   };
 
   const handleClose = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setIsVisible(false);
   };
@@ -109,10 +110,11 @@ export default function PushNotification({ sessionPoints = 0 }: PushNotification
                 variant="ghost"
                 size="icon"
                 onClick={handleClose}
-                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full hover:bg-gray-100 p-0 z-10"
+                className="absolute top-1 right-1 w-8 h-8 rounded-full hover:bg-gray-100 p-0 z-50"
                 data-testid="close-notification"
+                aria-label="Fechar notificação"
               >
-                <X className="w-3.5 h-3.5 text-gray-500" />
+                <X className="w-4 h-4 text-gray-600" />
               </Button>
               
               <div className="flex items-start gap-3 p-3">
