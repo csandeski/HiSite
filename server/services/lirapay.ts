@@ -168,21 +168,7 @@ export class LiraPayService {
       };
     } catch (error) {
       console.error('LiraPay createPixPayment error:', error);
-      
-      // Fallback for development/testing when LiraPay API is not working
-      if (error instanceof Error && error.message.includes('403')) {
-        console.log('LiraPay API key error - using development fallback');
-        
-        // Generate a mock PIX code for development
-        const mockPixCode = `00020126330014BR.GOV.BCB.PIX0111${reference}5204000053039865802BR5925EBOOK RECEITAS FITNESS PLANO6009SAO PAULO62070503***63041234`;
-        
-        return {
-          pixCode: mockPixCode,
-          qrCode: undefined,
-          reference: reference,
-        };
-      }
-      
+      // NEVER use fallback or mock PIX - only real LiraPay integration
       throw error;
     }
   }
