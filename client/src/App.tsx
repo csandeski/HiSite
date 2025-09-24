@@ -13,6 +13,7 @@ import Perfil from "@/pages/perfil";
 import { AdminPage } from "@/pages/admin";
 import { AdminLoginPage } from "@/pages/admin-login";
 import NotFound from "@/pages/not-found";
+import PixTestPage from "@/pages/pix-test";
 import { useState, useEffect, createContext, useContext, useRef, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
@@ -677,6 +678,9 @@ function App({ user }: { user: any }) {
               </Route>
               <Route path="/admin">
                 <AdminPage />
+              </Route>
+              <Route path="/pix-test">
+                <PixTestPage />
               </Route>
               <Route component={NotFound} />
             </Switch>
