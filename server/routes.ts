@@ -800,14 +800,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Estação de rádio não encontrada" });
       }
       
-      // CORREÇÃO: Calcular pontos corretamente baseado em pointsPerMinute
-      // pointsPerMinute = pontos ganhos em 60 segundos
-      // Pontos por segundo = pointsPerMinute / 60
-      const premiumMultiplier = user.isPremium ? 3 : 1;
-      const pointsPerSecond = (station.pointsPerMinute / 60) * premiumMultiplier;
+      // Calculate points based on duration and premium status
+      // Points are always awarded as integers (1 point at a time)
+      let pointsEarned = 0;
       
-      // Calculate total points earned based on duration
-      const pointsEarned = Math.floor(duration * pointsPerSecond);
+      // Always calculate points earned (remove 30 second minimum)
+      const premiumMultiplier = user.isPremium ? 3 : 1;
+      
+      // Calculate interval in seconds for earning 1 point
+      // Use Math.floor for consistency with frontend
+      const baseIntervalSeconds = Math.max(1, Math.floor(60 / station.pointsPerMinute));
+      const intervalWithPremium = Math.max(1, Math.floor(baseIntervalSeconds / premiumMultiplier));
+      
+      // Calculate how many points earned based on duration
+      pointsEarned = Math.floor(duration / intervalWithPremium);
       
       // End session
       await storage.endListeningSession(sessionId, duration, pointsEarned);
@@ -929,89 +935,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Estação de rádio não encontrada" });
       }
       
-      // CORREÇÃO: Calcular pontos corretamente baseado em pointsPerMinute
-      // pointsPerMinute = pontos ganhos em 60 segundos
-      // Pontos por segundo = pointsPerMinute / 60
+      // Calculate points based on duration and premium status
       const premiumMultiplier = user.isPremium ? 3 : 1;
-      const pointsPerSecond = (station.pointsPerMinute / 60) * premiumMultiplier;
+      const baseIntervalSeconds = Math.max(1, Math.floor(60 / station.pointsPerMinute));
+      const intervalWithPremium = Math.max(1, Math.floor(baseIntervalSeconds / premiumMultiplier));
       
-      // Calculate total points earned based on duration
-      const serverCalculatedPoints = Math.floor(duration * pointsPerSecond);
+      // Calculate how many points should have been earned based on duration
+      const serverCalculatedPoints = Math.floor(duration / intervalWithPremium);
       
       // Calculate new points to add (difference between server calculated and already awarded)
       const previouslyAwardedPoints = session.pointsEarned || 0;
       const newPointsToAdd = serverCalculatedPoints - previouslyAwardedPoints;
       
-      console.log('[UPDATE SESSION] Critical Debug:', {
+      console.log('[UPDATE SESSION] Updating points:', {
         sessionId,
-        userId: req.session.userId,
         duration,
-        stationPointsPerMinute: station.pointsPerMinute,
-        isPremium: user.isPremium,
-        premiumMultiplier,
-        pointsPerSecond,
         serverCalculatedPoints,
         previouslyAwardedPoints,
         newPointsToAdd,
-        userPointsBefore: user.points,
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV
+        isPremium: user.isPremium,
+        premiumMultiplier
       });
       
-      // ALWAYS save to database when there are new points
+      // Only update if there are new points to add
       if (newPointsToAdd > 0) {
-        // Update session with new total points earned
+        // Update session with new points earned (total)
         await storage.updateListeningSessionPoints(sessionId, serverCalculatedPoints);
         
-        // CRITICAL: Increment user points in database
+        // Update user points with only the new points
         const updatedUser = await storage.incrementUserPoints(req.session.userId!, newPointsToAdd);
         
-        console.log('[UPDATE SESSION] Points saved to database:', {
+        console.log('[UPDATE SESSION] Points updated:', {
           userId: req.session.userId,
           pointsAdded: newPointsToAdd,
-          userPointsAfter: updatedUser?.points || 0,
-          savedSuccessfully: true,
-          timestamp: new Date().toISOString()
+          totalPoints: updatedUser?.points || 0
         });
         
         res.json({
           success: true,
           pointsEarned: newPointsToAdd,
-          updatedPoints: updatedUser?.points || 0,
-          debug: {
-            duration,
-            serverCalculatedPoints,
-            previouslyAwardedPoints,
-            newPointsToAdd
-          }
-        });
-      } else if (newPointsToAdd < 0) {
-        // This should never happen - log error if it does
-        console.error('[UPDATE SESSION] CRITICAL ERROR - Negative points:', {
-          sessionId,
-          userId: req.session.userId,
-          serverCalculatedPoints,
-          previouslyAwardedPoints,
-          newPointsToAdd,
-          duration
-        });
-        
-        res.json({
-          success: true,
-          pointsEarned: 0,
-          updatedPoints: user.points,
-          warning: "Prevented negative points update"
+          updatedPoints: updatedUser?.points || 0
         });
       } else {
-        // No new points to add yet (duration too short)
-        console.log('[UPDATE SESSION] No new points yet:', {
-          userId: req.session.userId,
-          duration,
-          serverCalculatedPoints,
-          previouslyAwardedPoints,
-          waitingForMore: true
-        });
-        
+        // No new points to add, just return current state
         res.json({
           success: true,
           pointsEarned: 0,
@@ -1019,7 +985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
     } catch (error) {
-      console.error("[UPDATE SESSION] Critical error:", error);
+      console.error("Update listening session error:", error);
       res.status(500).json({ error: "Erro ao atualizar sessão" });
     }
   });
