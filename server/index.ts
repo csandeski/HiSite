@@ -4,18 +4,8 @@ import connectPgSimple from "connect-pg-simple";
 import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { initializeFirebaseAdmin } from "./config/firebase-admin";
 
 const app = express();
-
-// Initialize Firebase Admin SDK for push notifications
-try {
-  initializeFirebaseAdmin();
-  console.log('Firebase Admin SDK initialized');
-} catch (error) {
-  console.warn('Firebase Admin SDK initialization failed:', error);
-  console.warn('Push notifications will not work without proper Firebase configuration');
-}
 
 // Trust proxy - REQUIRED for Railway and other HTTPS proxies
 // This ensures Express knows it's behind a proxy and handles secure cookies correctly

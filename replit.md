@@ -2,14 +2,6 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
-## Recent Updates (25/09/2025)
-- **Documentação Completa do Sistema de Notificações Push**:
-  - ✅ Criado FIREBASE_PUSH_SETUP.md com guia completo em português
-  - ✅ Script de testes testNotifications.ts para validação do sistema
-  - ✅ Arquivo .env.example completo com todas as variáveis necessárias
-  - ✅ Documentação detalhada para iOS 16.4+, Android e Desktop
-  - ✅ Exemplos práticos e troubleshooting completo
-
 ## Recent Updates (23/09/2025)
 - **Correção Completa do Sistema de Autorização PIX**:
   - ✅ Valor de autorização corrigido para R$ 29,90 (conforme solicitado)
@@ -119,37 +111,3 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Google Fonts integration for typography (Architects Daughter, DM Sans, Fira Code, Geist Mono)
 - **Build Tools**: Vite for frontend bundling, esbuild for server-side compilation
 - **Type Checking**: TypeScript with strict configuration for both client and server
-- **Push Notifications**: Firebase Cloud Messaging (FCM) for cross-platform push notifications
-- **PWA Support**: Service Worker with vite-plugin-pwa for offline capabilities
-
-## PWA and Push Notifications System
-
-### Progressive Web App (PWA) Features
-- **Service Worker**: Comprehensive offline support with intelligent caching strategies
-- **Manifest Configuration**: Full PWA manifest with 12 icon sizes (16px to 512px)
-- **Installation Support**: Native install prompts for Android, iOS, and Desktop
-- **Platform Detection**: Automatic detection and customized install flows per platform
-- **Offline Fallback**: Custom offline page with graceful degradation
-
-### Push Notifications Architecture
-- **Firebase Cloud Messaging (FCM)**: Cross-platform push notification delivery
-- **Multi-Platform Support**:
-  - iOS 16.4+ (Safari PWA only)
-  - Android (Chrome 42+)
-  - Desktop (Chrome, Firefox, Edge)
-- **Service Worker Integration**: Background notification handling
-- **Token Management**: Automatic FCM token registration and refresh
-- **User Preferences**: Granular notification settings per user
-
-### iOS 16.4+ Specific Requirements
-- **PWA Installation Required**: Notifications only work when installed via "Add to Home Screen"
-- **HTTPS Mandatory**: Secure context required for service worker registration
-- **Explicit Permission**: User must grant notification permission within the PWA
-- **Limited Actions**: Notification actions have restricted support on iOS
-- **No Browser Support**: Notifications don't work in Safari browser, only in installed PWA
-
-### Documentation and Testing
-- **Complete Setup Guide**: FIREBASE_PUSH_SETUP.md with step-by-step Firebase configuration
-- **Test Utilities**: client/src/utils/testNotifications.ts for comprehensive testing
-- **Environment Variables**: Full .env.example with Firebase credentials documentation
-- **Troubleshooting Guide**: Common issues and solutions documented
