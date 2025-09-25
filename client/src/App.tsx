@@ -521,13 +521,11 @@ function App({ user }: { user: any }) {
           sessionInfoRef.current.sessionPoints = result.updatedPoints;
         }
         
-        // Refresh all user data to ensure consistency
-        await refreshPoints();
+        // Don't refresh points here - we already have the updated value
         
       } catch (error) {
         console.error('[SYNC] Failed to end listening session:', error);
-        // Even if the end session fails, try to refresh points to sync with backend
-        await refreshPoints();
+        // Keep using current points even if end session fails
       }
     }
   }, [refreshPoints]);

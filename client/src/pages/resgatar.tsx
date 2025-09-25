@@ -72,13 +72,8 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
 
-  // Refresh points when component mounts
-  useEffect(() => {
-    if (refreshPoints && !isRefreshingPoints) {
-      console.log('[RESGATAR] Refreshing points on mount...');
-      refreshPoints();
-    }
-  }, []); // Only run once on mount
+  // Don't refresh points on mount - keep the current state
+  // Points are already being tracked and saved in real-time
 
   // Save checkbox state to localStorage whenever it changes
   const handleShowOnlyAvailableChange = (checked: boolean) => {
@@ -152,11 +147,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   };
 
   const handleExchange = async (points: number, value: number) => {
-    // Refresh points before conversion to ensure we have latest data
-    if (refreshPoints && !isRefreshingPoints) {
-      console.log('[RESGATAR] Refreshing points before exchange...');
-      await refreshPoints();
-    }
+    // Use current points from state - they're already up-to-date
     
     // DEBUG: Log conversion attempt
     console.log('[RESGATAR] Initiating exchange:', {
@@ -173,11 +164,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
   const confirmExchange = async () => {
     if (selectedExchange) {
-      // Refresh points one more time before final confirmation
-      if (refreshPoints && !isRefreshingPoints) {
-        console.log('[RESGATAR] Final refresh before confirmation...');
-        await refreshPoints();
-      }
+      // Use current points from state for conversion
       
       // DEBUG: Log confirmation attempt
       console.log('[RESGATAR] Confirming exchange:', {
