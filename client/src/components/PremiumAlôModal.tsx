@@ -67,7 +67,7 @@ export default function PremiumAloModal({ open, onOpenChange }: PremiumAloModalP
           <ul className="text-left space-y-2 max-w-xs mx-auto">
             <li className="flex items-start gap-2">
               <span className="text-green-500 mt-0.5">✓</span>
-              <span className="text-sm text-gray-700">Ganhe <strong>5x mais pontos</strong> por minuto</span>
+              <span className="text-sm text-gray-700">Ganhe <strong>3x mais pontos</strong> por minuto</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-500 mt-0.5">✓</span>

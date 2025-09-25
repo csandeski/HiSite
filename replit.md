@@ -74,6 +74,7 @@ RádioPlay - A Portuguese-language platform about earning money by listening to 
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+Premium multiplier: 3x points (not 5x)
 
 # System Architecture
 
