@@ -604,14 +604,18 @@ function App({ user }: { user: any }) {
       const pointsPerMin = playingRadio?.pointsPerMin || 50;
       const isPremiumRadio = playingRadio?.isPremium || false;
       
-      // Start listening session in backend (if logged in)
-      api.startListening(playingRadioId.toString()).then((response) => {
-        sessionInfoRef.current.sessionId = response.session.id;
-        console.log('[SYNC] Session started:', response.session.id);
-      }).catch((error) => {
-        console.error('[SYNC] Failed to start listening session:', error);
-        // Continue tracking locally even if backend fails
-      });
+      // Start listening session in backend only if we don't have one
+      if (!sessionInfoRef.current.sessionId) {
+        api.startListening(playingRadioId.toString()).then((response) => {
+          sessionInfoRef.current.sessionId = response.session.id;
+          console.log('[SYNC] Session started:', response.session.id);
+        }).catch((error) => {
+          console.error('[SYNC] Failed to start listening session:', error);
+          // Continue tracking locally even if backend fails
+        });
+      } else {
+        console.log('[SYNC] Using existing session:', sessionInfoRef.current.sessionId);
+      }
       
       // Calculate points interval based on pointsPerMin
       // Always increment by 1 point at a time
