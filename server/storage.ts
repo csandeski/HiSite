@@ -159,23 +159,134 @@ export class SupabaseStorage implements IStorage {
   }
 
   async updateUser(id: string, data: Partial<User>): Promise<User | undefined> {
-    const result = await db.update(schema.users)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(schema.users.id, id))
-      .returning();
-    return result[0];
+    try {
+      // Log if points are being updated
+      if ('points' in data) {
+        const userBefore = await this.getUser(id);
+        console.log('[STORAGE] Updating user points directly:', {
+          userId: id,
+          pointsBefore: userBefore?.points,
+          pointsAfter: data.points,
+          change: data.points !== undefined && userBefore ? data.points - userBefore.points : undefined,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      const result = await db.update(schema.users)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(schema.users.id, id))
+        .returning();
+        
+      const updatedUser = result[0];
+      
+      // Log the result if points were updated
+      if ('points' in data && updatedUser) {
+        console.log('[STORAGE] User points updated:', {
+          userId: id,
+          newPoints: updatedUser.points,
+          requestedPoints: data.points,
+          match: updatedUser.points === data.points
+        });
+      }
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('[STORAGE] Error updating user:', {
+        userId: id,
+        data,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
+    }
   }
 
   async incrementUserPoints(userId: string, points: number): Promise<User | undefined> {
-    // Atomic increment of user points
-    const result = await db.update(schema.users)
-      .set({ 
-        points: sql`${schema.users.points} + ${points}`,
-        updatedAt: new Date() 
-      })
-      .where(eq(schema.users.id, userId))
-      .returning();
-    return result[0];
+    try {
+      // Log the operation for production debugging
+      console.log('[STORAGE] Incrementing points:', {
+        userId,
+        pointsToAdd: points,
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV
+      });
+      
+      // Get current user state before update
+      const userBefore = await this.getUser(userId);
+      if (!userBefore) {
+        console.error('[STORAGE] User not found for point increment:', userId);
+        throw new Error(`User ${userId} not found`);
+      }
+      
+      console.log('[STORAGE] User points before increment:', {
+        userId,
+        pointsBefore: userBefore.points,
+        pointsToAdd: points,
+        expectedAfter: userBefore.points + points
+      });
+      
+      // Atomic increment of user points with retry logic
+      let result: User[] | undefined;
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (attempts < maxAttempts) {
+        attempts++;
+        try {
+          result = await db.update(schema.users)
+            .set({ 
+              points: sql`${schema.users.points} + ${points}`,
+              updatedAt: new Date() 
+            })
+            .where(eq(schema.users.id, userId))
+            .returning();
+            
+          if (result && result.length > 0) {
+            break;
+          }
+        } catch (dbError) {
+          console.error(`[STORAGE] Point increment attempt ${attempts} failed:`, dbError);
+          if (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100 * attempts));
+          } else {
+            throw dbError;
+          }
+        }
+      }
+      
+      const updatedUser = result?.[0];
+      
+      if (updatedUser) {
+        console.log('[STORAGE] Points incremented successfully:', {
+          userId,
+          pointsBefore: userBefore.points,
+          pointsAdded: points,
+          pointsAfter: updatedUser.points,
+          actualIncrement: updatedUser.points - userBefore.points,
+          attempts
+        });
+        
+        // Verify the increment was correct
+        if (updatedUser.points !== userBefore.points + points) {
+          console.error('[STORAGE] Point increment mismatch!', {
+            expected: userBefore.points + points,
+            actual: updatedUser.points,
+            difference: updatedUser.points - (userBefore.points + points)
+          });
+        }
+      } else {
+        console.error('[STORAGE] No user returned after point increment');
+      }
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('[STORAGE] Critical error incrementing points:', {
+        userId,
+        points,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      throw error;
+    }
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -410,7 +521,7 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
-  // Transaction methods
+  // Transaction methods with enhanced logging
   async createTransaction(data: {
     userId: string;
     type: 'earning' | 'withdrawal' | 'bonus' | 'referral';
@@ -418,29 +529,94 @@ export class SupabaseStorage implements IStorage {
     points?: number;
     description?: string;
   }): Promise<Transaction> {
-    const result = await db.insert(schema.transactions).values([{
-      ...data,
-      amount: data.amount.toString()
-    }]).returning();
-    
-    // Update user balance
-    if (data.type === 'earning' || data.type === 'bonus' || data.type === 'referral') {
-      await db.update(schema.users)
-        .set({
-          balance: sql`${schema.users.balance} + ${data.amount}`,
-          totalEarnings: sql`${schema.users.totalEarnings} + ${data.amount}`
-        })
-        .where(eq(schema.users.id, data.userId));
-    } else if (data.type === 'withdrawal') {
-      await db.update(schema.users)
-        .set({
-          balance: sql`${schema.users.balance} - ${data.amount}`,
-          totalWithdrawn: sql`${schema.users.totalWithdrawn} + ${data.amount}`
-        })
-        .where(eq(schema.users.id, data.userId));
+    try {
+      console.log('[STORAGE] Creating transaction:', {
+        userId: data.userId,
+        type: data.type,
+        amount: data.amount,
+        points: data.points,
+        description: data.description,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Get user balance before transaction
+      const userBefore = await this.getUser(data.userId);
+      if (!userBefore) {
+        throw new Error(`User ${data.userId} not found for transaction`);
+      }
+      
+      console.log('[STORAGE] User state before transaction:', {
+        userId: data.userId,
+        balanceBefore: userBefore.balance,
+        pointsBefore: userBefore.points
+      });
+      
+      const result = await db.insert(schema.transactions).values([{
+        ...data,
+        amount: data.amount.toString()
+      }]).returning();
+      
+      // Update user balance with retry logic
+      let balanceUpdated = false;
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (!balanceUpdated && attempts < maxAttempts) {
+        attempts++;
+        try {
+          if (data.type === 'earning' || data.type === 'bonus' || data.type === 'referral') {
+            await db.update(schema.users)
+              .set({
+                balance: sql`${schema.users.balance} + ${data.amount}`,
+                totalEarnings: sql`${schema.users.totalEarnings} + ${data.amount}`
+              })
+              .where(eq(schema.users.id, data.userId));
+          } else if (data.type === 'withdrawal') {
+            await db.update(schema.users)
+              .set({
+                balance: sql`${schema.users.balance} - ${data.amount}`,
+                totalWithdrawn: sql`${schema.users.totalWithdrawn} + ${data.amount}`
+              })
+              .where(eq(schema.users.id, data.userId));
+          }
+          balanceUpdated = true;
+        } catch (balanceError) {
+          console.error(`[STORAGE] Balance update attempt ${attempts} failed:`, balanceError);
+          if (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100 * attempts));
+          } else {
+            throw balanceError;
+          }
+        }
+      }
+      
+      // Verify the update
+      const userAfter = await this.getUser(data.userId);
+      const expectedBalance = data.type === 'earning' || data.type === 'bonus' || data.type === 'referral'
+        ? parseFloat(userBefore.balance || '0') + data.amount
+        : parseFloat(userBefore.balance || '0') - data.amount;
+      
+      console.log('[STORAGE] Transaction completed:', {
+        transactionId: result[0].id,
+        userId: data.userId,
+        type: data.type,
+        amount: data.amount,
+        balanceBefore: userBefore.balance,
+        balanceAfter: userAfter?.balance,
+        expectedBalance: expectedBalance.toFixed(2),
+        balanceMatch: userAfter && Math.abs(parseFloat(userAfter.balance || '0') - expectedBalance) < 0.01,
+        attempts
+      });
+      
+      return result[0];
+    } catch (error) {
+      console.error('[STORAGE] Critical error creating transaction:', {
+        data,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      throw error;
     }
-    
-    return result[0];
   }
 
   async getUserTransactions(userId: string, limit?: number): Promise<Transaction[]> {

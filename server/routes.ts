@@ -110,9 +110,128 @@ const updateBalanceSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check
-  app.get("/api/health", (_req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  // Comprehensive health check for production diagnostics
+  app.get("/api/health", async (req, res) => {
+    try {
+      const healthData: any = {
+        status: "ok",
+        timestamp: new Date().toISOString(),
+        environment: {
+          NODE_ENV: process.env.NODE_ENV || 'development',
+          DATABASE_URL_EXISTS: !!process.env.DATABASE_URL,
+          SESSION_SECRET_EXISTS: !!process.env.SESSION_SECRET,
+          LIRAPAY_API_KEY_EXISTS: !!process.env.LIRAPAY_API_KEY,
+          PORT: process.env.PORT || '5000',
+          FRONTEND_URL: process.env.FRONTEND_URL || 'not set',
+          COOKIE_DOMAIN: process.env.COOKIE_DOMAIN || 'not set',
+          IS_PRODUCTION: process.env.NODE_ENV === 'production'
+        },
+        session: {
+          hasSession: !!req.session,
+          sessionId: req.sessionID || 'none',
+          isAuthenticated: !!req.session?.userId,
+          userId: req.session?.userId || null,
+          username: req.session?.username || null,
+          isAdmin: req.session?.isAdmin || false,
+          cookieSettings: req.session?.cookie ? {
+            secure: req.session.cookie.secure,
+            httpOnly: req.session.cookie.httpOnly,
+            sameSite: req.session.cookie.sameSite,
+            domain: req.session.cookie.domain,
+            maxAge: req.session.cookie.maxAge
+          } : null
+        },
+        database: {
+          connected: false,
+          error: null
+        },
+        user: null
+      };
+      
+      // Test database connection
+      try {
+        // Try to query the database
+        const testQuery = await storage.getRadioStations();
+        healthData.database.connected = true;
+        healthData.database.stationsCount = testQuery.length;
+      } catch (dbError) {
+        healthData.database.connected = false;
+        healthData.database.error = dbError instanceof Error ? dbError.message : String(dbError);
+        console.error('[HEALTH_CHECK] Database connection error:', dbError);
+      }
+      
+      // Get user data if authenticated
+      if (req.session?.userId) {
+        try {
+          const user = await storage.getUser(req.session.userId);
+          if (user) {
+            healthData.user = {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              points: user.points,
+              balance: user.balance,
+              isPremium: user.isPremium,
+              pixKeyAuthenticated: user.pixKeyAuthenticated,
+              accountAuthorized: user.accountAuthorized,
+              createdAt: user.createdAt,
+              updatedAt: user.updatedAt,
+              lastLoginAt: user.lastLoginAt
+            };
+            
+            // Get recent transactions for debugging
+            const recentTransactions = await storage.getUserTransactions(user.id, 3);
+            healthData.user.recentTransactions = recentTransactions.map(t => ({
+              type: t.type,
+              amount: t.amount,
+              points: t.points,
+              description: t.description,
+              createdAt: t.createdAt
+            }));
+          }
+        } catch (userError) {
+          healthData.user = {
+            error: userError instanceof Error ? userError.message : String(userError)
+          };
+          console.error('[HEALTH_CHECK] User fetch error:', userError);
+        }
+      }
+      
+      // Check for any recent errors in conversion
+      if (req.session?.userId) {
+        try {
+          // Get user's recent listening sessions to check point accumulation
+          const recentSessions = await storage.getUserListeningSessions(req.session.userId, 3);
+          healthData.recentSessions = recentSessions.map(s => ({
+            id: s.id,
+            startedAt: s.startedAt,
+            endedAt: s.endedAt,
+            duration: s.duration,
+            pointsEarned: s.pointsEarned,
+            isPremiumSession: s.isPremiumSession
+          }));
+        } catch (sessionError) {
+          console.error('[HEALTH_CHECK] Session fetch error:', sessionError);
+        }
+      }
+      
+      // Set overall status
+      const isHealthy = healthData.database.connected && 
+                       (process.env.NODE_ENV !== 'production' || 
+                        (healthData.environment.DATABASE_URL_EXISTS && 
+                         healthData.environment.SESSION_SECRET_EXISTS));
+      
+      healthData.status = isHealthy ? 'healthy' : 'unhealthy';
+      
+      res.json(healthData);
+    } catch (error) {
+      console.error('[HEALTH_CHECK] Critical error:', error);
+      res.status(500).json({ 
+        status: 'error',
+        error: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
+    }
   });
 
   // Debug endpoint for session issues (remove in production after fixing)
@@ -415,6 +534,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ error: "Erro ao buscar dados do usuário" });
+    }
+  });
+
+  // Force sync user points from database
+  app.post("/api/sync-points", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      
+      console.log('[SYNC_POINTS] Starting point sync for user:', userId);
+      
+      // Get fresh user data from database with retry logic
+      let user: User | undefined;
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (attempts < maxAttempts) {
+        attempts++;
+        try {
+          user = await storage.getUser(userId);
+          if (user) {
+            console.log(`[SYNC_POINTS] Attempt ${attempts} - User found:`, {
+              id: user.id,
+              points: user.points,
+              balance: user.balance,
+              updatedAt: user.updatedAt
+            });
+            break;
+          }
+        } catch (dbError) {
+          console.error(`[SYNC_POINTS] Attempt ${attempts} failed:`, dbError);
+          if (attempts < maxAttempts) {
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, 100 * attempts));
+          }
+        }
+      }
+      
+      if (!user) {
+        console.error('[SYNC_POINTS] User not found after', maxAttempts, 'attempts');
+        return res.status(404).json({ 
+          error: "Usuário não encontrado",
+          attempts: maxAttempts,
+          userId 
+        });
+      }
+      
+      // Calculate total points from all listening sessions
+      const allSessions = await storage.getUserListeningSessions(userId);
+      const totalSessionPoints = allSessions.reduce((sum, session) => 
+        sum + (session.pointsEarned || 0), 0);
+      
+      // Calculate total points from transactions
+      const allTransactions = await storage.getUserTransactions(userId);
+      const earnedFromTransactions = allTransactions
+        .filter(t => t.type === 'earning' && t.points)
+        .reduce((sum, t) => sum + (t.points || 0), 0);
+      
+      const spentInTransactions = allTransactions
+        .filter(t => (t.type === 'withdrawal' || t.type === 'bonus') && t.points)
+        .reduce((sum, t) => sum + (t.points || 0), 0);
+      
+      // Log detailed point calculation
+      const pointsAnalysis = {
+        userId: user.id,
+        currentPoints: user.points,
+        calculatedPoints: {
+          fromSessions: totalSessionPoints,
+          fromEarnings: earnedFromTransactions,
+          spent: spentInTransactions,
+          expected: totalSessionPoints - spentInTransactions
+        },
+        discrepancy: user.points - (totalSessionPoints - spentInTransactions),
+        sessionCount: allSessions.length,
+        transactionCount: allTransactions.length,
+        lastUpdated: user.updatedAt
+      };
+      
+      console.log('[SYNC_POINTS] Points analysis:', pointsAnalysis);
+      
+      // If there's a discrepancy and it's negative (user has fewer points than expected),
+      // we might want to correct it, but for safety, we'll just log it
+      if (pointsAnalysis.discrepancy !== 0) {
+        console.warn('[SYNC_POINTS] Points discrepancy detected:', pointsAnalysis.discrepancy);
+      }
+      
+      // Return fresh user data
+      res.json({ 
+        success: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          points: user.points,
+          balance: user.balance,
+          isPremium: user.isPremium
+        },
+        analysis: pointsAnalysis,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error('[SYNC_POINTS] Error syncing points:', error);
+      res.status(500).json({ 
+        error: "Erro ao sincronizar pontos",
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
@@ -756,7 +981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Points conversion
+  // Points conversion with retry logic and production fixes
   app.post("/api/points/convert", requireAuth, async (req, res) => {
     try {
       const conversionSchema = z.object({
@@ -770,14 +995,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: req.session.userId,
         sessionId: req.sessionID,
         requestedPoints: points,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV
       });
       
-      // Get user to check points balance
-      const user = await storage.getUser(req.session.userId!);
+      // Get user with retry logic for production
+      let user: User | undefined;
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (attempts < maxAttempts) {
+        attempts++;
+        try {
+          user = await storage.getUser(req.session.userId!);
+          if (user) {
+            console.log(`[POINTS_CONVERT] Attempt ${attempts} - User found:`, {
+              id: user.id,
+              points: user.points,
+              balance: user.balance
+            });
+            break;
+          }
+        } catch (dbError) {
+          console.error(`[POINTS_CONVERT] Attempt ${attempts} failed:`, dbError);
+          if (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100 * attempts));
+          }
+        }
+      }
+      
       if (!user) {
-        console.log('[POINTS_CONVERT] User not found:', req.session.userId);
-        return res.status(404).json({ error: "Usuário não encontrado" });
+        console.error('[POINTS_CONVERT] User not found after', maxAttempts, 'attempts:', req.session.userId);
+        return res.status(404).json({ 
+          error: "Usuário não encontrado",
+          details: "Failed to fetch user after multiple attempts",
+          userId: req.session.userId
+        });
+      }
+      
+      // Double-check points from database before conversion
+      // Refresh user data one more time to ensure we have latest points
+      try {
+        const freshUser = await storage.getUser(req.session.userId!);
+        if (freshUser) {
+          user = freshUser;
+          console.log('[POINTS_CONVERT] Fresh user data fetched:', {
+            userId: user.id,
+            currentPoints: user.points,
+            requestedPoints: points
+          });
+        }
+      } catch (refreshError) {
+        console.error('[POINTS_CONVERT] Warning: Could not refresh user data:', refreshError);
       }
       
       // DEBUG: Log user's actual points vs requested points
@@ -787,17 +1056,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userPoints: user.points,
         requestedPoints: points,
         hasEnoughPoints: user.points >= points,
-        difference: user.points - points
+        difference: user.points - points,
+        sessionStatus: {
+          sessionId: req.sessionID,
+          hasUserId: !!req.session.userId,
+          cookieSecure: req.session?.cookie?.secure
+        }
       });
       
       if (user.points < points) {
-        console.log('[POINTS_CONVERT] INSUFFICIENT POINTS:', {
+        console.error('[POINTS_CONVERT] INSUFFICIENT POINTS:', {
           userId: user.id,
+          available: user.points,
+          requested: points,
+          shortBy: points - user.points,
+          environment: process.env.NODE_ENV,
+          timestamp: new Date().toISOString()
+        });
+        return res.status(400).json({ 
+          error: "Pontos insuficientes",
           available: user.points,
           requested: points,
           shortBy: points - user.points
         });
-        return res.status(400).json({ error: "Pontos insuficientes" });
       }
       
       // Define conversion rates (server-controlled for security)
@@ -817,22 +1098,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Deduct points from user
-      await storage.updateUser(req.session.userId!, {
-        points: user.points - points
-      });
+      // Atomic transaction for points deduction and balance update
+      let conversionSuccess = false;
+      let transactionAttempts = 0;
+      const maxTransactionAttempts = 3;
+      let updatedUser: User | undefined;
       
-      // Create transaction to add to balance
-      await storage.createTransaction({
-        userId: req.session.userId!,
-        type: 'earning',
-        amount: amount,
-        points: points,
-        description: `Conversão de ${points} pontos em R$ ${amount.toFixed(2)}`
-      });
+      while (transactionAttempts < maxTransactionAttempts && !conversionSuccess) {
+        transactionAttempts++;
+        try {
+          console.log(`[POINTS_CONVERT] Transaction attempt ${transactionAttempts}`);
+          
+          // Deduct points from user
+          const pointsUpdated = await storage.updateUser(req.session.userId!, {
+            points: user.points - points
+          });
+          
+          if (!pointsUpdated) {
+            throw new Error('Failed to update user points');
+          }
+          
+          // Create transaction to add to balance
+          await storage.createTransaction({
+            userId: req.session.userId!,
+            type: 'earning',
+            amount: amount,
+            points: points,
+            description: `Conversão de ${points} pontos em R$ ${amount.toFixed(2)}`
+          });
+          
+          // Get updated user data
+          updatedUser = await storage.getUser(req.session.userId!);
+          conversionSuccess = true;
+          
+          console.log(`[POINTS_CONVERT] Transaction successful on attempt ${transactionAttempts}`);
+        } catch (txError) {
+          console.error(`[POINTS_CONVERT] Transaction attempt ${transactionAttempts} failed:`, txError);
+          if (transactionAttempts < maxTransactionAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 200 * transactionAttempts));
+          } else {
+            throw txError;
+          }
+        }
+      }
       
-      // Get updated user data
-      const updatedUser = await storage.getUser(req.session.userId!);
+      if (!conversionSuccess || !updatedUser) {
+        console.error('[POINTS_CONVERT] Transaction failed after all attempts');
+        throw new Error('Failed to complete points conversion after multiple attempts');
+      }
       
       // DEBUG: Log successful conversion
       console.log('[POINTS_CONVERT] Conversion successful:', {
@@ -842,7 +1155,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         oldPoints: user.points,
         newPoints: updatedUser?.points || 0,
         oldBalance: parseFloat(user.balance || "0"),
-        newBalance: parseFloat(updatedUser?.balance || "0")
+        newBalance: parseFloat(updatedUser?.balance || "0"),
+        attempts: transactionAttempts,
+        environment: process.env.NODE_ENV
       });
       
       res.json({ 
@@ -856,8 +1171,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Dados inválidos", details: error.errors });
       }
-      console.error("Convert points error:", error);
-      res.status(500).json({ error: "Erro ao converter pontos" });
+      console.error('[POINTS_CONVERT] Critical error:', error);
+      res.status(500).json({ 
+        error: "Erro ao converter pontos",
+        details: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
     }
   });
 

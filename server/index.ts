@@ -7,6 +7,34 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
+// Production configuration checks
+if (process.env.NODE_ENV === 'production') {
+  // Check critical environment variables
+  if (!process.env.DATABASE_URL) {
+    console.error('[CRITICAL] DATABASE_URL is not set in production!');
+    console.error('[CRITICAL] This will cause database connection failures');
+  } else {
+    console.log('[CONFIG] DATABASE_URL is configured');
+  }
+  
+  if (!process.env.SESSION_SECRET) {
+    console.warn('[WARNING] SESSION_SECRET is not set, using default (insecure for production)');
+  } else {
+    console.log('[CONFIG] SESSION_SECRET is configured');
+  }
+  
+  if (!process.env.LIRAPAY_API_KEY) {
+    console.warn('[WARNING] LIRAPAY_API_KEY is not set, payments will not work');
+  } else {
+    console.log('[CONFIG] LIRAPAY_API_KEY is configured');
+  }
+  
+  console.log('[CONFIG] Running in PRODUCTION mode');
+  console.log('[CONFIG] PORT:', process.env.PORT || '5000');
+  console.log('[CONFIG] FRONTEND_URL:', process.env.FRONTEND_URL || 'not set');
+  console.log('[CONFIG] COOKIE_DOMAIN:', process.env.COOKIE_DOMAIN || 'not set');
+}
+
 // Trust proxy - REQUIRED for Railway and other HTTPS proxies
 // This ensures Express knows it's behind a proxy and handles secure cookies correctly
 app.set('trust proxy', 1);
@@ -31,26 +59,41 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 // Configure session store
 const PgSession = connectPgSimple(session);
 
-// Session configuration
-app.use(
-  session({
-    store: new PgSession({
-      conString: process.env.DATABASE_URL,
-      tableName: 'user_sessions',
-      createTableIfMissing: true,
-    }),
-    secret: process.env.SESSION_SECRET || 'radioplay-secret-key-change-in-production',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-site in production
-      domain: process.env.COOKIE_DOMAIN || undefined // Optional: set if you need specific domain
+// Session configuration with production-specific logging
+const sessionConfig = {
+  store: new PgSession({
+    conString: process.env.DATABASE_URL,
+    tableName: 'user_sessions',
+    createTableIfMissing: true,
+    // Add error handler for session store
+    errorLog: (error: any) => {
+      console.error('[SESSION_STORE] Database error:', error);
     }
-  })
-);
+  }),
+  secret: process.env.SESSION_SECRET || 'radioplay-secret-key-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax', // 'none' for cross-site in production
+    domain: process.env.COOKIE_DOMAIN || undefined // Optional: set if you need specific domain
+  }
+};
+
+// Log session configuration in production
+if (process.env.NODE_ENV === 'production') {
+  console.log('[SESSION_CONFIG] Cookie settings:', {
+    secure: sessionConfig.cookie.secure,
+    httpOnly: sessionConfig.cookie.httpOnly,
+    sameSite: sessionConfig.cookie.sameSite,
+    domain: sessionConfig.cookie.domain,
+    maxAge: sessionConfig.cookie.maxAge
+  });
+}
+
+app.use(session(sessionConfig));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -68,6 +111,11 @@ app.use((req, res, next) => {
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       
+      // Log session info for debugging in production
+      if (process.env.NODE_ENV === 'production' && path.includes('points')) {
+        logLine += ` [Session: ${req.sessionID?.substring(0, 8)}... User: ${req.session?.userId || 'anonymous'}]`;
+      }
+      
       // Don't log large responses (like PIX images) to avoid memory issues
       if (capturedJsonResponse) {
         // Check if response contains large data (like base64 images)
@@ -77,6 +125,18 @@ app.use((req, res, next) => {
         } else {
           // Log a summary for large responses
           logLine += ` :: [Response too large - ${Math.round(jsonStr.length / 1024)}KB]`;
+        }
+        
+        // Log errors in detail for production debugging
+        if (res.statusCode >= 400 && capturedJsonResponse.error) {
+          console.error(`[API_ERROR] ${req.method} ${path}:`, {
+            status: res.statusCode,
+            error: capturedJsonResponse.error,
+            details: capturedJsonResponse.details,
+            userId: req.session?.userId,
+            sessionId: req.sessionID,
+            timestamp: new Date().toISOString()
+          });
         }
       }
 
