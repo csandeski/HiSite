@@ -622,11 +622,37 @@ function App({ user }: { user: any }) {
       // Note: Premium multiplier is handled server-side, so we use base interval here
       const intervalMs = baseIntervalSeconds * 1000; // Convert to milliseconds
       
+      // Function to save points immediately
+      const savePointsImmediately = async () => {
+        if (sessionInfoRef.current.sessionId && sessionInfoRef.current.sessionStartTime) {
+          const duration = Math.floor((Date.now() - sessionInfoRef.current.sessionStartTime) / 1000);
+          const currentPoints = sessionInfoRef.current.sessionPoints;
+          const baselinePoints = sessionInfoRef.current.baselinePoints;
+          const pointsEarnedThisSession = Math.max(0, currentPoints - baselinePoints);
+          
+          try {
+            const result = await api.updateListeningSession({
+              sessionId: sessionInfoRef.current.sessionId,
+              duration,
+              pointsEarned: pointsEarnedThisSession
+            });
+            
+            if (result && result.updatedPoints !== undefined) {
+              sessionInfoRef.current.baselinePoints = result.updatedPoints;
+            }
+          } catch (error) {
+            console.error('[POINT-SYNC] Failed to save point:', error);
+          }
+        }
+      };
+      
       // Increment points by 1 at calculated intervals
       pointsInterval = setInterval(() => {
         setSessionPoints((prev) => {
           const newPoints = prev + 1; // Always increment by 1
           sessionInfoRef.current.sessionPoints = newPoints;
+          // Save immediately after each point gained
+          savePointsImmediately();
           return newPoints;
         });
       }, intervalMs);
@@ -640,8 +666,9 @@ function App({ user }: { user: any }) {
         });
       }, 1000);
       
-      // AUTO-SYNC POINTS TO DATABASE EVERY 10 SECONDS
+      // AUTO-SYNC POINTS TO DATABASE EVERY 3 SECONDS
       // This ensures points are never lost when navigating between pages
+      // Additionally, points are saved immediately after each point is earned
       syncInterval = setInterval(async () => {
         if (sessionInfoRef.current.sessionId && sessionInfoRef.current.sessionStartTime) {
           const duration = Math.floor((Date.now() - sessionInfoRef.current.sessionStartTime) / 1000);
@@ -682,7 +709,7 @@ function App({ user }: { user: any }) {
             // Continue tracking locally even if sync fails
           }
         }
-      }, 10000); // Every 10 seconds
+      }, 3000); // Every 3 seconds
       
     } else if (!isPlaying && sessionInfoRef.current.sessionId) {
       // Radio stopped playing but we have an active session - end it immediately
