@@ -141,6 +141,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Debug endpoint for user points
+  app.get('/api/debug/user-points', requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      
+      // Get user full details
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Get recent listening sessions
+      const recentSessions = await storage.getUserListeningSessions(userId, 5);
+      
+      // Get recent transactions
+      const recentTransactions = await storage.getUserTransactions(userId, 5);
+      
+      // Get daily stats for the last 7 days
+      const dailyStats = await storage.getUserDailyStats(userId, 7);
+      
+      // Calculate total points earned from sessions
+      const totalSessionPoints = recentSessions.reduce((sum, session) => 
+        sum + (session.pointsEarned || 0), 0);
+      
+      // Calculate total points from transactions
+      const totalTransactionPoints = recentTransactions
+        .filter(t => t.type === 'earning' && t.points)
+        .reduce((sum, t) => sum + (t.points || 0), 0);
+      
+      // Debug response
+      res.json({
+        timestamp: new Date().toISOString(),
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          currentPoints: user.points,
+          balance: user.balance,
+          isPremium: user.isPremium,
+          totalListeningTime: user.totalListeningTime,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        },
+        session: {
+          sessionId: req.sessionID,
+          userId: req.session.userId,
+          isAuthenticated: !!req.session.userId
+        },
+        recentSessions: recentSessions.map(s => ({
+          id: s.id,
+          radioStationId: s.radioStationId,
+          startedAt: s.startedAt,
+          endedAt: s.endedAt,
+          duration: s.duration,
+          pointsEarned: s.pointsEarned,
+          isPremiumSession: s.isPremiumSession
+        })),
+        recentTransactions: recentTransactions.map(t => ({
+          id: t.id,
+          type: t.type,
+          amount: t.amount,
+          points: t.points,
+          description: t.description,
+          createdAt: t.createdAt
+        })),
+        dailyStats: dailyStats.map(stat => ({
+          date: stat.date,
+          pointsEarned: stat.pointsEarned,
+          listeningTime: stat.listeningTime,
+          sessionsCount: stat.sessionsCount
+        })),
+        summary: {
+          totalSessionPoints,
+          totalTransactionPoints,
+          currentPoints: user.points,
+          discrepancy: user.points - totalSessionPoints,
+          lastUpdated: user.updatedAt
+        }
+      });
+      
+    } catch (error) {
+      console.error('[DEBUG_USER_POINTS] Error:', error);
+      res.status(500).json({ 
+        error: "Failed to fetch user points debug info",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Debug endpoint to test LiraPay API
   app.get('/api/debug/lirapay-test', async (req, res) => {
     try {
@@ -510,12 +599,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update user points atomically
       let updatedUser: User | undefined;
       if (pointsEarned > 0) {
+        // DEBUG: Log before incrementing points
+        console.log('[LISTENING_END] Incrementing user points:', {
+          userId: req.session.userId,
+          sessionId: sessionId,
+          pointsToAdd: pointsEarned,
+          currentPoints: user.points,
+          expectedNewPoints: user.points + pointsEarned
+        });
+        
         updatedUser = await storage.incrementUserPoints(req.session.userId!, pointsEarned);
+        
+        // DEBUG: Log after incrementing points
+        console.log('[LISTENING_END] Points incremented:', {
+          userId: req.session.userId,
+          actualNewPoints: updatedUser?.points,
+          pointsAdded: pointsEarned,
+          incrementSuccess: updatedUser !== undefined
+        });
+      } else {
+        console.log('[LISTENING_END] No points earned:', {
+          userId: req.session.userId,
+          sessionId: sessionId,
+          duration: duration,
+          reason: 'pointsEarned was 0'
+        });
       }
       
       // Update listening time
       updatedUser = await storage.updateUser(req.session.userId!, {
         totalListeningTime: user.totalListeningTime + duration
+      });
+      
+      // DEBUG: Log final session end result
+      console.log('[LISTENING_END] Session ended successfully:', {
+        userId: req.session.userId,
+        sessionId: sessionId,
+        duration: duration,
+        pointsEarned: pointsEarned,
+        totalPoints: updatedUser?.points || 0,
+        totalListeningTime: user.totalListeningTime + duration,
+        timestamp: new Date().toISOString()
       });
       
       res.json({ 
@@ -641,13 +765,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { points } = conversionSchema.parse(req.body);
       
+      // DEBUG: Log conversion attempt details
+      console.log('[POINTS_CONVERT] Conversion attempt:', {
+        userId: req.session.userId,
+        sessionId: req.sessionID,
+        requestedPoints: points,
+        timestamp: new Date().toISOString()
+      });
+      
       // Get user to check points balance
       const user = await storage.getUser(req.session.userId!);
       if (!user) {
+        console.log('[POINTS_CONVERT] User not found:', req.session.userId);
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
       
+      // DEBUG: Log user's actual points vs requested points
+      console.log('[POINTS_CONVERT] Points validation:', {
+        userId: user.id,
+        userEmail: user.email,
+        userPoints: user.points,
+        requestedPoints: points,
+        hasEnoughPoints: user.points >= points,
+        difference: user.points - points
+      });
+      
       if (user.points < points) {
+        console.log('[POINTS_CONVERT] INSUFFICIENT POINTS:', {
+          userId: user.id,
+          available: user.points,
+          requested: points,
+          shortBy: points - user.points
+        });
         return res.status(400).json({ error: "Pontos insuficientes" });
       }
       
@@ -684,6 +833,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get updated user data
       const updatedUser = await storage.getUser(req.session.userId!);
+      
+      // DEBUG: Log successful conversion
+      console.log('[POINTS_CONVERT] Conversion successful:', {
+        userId: user.id,
+        pointsConverted: points,
+        amountAdded: amount,
+        oldPoints: user.points,
+        newPoints: updatedUser?.points || 0,
+        oldBalance: parseFloat(user.balance || "0"),
+        newBalance: parseFloat(updatedUser?.balance || "0")
+      });
       
       res.json({ 
         success: true,

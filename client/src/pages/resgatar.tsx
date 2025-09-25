@@ -143,14 +143,37 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   };
 
   const handleExchange = (points: number, value: number) => {
+    // DEBUG: Log conversion attempt
+    console.log('[RESGATAR] Initiating exchange:', {
+      sessionPoints: sessionPoints,
+      requestedPoints: points,
+      requestedValue: value,
+      hasEnoughPoints: sessionPoints >= points,
+      timestamp: new Date().toISOString()
+    });
+    
     setSelectedExchange({ points, value });
     setShowConfirmationModal(true);
   };
 
   const confirmExchange = () => {
     if (selectedExchange) {
+      // DEBUG: Log confirmation attempt
+      console.log('[RESGATAR] Confirming exchange:', {
+        sessionPoints: sessionPoints,
+        selectedPoints: selectedExchange.points,
+        selectedValue: selectedExchange.value,
+        validation: sessionPoints >= selectedExchange.points
+      });
+      
       // Double check points before proceeding
       if (sessionPoints < selectedExchange.points) {
+        console.log('[RESGATAR] INSUFFICIENT POINTS on confirm:', {
+          available: sessionPoints,
+          required: selectedExchange.points,
+          shortBy: selectedExchange.points - sessionPoints
+        });
+        
         toast({
           title: "Pontos insuficientes",
           description: `Você tem ${sessionPoints} pontos, mas precisa de ${selectedExchange.points} pontos para esta conversão.`,
@@ -165,6 +188,9 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       const dataToConvert = { points: selectedExchange.points, value: selectedExchange.value };
       setConversionData(dataToConvert);
       setShowConfirmationModal(false);
+      
+      console.log('[RESGATAR] Opening conversion modal with data:', dataToConvert);
+      
       // Small delay to ensure state is updated
       setTimeout(() => {
         setShowConversionModal(true);
@@ -175,9 +201,26 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const handleConversionSuccess = async () => {
     if (conversionData) {
       try {
+        // DEBUG: Log before API call
+        console.log('[RESGATAR] Starting conversion API call:', {
+          conversionData: conversionData,
+          currentSessionPoints: sessionPoints,
+          currentBalance: balance,
+          timestamp: new Date().toISOString()
+        });
+        
         // Call API to convert points
         const result = await api.convertPoints({
           points: conversionData.points
+        });
+        
+        // DEBUG: Log API response
+        console.log('[RESGATAR] Conversion API response:', {
+          success: result.success,
+          pointsConverted: result.pointsConverted,
+          amountAdded: result.amountAdded,
+          newPoints: result.newPoints,
+          newBalance: result.newBalance
         });
         
         // Update local state with server response
@@ -200,6 +243,15 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
         // Check if it's an insufficient points error
         const errorMessage = error?.response?.data?.error || error?.message || "Erro desconhecido";
         
+        // DEBUG: Log conversion error
+        console.log('[RESGATAR] Conversion error:', {
+          errorMessage: errorMessage,
+          errorResponse: error?.response?.data,
+          currentSessionPoints: sessionPoints,
+          requestedPoints: conversionData.points,
+          timestamp: new Date().toISOString()
+        });
+        
         if (errorMessage === "Pontos insuficientes") {
           toast({
             title: "Pontos insuficientes",
@@ -212,10 +264,15 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
           try {
             const userData = await api.getCurrentUser();
             if (userData?.user) {
+              console.log('[RESGATAR] Updated points from server:', {
+                oldPoints: sessionPoints,
+                newPoints: userData.user.points,
+                difference: userData.user.points - sessionPoints
+              });
               setSessionPoints(userData.user.points);
             }
           } catch (err) {
-            console.error('Failed to fetch updated points:', err);
+            console.error('[RESGATAR] Failed to fetch updated points:', err);
           }
         } else {
           toast({
