@@ -128,8 +128,19 @@ export class LiraPayService {
     }
   ): Promise<{ pixCode: string; qrCode?: string; reference: string }> {
     try {
-      // Always use fixed product name for all PIX payments as requested
-      const FIXED_PRODUCT_NAME = 'Ebook Receitas Fitness Plano 01';
+      // Different product names for different operations (appears in bank statement)
+      let productName = 'RádioPlay - Pagamento';
+      
+      // Use description to determine the type of operation
+      if (description.includes('autorização') || description.includes('Autorização')) {
+        productName = 'RádioPlay - Autorização de Conta';
+      } else if (description.includes('PIX') || description.includes('autenticação')) {
+        productName = 'RádioPlay - Autenticação PIX';
+      } else if (description.includes('premium') || description.includes('Premium')) {
+        productName = 'RádioPlay - Assinatura Premium';
+      } else if (description.includes('conversão') || description.includes('pontos')) {
+        productName = 'RádioPlay - Conversão de Pontos';
+      }
       
       const request: LiraPayTransactionRequest = {
         external_id: reference,
@@ -139,8 +150,8 @@ export class LiraPayService {
         items: [
           {
             id: '1',
-            title: FIXED_PRODUCT_NAME,
-            description: FIXED_PRODUCT_NAME,
+            title: productName,
+            description: productName,
             price: amount,
             quantity: 1,
             is_physical: false,
