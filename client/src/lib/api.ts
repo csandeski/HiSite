@@ -197,6 +197,21 @@ class ApiClient {
     });
   }
 
+  async updateListeningSession(data: {
+    sessionId: string;
+    duration: number;
+    pointsEarned: number;
+  }): Promise<{ 
+    success: boolean;
+    pointsEarned: number;
+    updatedPoints: number;
+  }> {
+    return this.request('/listening/update', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
   async getListeningHistory(): Promise<{ sessions: ListeningSession[] }> {
     return this.request('/listening/history');
   }

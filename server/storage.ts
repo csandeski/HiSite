@@ -334,6 +334,14 @@ export class SupabaseStorage implements IStorage {
       .where(eq(schema.listeningSessions.id, sessionId));
   }
 
+  async updateListeningSessionPoints(sessionId: string, pointsEarned: number): Promise<void> {
+    await db.update(schema.listeningSessions)
+      .set({
+        pointsEarned
+      })
+      .where(eq(schema.listeningSessions.id, sessionId));
+  }
+
   async getUserListeningSessions(userId: string, limit?: number): Promise<ListeningSession[]> {
     const query = db.select().from(schema.listeningSessions)
       .where(eq(schema.listeningSessions.userId, userId))

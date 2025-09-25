@@ -2,6 +2,15 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
+## Recent Updates (25/09/2025)
+- **Sistema de Sincronização Automática de Pontos**:
+  - ✅ Auto-sincronização a cada 10 segundos durante escuta de rádio
+  - ✅ Novo endpoint `/api/listening/update` para atualizações parciais
+  - ✅ Pontos salvos automaticamente no banco de dados
+  - ✅ Correção completa do bug de perda de pontos ao navegar entre telas
+  - ✅ Sistema à prova de falhas com retry automático
+  - ✅ Função `updateListeningSessionPoints` adicionada ao storage
+
 ## Recent Updates (23/09/2025)
 - **Correção Completa do Sistema de Autorização PIX**:
   - ✅ Valor de autorização corrigido para R$ 29,90 (conforme solicitado)

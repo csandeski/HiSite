@@ -570,6 +570,7 @@ function App({ user }: { user: any }) {
   useEffect(() => {
     let pointsInterval: NodeJS.Timeout | null = null;
     let timeInterval: NodeJS.Timeout | null = null;
+    let syncInterval: NodeJS.Timeout | null = null; // Auto-sync interval
     
     // Only start counting points when playing and NOT syncing
     if (isPlaying && playingRadioId !== null && !isSyncing) {
@@ -638,6 +639,51 @@ function App({ user }: { user: any }) {
           return newTotal;
         });
       }, 1000);
+      
+      // AUTO-SYNC POINTS TO DATABASE EVERY 10 SECONDS
+      // This ensures points are never lost when navigating between pages
+      syncInterval = setInterval(async () => {
+        if (sessionInfoRef.current.sessionId && sessionInfoRef.current.sessionStartTime) {
+          const duration = Math.floor((Date.now() - sessionInfoRef.current.sessionStartTime) / 1000);
+          const currentPoints = sessionInfoRef.current.sessionPoints;
+          const baselinePoints = sessionInfoRef.current.baselinePoints;
+          const pointsEarnedThisSession = Math.max(0, currentPoints - baselinePoints);
+          
+          console.log('[AUTO-SYNC] Saving points to database...', {
+            sessionId: sessionInfoRef.current.sessionId,
+            duration,
+            pointsEarned: pointsEarnedThisSession,
+            currentPoints,
+            timestamp: new Date().toISOString()
+          });
+          
+          try {
+            // Update session in backend without ending it
+            const result = await api.updateListeningSession({
+              sessionId: sessionInfoRef.current.sessionId,
+              duration,
+              pointsEarned: pointsEarnedThisSession
+            });
+            
+            console.log('[AUTO-SYNC] Points saved successfully:', {
+              updatedPoints: result.updatedPoints,
+              timestamp: new Date().toISOString()
+            });
+            
+            // Update points with server response to ensure consistency
+            if (result && result.updatedPoints !== undefined) {
+              setSessionPoints(result.updatedPoints);
+              sessionInfoRef.current.sessionPoints = result.updatedPoints;
+              // Update baseline for next sync
+              sessionInfoRef.current.baselinePoints = result.updatedPoints;
+            }
+          } catch (error) {
+            console.error('[AUTO-SYNC] Failed to save points:', error);
+            // Continue tracking locally even if sync fails
+          }
+        }
+      }, 10000); // Every 10 seconds
+      
     } else if (!isPlaying && sessionInfoRef.current.sessionId) {
       // Radio stopped playing but we have an active session - end it immediately
       console.log('[SYNC] Radio stopped, ending session...');
@@ -650,6 +696,7 @@ function App({ user }: { user: any }) {
     return () => {
       if (pointsInterval) clearInterval(pointsInterval);
       if (timeInterval) clearInterval(timeInterval);
+      if (syncInterval) clearInterval(syncInterval);
     };
   }, [isPlaying, playingRadioId, isSyncing, endListeningSession]); // Add endListeningSession to deps
 

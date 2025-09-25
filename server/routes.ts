@@ -890,6 +890,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update listening session endpoint (for auto-sync)
+  app.post('/api/listening/update', requireAuth, async (req, res) => {
+    try {
+      const { sessionId, duration: clientDuration, pointsEarned: clientPointsEarned } = req.body;
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID é obrigatório" });
+      }
+      
+      // Get session and verify ownership
+      const session = await storage.getListeningSession(sessionId);
+      if (!session) {
+        return res.status(404).json({ error: "Sessão não encontrada" });
+      }
+      
+      // Verify session belongs to authenticated user
+      if (session.userId !== req.session.userId) {
+        return res.status(403).json({ error: "Não autorizado a atualizar esta sessão" });
+      }
+      
+      // Check if session is already ended
+      if (session.endedAt) {
+        return res.status(400).json({ error: "Sessão já finalizada" });
+      }
+      
+      // Calculate actual duration (server-side validation)
+      const now = new Date();
+      const sessionStart = new Date(session.startedAt);
+      const actualDuration = Math.floor((now.getTime() - sessionStart.getTime()) / 1000);
+      
+      // Use minimum of client-reported and server-calculated duration
+      const duration = Math.min(actualDuration, clientDuration || actualDuration);
+      
+      // Get user to check premium status
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Get radio station to get points per minute
+      const station = await storage.getRadioStation(session.radioStationId!);
+      if (!station) {
+        return res.status(400).json({ error: "Estação de rádio não encontrada" });
+      }
+      
+      // Calculate points based on duration and premium status
+      const premiumMultiplier = user.isPremium ? 3 : 1;
+      const baseIntervalSeconds = Math.max(1, Math.floor(60 / station.pointsPerMinute));
+      const intervalWithPremium = Math.max(1, Math.floor(baseIntervalSeconds / premiumMultiplier));
+      
+      // Calculate how many points should have been earned based on duration
+      const serverCalculatedPoints = Math.floor(duration / intervalWithPremium);
+      
+      // Calculate new points to add (difference between server calculated and already awarded)
+      const previouslyAwardedPoints = session.pointsEarned || 0;
+      const newPointsToAdd = serverCalculatedPoints - previouslyAwardedPoints;
+      
+      console.log('[UPDATE SESSION] Updating points:', {
+        sessionId,
+        duration,
+        serverCalculatedPoints,
+        previouslyAwardedPoints,
+        newPointsToAdd,
+        isPremium: user.isPremium,
+        premiumMultiplier
+      });
+      
+      // Only update if there are new points to add
+      if (newPointsToAdd > 0) {
+        // Update session with new points earned (total)
+        await storage.updateListeningSessionPoints(sessionId, serverCalculatedPoints);
+        
+        // Update user points with only the new points
+        const updatedUser = await storage.incrementUserPoints(req.session.userId!, newPointsToAdd);
+        
+        console.log('[UPDATE SESSION] Points updated:', {
+          userId: req.session.userId,
+          pointsAdded: newPointsToAdd,
+          totalPoints: updatedUser?.points || 0
+        });
+        
+        res.json({
+          success: true,
+          pointsEarned: newPointsToAdd,
+          updatedPoints: updatedUser?.points || 0
+        });
+      } else {
+        // No new points to add, just return current state
+        res.json({
+          success: true,
+          pointsEarned: 0,
+          updatedPoints: user.points
+        });
+      }
+    } catch (error) {
+      console.error("Update listening session error:", error);
+      res.status(500).json({ error: "Erro ao atualizar sessão" });
+    }
+  });
+
   // Daily stats
   app.get("/api/stats/daily", requireAuth, async (req, res) => {
     try {
