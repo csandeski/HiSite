@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ConversionModal from '@/components/ConversionModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import WithdrawProcessingModal from '@/components/WithdrawProcessingModal';
@@ -45,9 +45,11 @@ interface ResgatarProps {
   setSessionPoints: (points: number | ((prev: number) => number)) => void;
   balance: number;
   setBalance: (balance: number | ((prev: number) => number)) => void;
+  refreshPoints?: () => Promise<void>;
+  isRefreshingPoints?: boolean;
 }
 
-export default function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance }: ResgatarProps) {
+export default function Resgatar({ balance, sessionPoints, setSessionPoints, setBalance, refreshPoints, isRefreshingPoints }: ResgatarProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
@@ -70,6 +72,14 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
+
+  // Refresh points when component mounts
+  useEffect(() => {
+    if (refreshPoints && !isRefreshingPoints) {
+      console.log('[RESGATAR] Refreshing points on mount...');
+      refreshPoints();
+    }
+  }, []); // Only run once on mount
 
   // Save checkbox state to localStorage whenever it changes
   const handleShowOnlyAvailableChange = (checked: boolean) => {
@@ -142,7 +152,13 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     setLocation('/dashboard');
   };
 
-  const handleExchange = (points: number, value: number) => {
+  const handleExchange = async (points: number, value: number) => {
+    // Refresh points before conversion to ensure we have latest data
+    if (refreshPoints && !isRefreshingPoints) {
+      console.log('[RESGATAR] Refreshing points before exchange...');
+      await refreshPoints();
+    }
+    
     // DEBUG: Log conversion attempt
     console.log('[RESGATAR] Initiating exchange:', {
       sessionPoints: sessionPoints,
@@ -156,8 +172,14 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     setShowConfirmationModal(true);
   };
 
-  const confirmExchange = () => {
+  const confirmExchange = async () => {
     if (selectedExchange) {
+      // Refresh points one more time before final confirmation
+      if (refreshPoints && !isRefreshingPoints) {
+        console.log('[RESGATAR] Final refresh before confirmation...');
+        await refreshPoints();
+      }
+      
       // DEBUG: Log confirmation attempt
       console.log('[RESGATAR] Confirming exchange:', {
         sessionPoints: sessionPoints,
@@ -362,11 +384,24 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                 <p className="text-sm text-gray-500">Saldo disponível</p>
               </div>
               
-              <div className="px-4 text-center">
+              <div className="px-4 text-center relative">
                 <Coins className="w-6 h-6 text-primary mx-auto mb-2" />
-                <h3 className="text-xl font-bold text-gray-900" data-testid="points-stat">
-                  {sessionPoints}
-                </h3>
+                <div className="flex items-center justify-center gap-2">
+                  <h3 className="text-xl font-bold text-gray-900" data-testid="points-stat">
+                    {sessionPoints}
+                  </h3>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="w-6 h-6 p-0"
+                    onClick={() => refreshPoints && refreshPoints()}
+                    disabled={isRefreshingPoints}
+                    data-testid="refresh-points-button"
+                    title="Atualizar pontos"
+                  >
+                    <RefreshCw className={`w-4 h-4 text-primary ${isRefreshingPoints ? 'animate-spin' : ''}`} />
+                  </Button>
+                </div>
                 <p className="text-sm text-gray-500">Pontos acumulados</p>
               </div>
             </div>

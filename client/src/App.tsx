@@ -174,6 +174,7 @@ function App({ user }: { user: any }) {
   const [initialPointsLoaded, setInitialPointsLoaded] = useState(false);
   const [hasShown100PointsPopup, setHasShown100PointsPopup] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isRefreshingPoints, setIsRefreshingPoints] = useState(false);
   
   // Celebration toast states
   const [hasReached20Points, setHasReached20Points] = useState(false);
@@ -439,8 +440,46 @@ function App({ user }: { user: any }) {
     }
   }, [user, hasReached20Points, isPlaying, location, toast]);
 
+  // Helper function to refresh points from backend
+  const refreshPoints = useCallback(async () => {
+    if (!user || isRefreshingPoints) return;
+    
+    console.log('[SYNC] Refreshing points from backend...');
+    setIsRefreshingPoints(true);
+    
+    try {
+      const { user: freshUserData } = await api.getCurrentUser();
+      if (freshUserData) {
+        console.log('[SYNC] Points refreshed:', {
+          oldPoints: sessionPoints,
+          newPoints: freshUserData.points,
+          oldBalance: balance,
+          newBalance: freshUserData.balance || 0,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Update points and balance with fresh data
+        setSessionPoints(freshUserData.points || 0);
+        setBalance(parseFloat(freshUserData.balance) || 0);
+        
+        // Update sessionInfoRef to match new server value
+        sessionInfoRef.current.sessionPoints = freshUserData.points || 0;
+        
+        // Refresh user in auth context
+        refreshUser();
+        
+        // Invalidate queries to update other components
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      }
+    } catch (error) {
+      console.error('[SYNC] Failed to refresh points:', error);
+    } finally {
+      setIsRefreshingPoints(false);
+    }
+  }, [user, isRefreshingPoints, sessionPoints, balance, refreshUser]);
+
   // Helper function to end listening session
-  const endListeningSession = useCallback(() => {
+  const endListeningSession = useCallback(async () => {
     if (sessionInfoRef.current.sessionId && sessionInfoRef.current.sessionStartTime) {
       const duration = Math.floor((Date.now() - sessionInfoRef.current.sessionStartTime) / 1000);
       const sessionId = sessionInfoRef.current.sessionId;
@@ -450,28 +489,48 @@ function App({ user }: { user: any }) {
       // Calculate points earned in this session only
       const pointsEarnedThisSession = Math.max(0, currentPoints - baselinePoints);
       
+      console.log('[SYNC] Ending listening session:', {
+        sessionId,
+        duration,
+        pointsEarned: pointsEarnedThisSession,
+        currentPoints,
+        timestamp: new Date().toISOString()
+      });
+      
       // Clear only session ID and start time, but KEEP the points
       sessionInfoRef.current = { sessionId: null, sessionStartTime: 0, sessionPoints: currentPoints, baselinePoints: 0 };
       
-      // End session in backend and refresh user data
-      api.endListening({
-        sessionId,
-        duration,
-        pointsEarned: pointsEarnedThisSession
-      }).then((result) => {
+      try {
+        // End session in backend and refresh user data
+        const result = await api.endListening({
+          sessionId,
+          duration,
+          pointsEarned: pointsEarnedThisSession
+        });
+        
+        console.log('[SYNC] Session ended successfully:', {
+          updatedPoints: result.updatedPoints,
+          totalListeningTime: result.totalListeningTime,
+          timestamp: new Date().toISOString()
+        });
+        
         // Use the updated points from the server response
         if (result && result.updatedPoints !== undefined) {
           setSessionPoints(result.updatedPoints);
           // Update sessionInfoRef to match new server value
           sessionInfoRef.current.sessionPoints = result.updatedPoints;
         }
-        // Invalidate queries to update other components
-        queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      }).catch((error) => {
-        console.error('Failed to end listening session:', error);
-      });
+        
+        // Refresh all user data to ensure consistency
+        await refreshPoints();
+        
+      } catch (error) {
+        console.error('[SYNC] Failed to end listening session:', error);
+        // Even if the end session fails, try to refresh points to sync with backend
+        await refreshPoints();
+      }
     }
-  }, []);
+  }, [refreshPoints]);
 
   // Handle page unload only (not visibility changes)
   useEffect(() => {
@@ -511,16 +570,21 @@ function App({ user }: { user: any }) {
   useEffect(() => {
     let pointsInterval: NodeJS.Timeout | null = null;
     let timeInterval: NodeJS.Timeout | null = null;
-    let shouldEndSession = false;
     
     // Only start counting points when playing and NOT syncing
     if (isPlaying && playingRadioId !== null && !isSyncing) {
-      shouldEndSession = true; // Mark that we should end session on cleanup
+      console.log('[SYNC] Starting listening session...', {
+        radioId: playingRadioId,
+        currentPoints: sessionPoints,
+        timestamp: new Date().toISOString()
+      });
       
       // DON'T reset session points when resuming same radio
       // Only reset if we never had points or changed radio
       if (prevRadioId !== playingRadioId && prevRadioId !== null) {
-        // Radio changed - keep accumulated points but start new backend session
+        // Radio changed - end previous session and start new one
+        console.log('[SYNC] Radio changed, ending previous session...');
+        endListeningSession();
         setPrevRadioId(playingRadioId);
       } else if (prevRadioId === null) {
         // First time playing - keep existing session points (don't reset)
@@ -544,8 +608,9 @@ function App({ user }: { user: any }) {
       // Start listening session in backend (if logged in)
       api.startListening(playingRadioId.toString()).then((response) => {
         sessionInfoRef.current.sessionId = response.session.id;
+        console.log('[SYNC] Session started:', response.session.id);
       }).catch((error) => {
-        console.error('Failed to start listening session:', error);
+        console.error('[SYNC] Failed to start listening session:', error);
         // Continue tracking locally even if backend fails
       });
       
@@ -573,6 +638,11 @@ function App({ user }: { user: any }) {
           return newTotal;
         });
       }, 1000);
+    } else if (!isPlaying && sessionInfoRef.current.sessionId) {
+      // Radio stopped playing but we have an active session - end it immediately
+      console.log('[SYNC] Radio stopped, ending session...');
+      endListeningSession();
+      setListeningStartTime(null);
     } else {
       setListeningStartTime(null);
     }
@@ -580,15 +650,8 @@ function App({ user }: { user: any }) {
     return () => {
       if (pointsInterval) clearInterval(pointsInterval);
       if (timeInterval) clearInterval(timeInterval);
-      
-      // Only end session if we actually stopped playing (not just re-rendering)
-      if (shouldEndSession && !isPlaying) {
-        endListeningSession();
-      }
-      
-      setListeningStartTime(null);
     };
-  }, [isPlaying, playingRadioId, isSyncing]); // Add isSyncing to deps
+  }, [isPlaying, playingRadioId, isSyncing, endListeningSession]); // Add endListeningSession to deps
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 
@@ -618,7 +681,9 @@ function App({ user }: { user: any }) {
     showPremiumPopup,
     setShowPremiumPopup: handlePremiumPopupClose,
     userName,
-    setUserName
+    setUserName,
+    refreshPoints,
+    isRefreshingPoints
   };
 
   return (
