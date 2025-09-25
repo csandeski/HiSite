@@ -709,12 +709,9 @@ function App({ user }: { user: any }) {
         }
       }, 3000); // Every 3 seconds
       
-    } else if (!isPlaying && sessionInfoRef.current.sessionId) {
-      // Radio stopped playing but we have an active session - end it immediately
-      console.log('[SYNC] Radio stopped, ending session...');
-      endListeningSession();
-      setListeningStartTime(null);
     } else {
+      // Radio not playing - but don't end session here
+      // The session will be ended properly when user actually stops the radio
       setListeningStartTime(null);
     }
     
@@ -735,6 +732,19 @@ function App({ user }: { user: any }) {
       setLocation("/resgatar");
     } else if (tab === "perfil") {
       setLocation("/perfil");
+    }
+  };
+  
+  // Handle user manually stopping the radio
+  const handleStopRadio = () => {
+    if (isPlaying) {
+      setIsPlaying(false);
+      // End the session when user manually stops the radio
+      if (sessionInfoRef.current.sessionId) {
+        endListeningSession();
+      }
+    } else {
+      setIsPlaying(true);
     }
   };
 
@@ -960,7 +970,7 @@ function App({ user }: { user: any }) {
                         size="icon"
                         variant="ghost"
                         className="bg-primary text-white w-8 h-8 rounded-full hover:bg-primary/90"
-                        onClick={() => setIsPlaying(!isPlaying)}
+                        onClick={handleStopRadio}
                         data-testid={isPlaying ? "pause-player" : "play-player"}
                       >
                         {isPlaying ? (
