@@ -460,6 +460,9 @@ class NotificationManager {
 // Create singleton instance
 export const notificationManager = new NotificationManager();
 
+// Export as default for backward compatibility
+export default notificationManager;
+
 // Auto-refresh token on visibility change
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
