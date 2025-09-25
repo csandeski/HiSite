@@ -650,6 +650,53 @@ function App({ user }: { user: any }) {
         }
       };
       
+      // Public function to sync current points before critical operations  
+      const syncCurrentPoints = async (): Promise<void> => {
+        if (!sessionInfoRef.current.sessionId || !sessionInfoRef.current.sessionStartTime) {
+          console.log('[SYNC-POINTS] No active session, skipping sync');
+          return;
+        }
+        
+        const duration = Math.floor((Date.now() - sessionInfoRef.current.sessionStartTime) / 1000);
+        const currentPoints = sessionInfoRef.current.sessionPoints;
+        const baselinePoints = sessionInfoRef.current.baselinePoints;
+        const pointsEarnedThisSession = Math.max(0, currentPoints - baselinePoints);
+        
+        console.log('[SYNC-POINTS] Syncing points before critical operation:', {
+          sessionId: sessionInfoRef.current.sessionId,
+          duration,
+          pointsEarned: pointsEarnedThisSession,
+          currentPoints,
+          timestamp: new Date().toISOString()
+        });
+        
+        try {
+          const result = await api.updateListeningSession({
+            sessionId: sessionInfoRef.current.sessionId,
+            duration,
+            pointsEarned: pointsEarnedThisSession
+          });
+          
+          console.log('[SYNC-POINTS] Points synced successfully:', {
+            updatedPoints: result.updatedPoints,
+            timestamp: new Date().toISOString()
+          });
+          
+          if (result && result.updatedPoints !== undefined) {
+            setSessionPoints(result.updatedPoints);
+            sessionInfoRef.current.sessionPoints = result.updatedPoints;
+          }
+          
+          return;
+        } catch (error) {
+          console.error('[SYNC-POINTS] Failed to sync points:', error);
+          throw error; // Re-throw to let caller handle the error
+        }
+      };
+      
+      // Make syncCurrentPoints available globally for critical operations
+      (window as any).syncCurrentPoints = syncCurrentPoints;
+      
       // Increment points by 1 at calculated intervals
       pointsInterval = setInterval(() => {
         setSessionPoints((prev) => {

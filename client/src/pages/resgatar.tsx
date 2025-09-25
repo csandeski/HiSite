@@ -87,7 +87,18 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     localStorage.setItem('resgatar-accordionValue', value || '');
   };
 
-  const handleWithdraw = () => {
+  const handleWithdraw = async () => {
+    // Sync points to database before withdraw operation
+    if ((window as any).syncCurrentPoints) {
+      try {
+        console.log('[RESGATAR] Syncing points before withdraw...');
+        await (window as any).syncCurrentPoints();
+        console.log('[RESGATAR] Points synced successfully');
+      } catch (error) {
+        console.error('[RESGATAR] Failed to sync points before withdraw:', error);
+      }
+    }
+    
     if (balance < minimumWithdrawal) {
       setShowInsufficientModal(true);
     } else {
@@ -147,6 +158,17 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   };
 
   const handleExchange = async (points: number, value: number) => {
+    // Sync points to database before exchange operation
+    if ((window as any).syncCurrentPoints) {
+      try {
+        console.log('[RESGATAR] Syncing points before exchange...');
+        await (window as any).syncCurrentPoints();
+        console.log('[RESGATAR] Points synced successfully');
+      } catch (error) {
+        console.error('[RESGATAR] Failed to sync points before exchange:', error);
+      }
+    }
+    
     // Use current points from state - they're already up-to-date
     
     // DEBUG: Log conversion attempt
@@ -164,6 +186,17 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
   const confirmExchange = async () => {
     if (selectedExchange) {
+      // Sync points one more time before final confirmation
+      if ((window as any).syncCurrentPoints) {
+        try {
+          console.log('[RESGATAR] Final sync before exchange confirmation...');
+          await (window as any).syncCurrentPoints();
+          console.log('[RESGATAR] Final sync completed');
+        } catch (error) {
+          console.error('[RESGATAR] Failed to sync points before confirmation:', error);
+        }
+      }
+      
       // Use current points from state for conversion
       
       // DEBUG: Log confirmation attempt
