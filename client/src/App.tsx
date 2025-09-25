@@ -640,7 +640,9 @@ function App({ user }: { user: any }) {
             });
             
             if (result && result.updatedPoints !== undefined) {
-              sessionInfoRef.current.baselinePoints = result.updatedPoints;
+              // DO NOT update baseline - keep it as the initial session value
+              // Just update the current points display
+              sessionInfoRef.current.sessionPoints = result.updatedPoints;
             }
           } catch (error) {
             console.error('[POINT-SYNC] Failed to save point:', error);
@@ -703,8 +705,8 @@ function App({ user }: { user: any }) {
             if (result && result.updatedPoints !== undefined) {
               setSessionPoints(result.updatedPoints);
               sessionInfoRef.current.sessionPoints = result.updatedPoints;
-              // Update baseline for next sync
-              sessionInfoRef.current.baselinePoints = result.updatedPoints;
+              // DO NOT update baseline - it should remain the initial value from session start
+              // This ensures the server always receives the total points earned in this session
             }
           } catch (error) {
             console.error('[AUTO-SYNC] Failed to save points:', error);
