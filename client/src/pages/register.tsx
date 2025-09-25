@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Radio } from "lucide-react";
+import { trackCompleteRegistration } from "@/services/fbPixel";
 
 export default function RegisterPage() {
   const [, setLocation] = useLocation();
@@ -60,6 +61,14 @@ export default function RegisterPage() {
         fullName: formData.fullName || undefined,
         password: formData.password
       });
+      
+      // Track CompleteRegistration event for Facebook Pixel
+      await trackCompleteRegistration({
+        email: formData.email,
+        fullName: formData.fullName || undefined,
+        userId: formData.username // Use username as userId for now
+      });
+      
       toast({
         title: "Conta criada com sucesso!",
         description: "Bem-vindo ao RádioPlay"

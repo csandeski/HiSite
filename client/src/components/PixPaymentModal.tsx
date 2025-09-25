@@ -17,6 +17,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import PixQRCode from '@/components/PixQRCode';
 import { AUTHORIZATION_AMOUNT_CENTS, PIX_AUTH_AMOUNT_CENTS, centsToBRL } from "@shared/constants";
+import { trackInitiateCheckout, trackPurchase, initFacebookPixel } from "@/services/fbPixel";
 
 interface PixPaymentModalProps {
   open: boolean;
@@ -34,14 +35,18 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
   const [pixData, setPixData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [checkingPayment, setCheckingPayment] = useState(false);
+  const [purchaseTracked, setPurchaseTracked] = useState(false); // To prevent duplicate purchase tracking
   
   // Use correct amounts from constants
   // Authorization: R$ 29,90, PIX key auth: R$ 19,90
   const finalAmount = type === 'authorization' ? centsToBRL(AUTHORIZATION_AMOUNT_CENTS) : 
                       (type === 'pix_key_auth' ? centsToBRL(PIX_AUTH_AMOUNT_CENTS) : amount);
   
-  // Generate PIX payment when modal opens
+  // Initialize Facebook Pixel and generate PIX payment when modal opens
   useEffect(() => {
+    // Initialize Facebook Pixel to capture fbclid if present
+    initFacebookPixel();
+    
     if (open && !pixData) {
       generatePixPayment();
     }
@@ -51,6 +56,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
       setError(null);
       setLoading(false);
       setCheckingPayment(false);
+      setPurchaseTracked(false); // Reset purchase tracking flag
     }
   }, [open]);
   
@@ -78,6 +84,21 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
         console.log('Payment status response:', data);
         
         if (data.status === 'approved') {
+          // Track Purchase event for Facebook Pixel (only once per transaction)
+          if (!purchaseTracked) {
+            await trackPurchase({
+              value: finalAmount,
+              type: type,
+              transactionId: pixData?.transactionId || pixData?.reference,
+              userData: user ? {
+                email: user.email,
+                fullName: user.fullName || undefined,
+                userId: user.id
+              } : undefined
+            });
+            setPurchaseTracked(true);
+          }
+          
           // Payment approved!
           let toastTitle = "Pagamento aprovado!";
           let toastDescription = "Seu pagamento foi processado com sucesso.";
@@ -192,6 +213,18 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
         console.log('PIX payment generated successfully!');
         console.log('PIX data:', data);
         setPixData(data);
+        
+        // Track InitiateCheckout event for Facebook Pixel
+        await trackInitiateCheckout({
+          value: finalAmount,
+          type: type,
+          transactionId: data.transactionId || data.reference,
+          userData: user ? {
+            email: user.email,
+            fullName: user.fullName || undefined,
+            userId: user.id
+          } : undefined
+        });
       } else {
         console.error('Server returned error:', data.error);
         throw new Error(data.error || 'Erro ao gerar pagamento');
