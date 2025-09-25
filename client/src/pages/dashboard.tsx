@@ -18,6 +18,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import WelcomeModal from '@/components/WelcomeModal';
+import BannerCarousel from '@/components/BannerCarousel';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -152,6 +153,7 @@ export default function Dashboard({
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <BannerCarousel />
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3">

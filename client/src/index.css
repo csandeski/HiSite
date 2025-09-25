@@ -317,6 +317,32 @@
   }
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.marquee-content {
+  display: flex;
+  animation: marquee 30s linear infinite;
+  white-space: nowrap;
+}
+
+.marquee-content > * {
+  flex-shrink: 0;
+  padding: 0 4rem;
+}
+
 /* Volume Slider Styles */
 input[type="range"] {
   -webkit-appearance: none;
