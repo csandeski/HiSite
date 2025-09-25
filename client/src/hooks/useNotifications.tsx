@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import NotificationManager from '@/lib/notifications';
+import { notificationManager } from '@/lib/notifications';
 import { useToast } from '@/hooks/use-toast';
 
 export interface NotificationStatus {
@@ -28,8 +28,7 @@ export function useNotifications() {
     requiresInstall: false,
   });
 
-  // Inicializar o manager
-  const [notificationManager] = useState(() => new NotificationManager());
+  // O notificationManager já é importado como singleton, não precisa criar nova instância
 
   // Verificar status inicial
   useEffect(() => {
