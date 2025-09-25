@@ -26,7 +26,6 @@ import {
   CheckCircle,
   Clock,
   PiggyBank,
-  RefreshCw,
   ArrowRight,
   TrendingUp
 } from "lucide-react";
@@ -386,22 +385,9 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
               
               <div className="px-4 text-center relative">
                 <Coins className="w-6 h-6 text-primary mx-auto mb-2" />
-                <div className="flex items-center justify-center gap-2">
-                  <h3 className="text-xl font-bold text-gray-900" data-testid="points-stat">
-                    {sessionPoints}
-                  </h3>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="w-6 h-6 p-0"
-                    onClick={() => refreshPoints && refreshPoints()}
-                    disabled={isRefreshingPoints}
-                    data-testid="refresh-points-button"
-                    title="Atualizar pontos"
-                  >
-                    <RefreshCw className={`w-4 h-4 text-primary ${isRefreshingPoints ? 'animate-spin' : ''}`} />
-                  </Button>
-                </div>
+                <h3 className="text-xl font-bold text-gray-900" data-testid="points-stat">
+                  {sessionPoints}
+                </h3>
                 <p className="text-sm text-gray-500">Pontos acumulados</p>
               </div>
             </div>
@@ -690,7 +676,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             {/* Header with Icon */}
             <div className="flex flex-col items-center text-center space-y-3">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-lg">
-                <RefreshCw className="w-8 h-8 text-white" />
+                <ArrowRight className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-xl font-bold text-gray-900">
                 Confirmar Conversão
