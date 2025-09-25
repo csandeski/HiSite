@@ -153,10 +153,15 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   
   // Get initials from name
   const getInitials = (name: string) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    if (parts.length === 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    if (!name || name.trim() === '') return 'U';
+    const parts = name.trim().split(' ').filter(p => p.length > 0);
+    if (parts.length === 0) return 'U';
+    if (parts.length === 1) {
+      return parts[0][0] ? parts[0][0].toUpperCase() : 'U';
+    }
+    const first = parts[0][0] ? parts[0][0].toUpperCase() : '';
+    const last = parts[parts.length - 1][0] ? parts[parts.length - 1][0].toUpperCase() : '';
+    return (first + last) || 'U';
   };
 
   // Avatar options
@@ -211,7 +216,9 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
       const avatar = avatarIcons.find(a => a.id === selectedAvatar);
       return { type: 'icon' as const, content: avatar };
     }
-    return { type: 'initials' as const, content: getInitials(user?.fullName || user?.username || '') };
+    // Get initials or fallback to 'U' for default
+    const initials = getInitials(user?.fullName || user?.username || '');
+    return { type: 'initials' as const, content: initials || 'U' };
   };
 
   return (
@@ -265,9 +272,15 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
                       </div>
                     );
                   } else {
+                    // Default avatar with initials or user icon
+                    const initials = String(avatar.content || 'U');
                     return (
                       <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-xl border-4 border-white">
-                        <span className="text-white text-2xl font-bold">{String(avatar.content)}</span>
+                        {initials === 'U' || initials === 'undefined' || !initials ? (
+                          <User className="w-10 h-10 text-white" />
+                        ) : (
+                          <span className="text-white text-2xl font-bold">{initials}</span>
+                        )}
                       </div>
                     );
                   }
