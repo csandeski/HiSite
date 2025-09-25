@@ -115,6 +115,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
+  // Firebase configuration endpoint (public credentials)
+  app.get("/api/config/firebase", (_req, res) => {
+    // These are public Firebase Web App credentials - safe to expose
+    const config = {
+      apiKey: process.env.VITE_FIREBASE_API_KEY || "AIzaSyDummy-Key",
+      authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "radioplay-app.firebaseapp.com",
+      projectId: process.env.VITE_FIREBASE_PROJECT_ID || "radioplay-app",
+      storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "radioplay-app.appspot.com",
+      messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
+      appId: process.env.VITE_FIREBASE_APP_ID || "1:123456789:web:dummy",
+      measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || "G-DUMMY",
+      vapidKey: process.env.VITE_FIREBASE_VAPID_KEY || "BKagOny0KF_dummy_vapid_key"
+    };
+    
+    // Add cache headers for better performance
+    res.setHeader("Cache-Control", "public, max-age=3600"); // Cache for 1 hour
+    res.json(config);
+  });
+
   // Debug endpoint for session issues (remove in production after fixing)
   app.get("/api/debug/session", (req, res) => {
     res.json({
@@ -1454,10 +1473,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Register push notification token
+  app.post("/api/notifications/register-token", requireAuth, async (req, res) => {
+    try {
+      const { token, platform, userAgent } = req.body;
+      
+      if (!token || !platform) {
+        return res.status(400).json({ error: "Token e platform são obrigatórios" });
+      }
+      
+      // Validar plataforma
+      if (!['ios', 'android', 'web', 'desktop'].includes(platform)) {
+        return res.status(400).json({ error: "Platform deve ser: ios, android, web ou desktop" });
+      }
+      
+      // Importar e validar token
+      const { notificationService } = await import('./services/notifications');
+      
+      // Validar token antes de salvar
+      const isValid = await notificationService.validateToken(token);
+      if (!isValid) {
+        return res.status(400).json({ error: "Token FCM inválido" });
+      }
+      
+      // Salvar token no banco
+      await storage.registerPushToken(
+        req.session.userId!,
+        token,
+        platform,
+        userAgent || req.headers['user-agent']
+      );
+      
+      res.json({ 
+        success: true,
+        message: "Token registrado com sucesso"
+      });
+    } catch (error) {
+      console.error("Register push token error:", error);
+      res.status(500).json({ error: "Erro ao registrar token" });
+    }
+  });
+  
+  // Unregister push notification token
+  app.delete("/api/notifications/unregister-token", requireAuth, async (req, res) => {
+    try {
+      const { token } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Token é obrigatório" });
+      }
+      
+      // Verificar se o token pertence ao usuário
+      const userTokens = await storage.getUserPushTokens(req.session.userId!);
+      const tokenBelongsToUser = userTokens.some(t => t.token === token);
+      
+      if (!tokenBelongsToUser) {
+        return res.status(403).json({ error: "Token não pertence ao usuário" });
+      }
+      
+      await storage.unregisterPushToken(token);
+      
+      res.json({ 
+        success: true,
+        message: "Token removido com sucesso"
+      });
+    } catch (error) {
+      console.error("Unregister push token error:", error);
+      res.status(500).json({ error: "Erro ao remover token" });
+    }
+  });
+  
+  // Send test notification to user
+  app.post("/api/notifications/send-test", requireAuth, async (req, res) => {
+    try {
+      const { notificationService } = await import('./services/notifications');
+      
+      // Enviar notificação de teste apenas para o próprio usuário
+      const result = await notificationService.sendTestNotification(req.session.userId!);
+      
+      if (result.length === 0) {
+        return res.status(404).json({ 
+          error: "Nenhum dispositivo registrado. Registre um token FCM primeiro." 
+        });
+      }
+      
+      const successCount = result.filter(r => r.success).length;
+      const failureCount = result.filter(r => !r.success).length;
+      
+      res.json({ 
+        success: successCount > 0,
+        message: successCount > 0 
+          ? `Notificação de teste enviada para ${successCount} dispositivo(s)`
+          : "Falha ao enviar notificação de teste",
+        details: {
+          sent: successCount,
+          failed: failureCount,
+          results: result
+        }
+      });
+    } catch (error) {
+      console.error("Send test notification error:", error);
+      res.status(500).json({ error: "Erro ao enviar notificação de teste" });
+    }
+  });
+  
+  // Get notification status for user
+  app.get("/api/notifications/status", requireAuth, async (req, res) => {
+    try {
+      const [settings, tokens, notifications] = await Promise.all([
+        storage.getUserSettings(req.session.userId!),
+        storage.getUserPushTokens(req.session.userId!),
+        storage.getUserNotifications(req.session.userId!, false)
+      ]);
+      
+      res.json({
+        pushNotificationsEnabled: settings?.pushNotifications ?? true,
+        emailNotificationsEnabled: settings?.emailNotifications ?? true,
+        registeredDevices: tokens.filter(t => t.isActive).length,
+        totalDevices: tokens.length,
+        devices: tokens.map(t => ({
+          platform: t.platform,
+          userAgent: t.userAgent,
+          isActive: t.isActive,
+          lastUsedAt: t.lastUsedAt,
+          createdAt: t.createdAt
+        })),
+        recentNotifications: notifications.slice(0, 10).map(n => ({
+          id: n.id,
+          title: n.title,
+          message: n.message,
+          type: n.type,
+          isRead: n.isRead,
+          createdAt: n.createdAt
+        })),
+        unreadCount: notifications.filter(n => !n.isRead).length,
+        firebaseConfigured: (await import('./config/firebase-admin')).isFirebaseConfigured()
+      });
+    } catch (error) {
+      console.error("Get notification status error:", error);
+      res.status(500).json({ error: "Erro ao buscar status das notificações" });
+    }
+  });
+
   // Admin: Send notification to specific user
   app.post("/api/admin/notifications/send-to-user", requireAdmin, async (req, res) => {
     try {
-      const { notificationService } = await import('./services/notification');
+      const { notificationService } = await import('./services/notifications');
       
       const { userId, title, body, data, imageUrl } = req.body;
       
@@ -1482,7 +1643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin: Send notification to all users
   app.post("/api/admin/notifications/send-to-all", requireAdmin, async (req, res) => {
     try {
-      const { notificationService } = await import('./services/notification');
+      const { notificationService } = await import('./services/notifications');
       
       const { title, body, data, imageUrl } = req.body;
       
@@ -1490,7 +1651,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "title e body são obrigatórios" });
       }
       
-      const result = await notificationService.sendToAll({
+      const result = await notificationService.sendToAllUsers({
         title,
         body,
         data,
@@ -1504,11 +1665,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Admin: Send typed notification with more control
+  app.post("/api/notifications/send", requireAdmin, async (req, res) => {
+    try {
+      const { notificationService } = await import('./services/notifications');
+      
+      const { 
+        userId, 
+        userIds, 
+        type, 
+        title, 
+        body, 
+        data, 
+        imageUrl,
+        sendToAll 
+      } = req.body;
+      
+      // Validação de tipo
+      const validTypes = ['points', 'reward', 'withdrawal', 'alert', 'premium', 'message', 'referral', 'system'];
+      if (type && !validTypes.includes(type)) {
+        return res.status(400).json({ 
+          error: `Tipo inválido. Use um dos seguintes: ${validTypes.join(', ')}` 
+        });
+      }
+      
+      let result;
+      
+      if (sendToAll) {
+        // Enviar para todos os usuários
+        if (type) {
+          // Com tipo específico (usa templates predefinidos)
+          const users = await storage.getAllUsers();
+          const promises = users.map(user => 
+            notificationService.sendTypedNotification(user.id, type, { 
+              ...data,
+              customTitle: title,
+              customBody: body 
+            })
+          );
+          const results = await Promise.all(promises);
+          result = { 
+            sent: results.flat().filter(r => r.success).length, 
+            failed: results.flat().filter(r => !r.success).length 
+          };
+        } else {
+          // Sem tipo (notificação customizada)
+          result = await notificationService.sendToAllUsers({ title, body, data, imageUrl });
+        }
+      } else if (userIds && Array.isArray(userIds)) {
+        // Enviar para múltiplos usuários específicos
+        if (type) {
+          const promises = userIds.map((uid: string) => 
+            notificationService.sendTypedNotification(uid, type, { 
+              ...data,
+              customTitle: title,
+              customBody: body 
+            })
+          );
+          const results = await Promise.all(promises);
+          result = { 
+            sent: results.flat().filter(r => r.success).length, 
+            failed: results.flat().filter(r => !r.success).length 
+          };
+        } else {
+          const promises = userIds.map((uid: string) => 
+            notificationService.sendToUser(uid, { title, body, data, imageUrl })
+          );
+          const results = await Promise.all(promises);
+          result = { 
+            sent: results.flat().filter(r => r.success).length, 
+            failed: results.flat().filter(r => !r.success).length 
+          };
+        }
+      } else if (userId) {
+        // Enviar para um único usuário
+        if (type) {
+          result = await notificationService.sendTypedNotification(userId, type, { 
+            ...data,
+            customTitle: title,
+            customBody: body 
+          });
+        } else {
+          result = await notificationService.sendToUser(userId, { title, body, data, imageUrl });
+        }
+      } else {
+        return res.status(400).json({ 
+          error: "Especifique userId, userIds ou sendToAll: true" 
+        });
+      }
+      
+      res.json({
+        success: true,
+        message: "Notificação enviada",
+        ...result
+      });
+    } catch (error) {
+      console.error("Send notification error:", error);
+      res.status(500).json({ error: "Erro ao enviar notificação" });
+    }
+  });
+  
   // Public endpoint for testing notifications (Development only)
   if (process.env.NODE_ENV === 'development') {
     app.post("/api/send-notification", async (req, res) => {
       try {
-        const { notificationService } = await import('./services/notification');
+        const { notificationService } = await import('./services/notifications');
         
         const { userId, userIds, title, body, data, imageUrl, sendToAll } = req.body;
         
@@ -1519,9 +1780,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let result;
         
         if (sendToAll) {
-          result = await notificationService.sendToAll({ title, body, data, imageUrl });
+          result = await notificationService.sendToAllUsers({ title, body, data, imageUrl });
         } else if (userIds && Array.isArray(userIds)) {
-          result = await notificationService.sendToUsers(userIds, { title, body, data, imageUrl });
+          const promises = userIds.map((userId: string) => 
+            notificationService.sendToUser(userId, { title, body, data, imageUrl })
+          );
+          const results = await Promise.all(promises);
+          result = { sent: results.flat().filter(r => r.success).length, failed: results.flat().filter(r => !r.success).length, results: results.flat() };
         } else if (userId) {
           result = await notificationService.sendToUser(userId, { title, body, data, imageUrl });
         } else {

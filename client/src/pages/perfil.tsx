@@ -18,6 +18,7 @@ import {
   HelpCircle,
   Award,
   Check,
+  CheckCircle,
   ShieldCheck,
   Clock,
   TrendingUp,
@@ -33,7 +34,8 @@ import {
   Gamepad2,
   Rocket,
   Upload,
-  Bell
+  Bell,
+  BellOff
 } from "lucide-react";
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
@@ -41,6 +43,8 @@ import PixPaymentModal from '@/components/PixPaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { NotificationSettings } from '@/components/NotificationSettings';
+import { Badge } from '@/components/ui/badge';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface Achievement {
   achievementId: string;
@@ -95,6 +99,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   const [editingBio, setEditingBio] = useState(false);
   const [bioText, setBioText] = useState("");
   const [userAchievements, setUserAchievements] = useState<Achievement[]>([]);
+  const { status: notificationStatus, isEnabled: notificationsEnabled } = useNotifications();
   
   // Initialize bio from user data
   useEffect(() => {
@@ -458,14 +463,23 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
           </Card>
           
           <Card 
-            className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer"
-            onClick={() => setShowNotificationModal(true)}
+            className="p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer relative"
+            onClick={() => setLocation('/test-notifications')}
             data-testid="card-notification-action"
           >
             <div className="flex flex-col items-center gap-2">
-              <Bell className="w-6 h-6 text-purple-500" />
+              {notificationsEnabled ? (
+                <Bell className="w-6 h-6 text-purple-500" />
+              ) : (
+                <BellOff className="w-6 h-6 text-gray-400" />
+              )}
               <span className="text-sm font-medium text-gray-700">Notificações</span>
             </div>
+            {notificationsEnabled && (
+              <div className="absolute top-2 right-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              </div>
+            )}
           </Card>
           
           <Card 
