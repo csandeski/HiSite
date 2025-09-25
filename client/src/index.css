@@ -343,6 +343,17 @@
   padding: 0 4rem;
 }
 
+/* Mobile specific marquee adjustments */
+@media (max-width: 768px) {
+  .marquee-content {
+    animation: marquee 3s linear infinite; /* Faster on mobile */
+  }
+  
+  .marquee-content > * {
+    padding: 0 1.5rem; /* Less padding on mobile so all text fits */
+  }
+}
+
 /* Volume Slider Styles */
 input[type="range"] {
   -webkit-appearance: none;
