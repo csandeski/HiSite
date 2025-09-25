@@ -289,6 +289,122 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
+  async decrementUserPoints(userId: string, points: number): Promise<User | undefined> {
+    try {
+      // Log the operation for production debugging
+      console.log('[STORAGE] Decrementing points (ATOMIC):', {
+        userId,
+        pointsToDeduct: points,
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV
+      });
+      
+      // Get current user state before update
+      const userBefore = await this.getUser(userId);
+      if (!userBefore) {
+        console.error('[STORAGE] User not found for point decrement:', userId);
+        throw new Error(`User ${userId} not found`);
+      }
+      
+      console.log('[STORAGE] User points before decrement:', {
+        userId,
+        pointsBefore: userBefore.points,
+        pointsToDeduct: points,
+        expectedAfter: userBefore.points - points,
+        hasEnoughPoints: userBefore.points >= points
+      });
+      
+      // Check if user has enough points
+      if (userBefore.points < points) {
+        console.error('[STORAGE] INSUFFICIENT POINTS for atomic decrement:', {
+          userId,
+          available: userBefore.points,
+          requested: points,
+          shortBy: points - userBefore.points
+        });
+        throw new Error(`Pontos insuficientes`);
+      }
+      
+      // Atomic decrement of user points with retry logic
+      let result: User[] | undefined;
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (attempts < maxAttempts) {
+        attempts++;
+        try {
+          // CRITICAL: Use atomic SQL operation with WHERE clause to prevent negative points
+          result = await db.update(schema.users)
+            .set({ 
+              points: sql`GREATEST(0, ${schema.users.points} - ${points})`, // Never go below 0
+              updatedAt: new Date() 
+            })
+            .where(
+              sql`${schema.users.id} = ${userId} AND ${schema.users.points} >= ${points}`
+            )
+            .returning();
+            
+          if (result && result.length > 0) {
+            break;
+          } else if (attempts === 1) {
+            // First attempt failed - likely insufficient points after race condition
+            const currentUser = await this.getUser(userId);
+            if (currentUser && currentUser.points < points) {
+              console.error('[STORAGE] Race condition detected - points changed:', {
+                originalPoints: userBefore.points,
+                currentPoints: currentUser.points,
+                requested: points
+              });
+              throw new Error(`Pontos insuficientes`);
+            }
+          }
+        } catch (dbError) {
+          console.error(`[STORAGE] Point decrement attempt ${attempts} failed:`, dbError);
+          if (attempts < maxAttempts && !(dbError instanceof Error && dbError.message.includes('Pontos insuficientes'))) {
+            await new Promise(resolve => setTimeout(resolve, 100 * attempts));
+          } else {
+            throw dbError;
+          }
+        }
+      }
+      
+      const updatedUser = result?.[0];
+      
+      if (updatedUser) {
+        console.log('[STORAGE] Points decremented successfully (ATOMIC):', {
+          userId,
+          pointsBefore: userBefore.points,
+          pointsDeducted: points,
+          pointsAfter: updatedUser.points,
+          actualDecrement: userBefore.points - updatedUser.points,
+          attempts
+        });
+        
+        // Verify the decrement was correct
+        if (updatedUser.points !== userBefore.points - points) {
+          console.error('[STORAGE] Point decrement mismatch!', {
+            expected: userBefore.points - points,
+            actual: updatedUser.points,
+            difference: updatedUser.points - (userBefore.points - points)
+          });
+        }
+      } else {
+        console.error('[STORAGE] No user returned after point decrement - likely insufficient points');
+        throw new Error('Pontos insuficientes');
+      }
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('[STORAGE] Critical error decrementing points:', {
+        userId,
+        points,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      throw error;
+    }
+  }
+
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(schema.users).orderBy(desc(schema.users.createdAt));
   }

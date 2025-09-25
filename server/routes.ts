@@ -1209,10 +1209,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           console.log(`[POINTS_CONVERT] Transaction attempt ${transactionAttempts}`);
           
-          // Deduct points from user
-          const pointsUpdated = await storage.updateUser(req.session.userId!, {
-            points: user.points - points
-          });
+          // Deduct points from user with atomic operation
+          // Use decrementUserPoints for thread-safe operation
+          const pointsUpdated = await storage.decrementUserPoints(req.session.userId!, points);
           
           if (!pointsUpdated) {
             throw new Error('Failed to update user points');
