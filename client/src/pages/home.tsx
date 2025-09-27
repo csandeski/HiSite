@@ -12,6 +12,7 @@ import * as z from "zod";
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { trackCompleteRegistration } from "@/services/fbPixel";
 
 // Login form schema
 const loginSchema = z.object({
@@ -104,6 +105,14 @@ export default function Home({ setUserName }: HomeProps) {
         password: data.password,
         fullName: data.fullName,
       });
+      
+      // Track CompleteRegistration event for Facebook Pixel
+      await trackCompleteRegistration({
+        email: data.email,
+        fullName: data.fullName,
+        userId: data.email.split('@')[0] // Use username as userId
+      });
+      
       toast({
         title: "Cadastro realizado com sucesso!",
         description: "Bem-vindo ao RádioPlay!",
