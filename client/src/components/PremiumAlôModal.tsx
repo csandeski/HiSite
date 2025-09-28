@@ -53,33 +53,19 @@ export default function PremiumAloModal({ open, onOpenChange }: PremiumAloModalP
           {/* Title and Description */}
           <div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Envie Alôs Ilimitados!
+              Recurso Exclusivo Premium
             </h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Apenas membros <span className="font-semibold text-purple-600">Premium</span> podem enviar mensagens para as rádios. 
-              Além disso, você ganha:
+            <p className="text-gray-700 text-base leading-relaxed font-medium">
+              Para enviar mensagens ou alô torne-se um usuário <span className="font-bold text-purple-600">Premium</span>
             </p>
           </div>
 
-          {/* Benefits list */}
-          <ul className="text-left space-y-2 max-w-xs mx-auto">
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">✓</span>
-              <span className="text-sm text-gray-700">Ganhe <strong>3x mais pontos</strong> por minuto</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">✓</span>
-              <span className="text-sm text-gray-700">Envie quantos <strong>Alôs quiser</strong></span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">✓</span>
-              <span className="text-sm text-gray-700">Acesso a <strong>todas as rádios premium</strong></span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">✓</span>
-              <span className="text-sm text-gray-700"><strong>Prioridade</strong> no atendimento</span>
-            </li>
-          </ul>
+          {/* Benefits list - simplificado */}
+          <div className="text-sm text-gray-600 space-y-1">
+            <p>✓ Envie mensagens ilimitadas para as rádios</p>
+            <p>✓ Ganhe 3x mais pontos por minuto</p>
+            <p>✓ Acesso a todas as funcionalidades</p>
+          </div>
 
           {/* Buttons */}
           <div className="flex flex-col gap-3 pt-2">
