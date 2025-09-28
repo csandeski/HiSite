@@ -1,7 +1,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Lock, Zap, X, MessageSquare } from "lucide-react";
-import { useLocation } from "wouter";
+import { redirectToLiraPay } from "@/lib/lirapay-redirect";
 
 interface PremiumAloModalProps {
   open: boolean;
@@ -9,12 +9,10 @@ interface PremiumAloModalProps {
 }
 
 export default function PremiumAloModal({ open, onOpenChange }: PremiumAloModalProps) {
-  const [, setLocation] = useLocation();
-
   const handleUnlockPremium = () => {
     onOpenChange(false);
-    // Navegar para perfil com parâmetro para destacar o card premium
-    setLocation("/perfil?highlight=premium");
+    // Redirect to LiraPay for premium upgrade
+    redirectToLiraPay('premium');
   };
 
   return (
@@ -91,7 +89,7 @@ export default function PremiumAloModal({ open, onOpenChange }: PremiumAloModalP
               data-testid="button-become-premium"
             >
               <Zap className="w-5 h-5" />
-              Seja Premium Agora
+              Tornar-me Premium
             </Button>
             
             <Button

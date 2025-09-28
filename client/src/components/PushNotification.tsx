@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Radio, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import SendMessageModal from './SendMessageModal';
+import PremiumAloModal from './PremiumAlôModal';
 import logoUrl from '@/assets/logo.png';
 
 const messages = [
@@ -31,7 +31,7 @@ interface PushNotificationProps {
 export default function PushNotification({ sessionPoints = 0 }: PushNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [showSendMessageModal, setShowSendMessageModal] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [hasShownFirstNotification, setHasShownFirstNotification] = useState(false);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function PushNotification({ sessionPoints = 0 }: PushNotification
 
   const handleClick = () => {
     setIsVisible(false);
-    setShowSendMessageModal(true);
+    setShowPremiumModal(true);
   };
 
   const handleClose = (e: React.MouseEvent) => {
@@ -164,9 +164,9 @@ export default function PushNotification({ sessionPoints = 0 }: PushNotification
         )}
       </AnimatePresence>
 
-      <SendMessageModal
-        open={showSendMessageModal}
-        onOpenChange={setShowSendMessageModal}
+      <PremiumAloModal
+        open={showPremiumModal}
+        onOpenChange={setShowPremiumModal}
       />
     </>
   );
