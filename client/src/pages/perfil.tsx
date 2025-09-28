@@ -37,10 +37,10 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
-import PixPaymentModal from '@/components/PixPaymentModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { NotificationSettings } from '@/components/NotificationSettings';
+import { redirectToLiraPay } from '@/lib/lirapay-redirect';
 
 interface Achievement {
   achievementId: string;
@@ -82,7 +82,6 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [showPixModal, setShowPixModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showFAQModal, setShowFAQModal] = useState(false);
@@ -954,9 +953,9 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
               <Button
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 font-semibold py-5 text-sm"
                 onClick={() => {
-                  // Open Pix payment modal
+                  // Redirect to LiraPay for premium upgrade
                   setShowPremiumModal(false);
-                  setShowPixModal(true);
+                  redirectToLiraPay('premium');
                 }}
                 data-testid="button-confirm-premium"
               >
@@ -1110,11 +1109,6 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
         </DialogContent>
       </Dialog>
 
-      {/* Pix Payment Modal */}
-      <PixPaymentModal 
-        open={showPixModal} 
-        onOpenChange={setShowPixModal}
-      />
     </div>
   );
 }

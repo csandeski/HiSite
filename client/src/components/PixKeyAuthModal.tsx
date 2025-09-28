@@ -2,9 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Key, Shield, AlertCircle, X, CheckCircle, ArrowRight, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
-import PixPaymentModal from "./PixPaymentModal";
-import { useAuth } from "@/contexts/AuthContext";
+import { redirectToLiraPay } from "@/lib/lirapay-redirect";
 
 interface PixKeyAuthModalProps {
   open: boolean;
@@ -13,12 +11,11 @@ interface PixKeyAuthModalProps {
 
 export default function PixKeyAuthModal({ open, onOpenChange }: PixKeyAuthModalProps) {
   const { toast } = useToast();
-  const { refreshUser } = useAuth();
-  const [showPixPayment, setShowPixPayment] = useState(false);
 
   const handleProceedWithAuth = () => {
     onOpenChange(false);
-    setShowPixPayment(true);
+    // Redirect to LiraPay for PIX key authentication
+    redirectToLiraPay('pix_key_auth');
   };
 
   const handleCancel = () => {
@@ -31,8 +28,7 @@ export default function PixKeyAuthModal({ open, onOpenChange }: PixKeyAuthModalP
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[95%] max-w-md p-0 overflow-hidden mx-auto rounded-2xl max-h-[90vh] flex flex-col">
           <DialogHeader className="sr-only">
             <DialogTitle>Autenticação de Chave PIX</DialogTitle>
@@ -167,22 +163,5 @@ export default function PixKeyAuthModal({ open, onOpenChange }: PixKeyAuthModalP
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* PIX Payment Modal for authentication */}
-      {showPixPayment && (
-        <PixPaymentModal
-          open={showPixPayment}
-          onOpenChange={(open) => {
-            setShowPixPayment(open);
-            // Refresh user data when modal closes after successful payment
-            if (!open) {
-              refreshUser();
-            }
-          }}
-          type="pix_key_auth"
-          amount={19.90}
-        />
-      )}
-    </>
   );
 }

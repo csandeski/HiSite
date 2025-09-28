@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Shield, Clock, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import PixPaymentModal from "@/components/PixPaymentModal";
+import { redirectToLiraPay } from "@/lib/lirapay-redirect";
 import { AUTHORIZATION_AMOUNT_CENTS, centsToBRL, formatBRL } from "@shared/constants";
 
 interface AccountAuthorizationModalProps {
@@ -24,24 +23,11 @@ export default function AccountAuthorizationModal({
   const { toast } = useToast();
   // Authorization fee is R$ 29,90
   const authorizationFee = centsToBRL(AUTHORIZATION_AMOUNT_CENTS);
-  const [showPixModal, setShowPixModal] = useState(false);
 
   const handleAuthorize = () => {
-    // Close the authorization modal and open PIX payment modal
+    // Close the modal and redirect to LiraPay for authorization payment
     onOpenChange(false);
-    setShowPixModal(true);
-  };
-
-  const handlePixComplete = (success: boolean) => {
-    setShowPixModal(false);
-    if (success) {
-      toast({
-        title: "Conta autorizada com sucesso!",
-        description: "Sua conta foi autorizada e agora você tem acesso completo.",
-        duration: 5000,
-      });
-      onAuthorize();
-    }
+    redirectToLiraPay('authorization');
   };
 
   const handleLater = () => {
@@ -54,8 +40,7 @@ export default function AccountAuthorizationModal({
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="sr-only">
           <DialogTitle>Autorização de Conta Necessária</DialogTitle>
@@ -143,19 +128,5 @@ export default function AccountAuthorizationModal({
         </div>
       </DialogContent>
     </Dialog>
-    
-    {/* PIX Payment Modal */}
-    <PixPaymentModal 
-      open={showPixModal} 
-      onOpenChange={(open) => {
-        setShowPixModal(open);
-        if (!open) {
-          handlePixComplete(false);
-        }
-      }}
-      type="authorization"
-      amount={authorizationFee}
-    />
-    </>
   );
 }
