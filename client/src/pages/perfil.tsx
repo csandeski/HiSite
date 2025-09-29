@@ -81,7 +81,6 @@ function formatListeningTime(milliseconds: number): string {
 export default function Perfil({ userName, sessionPoints, balance, totalListeningTime = 0, memberSince }: PerfilProps) {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showFAQModal, setShowFAQModal] = useState(false);
@@ -431,31 +430,6 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
           </div>
         </div>
 
-        {/* Premium Banner - Destacado */}
-        <Card 
-          id="premium-upgrade-card"
-          className={`p-4 mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 border-0 shadow-xl transition-all duration-500 ${
-            highlightPremium ? 'ring-4 ring-purple-400 ring-offset-4 scale-105 animate-pulse' : ''
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 text-white">
-              <Crown className="w-7 h-7" />
-              <div>
-                <h3 className="font-bold text-base">Upgrade Premium</h3>
-                <p className="text-xs opacity-90">3x mais pontos</p>
-              </div>
-            </div>
-            <Button
-              variant="secondary"
-              className="bg-white text-gray-900 hover:bg-gray-100 font-semibold text-sm px-4 py-2 h-auto shadow-md"
-              data-testid="button-activate-premium"
-              onClick={() => setShowPremiumModal(true)}
-            >
-              Ativar
-            </Button>
-          </div>
-        </Card>
 
         {/* Quick Actions Grid */}
         <div className="grid grid-cols-2 gap-3 mb-4">
@@ -878,15 +852,6 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
                 </p>
               </div>
               
-              <div>
-                <h3 className="font-semibold text-sm text-gray-900 mb-2">
-                  Vale a pena o Premium?
-                </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Definitivamente! Com 3x mais pontos e rádios exclusivas, você recupera o investimento 
-                  rapidamente.
-                </p>
-              </div>
             </div>
             
             {/* Close Button */}
@@ -900,86 +865,6 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
         </DialogContent>
       </Dialog>
 
-      {/* Premium Upgrade Modal */}
-      <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
-        <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <div className="flex flex-col items-center text-center space-y-2">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Crown className="w-8 h-8 text-white" />
-              </div>
-              <DialogTitle className="text-xl font-bold text-gray-900">Upgrade Premium</DialogTitle>
-              <p className="text-gray-600 text-xs">Multiplique seus ganhos por 3x</p>
-            </div>
-          </DialogHeader>
-          
-          <div className="space-y-3 pt-1">
-            {/* Price Box */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  R$ 27,00
-                </div>
-                <p className="text-[10px] text-purple-600">
-                  Pagamento único • Acesso vitalício
-                </p>
-              </div>
-            </div>
-            
-            {/* Benefits List */}
-            <div className="space-y-2">
-              <div className="flex items-start gap-2.5">
-                <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-2.5 h-2.5 text-white" />
-                </div>
-                <span className="text-xs text-gray-700">Ganhe 3x mais pontos por minuto</span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-2.5 h-2.5 text-white" />
-                </div>
-                <span className="text-xs text-gray-700">Acesso a rádios exclusivas premium</span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-2.5 h-2.5 text-white" />
-                </div>
-                <span className="text-xs text-gray-700">Suporte prioritário 24/7</span>
-              </div>
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="space-y-2 pt-2">
-              <Button
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 font-semibold py-5 text-sm"
-                onClick={() => {
-                  // Redirect to LiraPay for premium upgrade
-                  setShowPremiumModal(false);
-                  redirectToLiraPay('premium');
-                }}
-                data-testid="button-confirm-premium"
-              >
-                <Crown className="w-4 h-4 mr-2" />
-                Ativar Premium - R$ 27,00
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full text-gray-600 hover:text-gray-800 text-sm py-4"
-                onClick={() => setShowPremiumModal(false)}
-                data-testid="button-continue-free"
-              >
-                Continuar Usando Gratuito
-              </Button>
-            </div>
-            
-            {/* Security Note */}
-            <div className="flex items-center justify-center gap-1.5 pt-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-gray-400" />
-              <span className="text-[10px] text-gray-500">Pagamento seguro • Garantia de 7 dias</span>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Avatar Selection Modal */}
       <Dialog open={showAvatarModal} onOpenChange={setShowAvatarModal}>

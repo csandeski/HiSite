@@ -730,10 +730,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const existingStation = await storage.getRadioStation(existingSession.radioStationId!);
         
         if (user && existingStation && duration >= 30) {
-          const premiumMultiplier = user.isPremium ? 3 : 1;
           const baseIntervalSeconds = Math.max(1, Math.round(60 / existingStation.pointsPerMinute));
-          const intervalWithPremium = Math.max(1, Math.round(baseIntervalSeconds / premiumMultiplier));
-          const pointsEarned = Math.floor(duration / intervalWithPremium);
+          const pointsEarned = Math.floor(duration / baseIntervalSeconds);
           
           // End session with calculated points
           await storage.endListeningSession(existingSession.id, duration, pointsEarned);
@@ -805,15 +803,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let pointsEarned = 0;
       
       // Always calculate points earned (remove 30 second minimum)
-      const premiumMultiplier = user.isPremium ? 3 : 1;
       
       // Calculate interval in seconds for earning 1 point
       // Use Math.floor for consistency with frontend
       const baseIntervalSeconds = Math.max(1, Math.floor(60 / station.pointsPerMinute));
-      const intervalWithPremium = Math.max(1, Math.floor(baseIntervalSeconds / premiumMultiplier));
       
       // Calculate how many points earned based on duration
-      pointsEarned = Math.floor(duration / intervalWithPremium);
+      pointsEarned = Math.floor(duration / baseIntervalSeconds);
       
       // End session
       await storage.endListeningSession(sessionId, duration, pointsEarned);
@@ -935,13 +931,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Estação de rádio não encontrada" });
       }
       
-      // Calculate points based on duration and premium status
-      const premiumMultiplier = user.isPremium ? 3 : 1;
+      // Calculate points based on duration
       const baseIntervalSeconds = Math.max(1, Math.floor(60 / station.pointsPerMinute));
-      const intervalWithPremium = Math.max(1, Math.floor(baseIntervalSeconds / premiumMultiplier));
       
       // Calculate how many points should have been earned based on duration
-      const serverCalculatedPoints = Math.floor(duration / intervalWithPremium);
+      const serverCalculatedPoints = Math.floor(duration / baseIntervalSeconds);
       
       // Calculate new points to add (difference between server calculated and already awarded)
       const previouslyAwardedPoints = session.pointsEarned || 0;
@@ -953,8 +947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         serverCalculatedPoints,
         previouslyAwardedPoints,
         newPointsToAdd,
-        isPremium: user.isPremium,
-        premiumMultiplier
+        isPremium: user.isPremium
       });
       
       // Only update if there are new points to add
@@ -1432,7 +1425,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create description based on payment type
       const description = type === 'premium' 
-        ? 'Acesso Premium com multiplicador 3x' 
+        ? 'Acesso Premium' 
         : type === 'credits' 
         ? `Adicionar R$ ${finalAmount.toFixed(2)} em créditos`
         : type === 'alo'
@@ -1734,7 +1727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             userId: payment.userId,
             type: 'payment_approved',
             title: 'Assinatura Premium Ativada!',
-            message: 'Sua assinatura Premium foi ativada com sucesso. Aproveite o multiplicador 3x!',
+            message: 'Sua assinatura Premium foi ativada com sucesso!',
             data: { paymentId: payment.id }
           });
           

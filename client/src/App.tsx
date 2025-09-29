@@ -17,7 +17,6 @@ import PixTestPage from "@/pages/pix-test";
 import { useState, useEffect, createContext, useContext, useRef, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
-import PremiumPopup from "@/components/PremiumPopup";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 import PushNotification from "@/components/PushNotification";
@@ -169,7 +168,6 @@ function App({ user }: { user: any }) {
   const [activeTab, setActiveTab] = useState("radio");
   const [location, setLocation] = useLocation();
   const [hasReachedPointsThreshold, setHasReachedPointsThreshold] = useState(false);
-  const [showPremiumPopup, setShowPremiumPopup] = useState(false);
   const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
   const [initialPointsLoaded, setInitialPointsLoaded] = useState(false);
   const [hasShown100PointsPopup, setHasShown100PointsPopup] = useState(false);
@@ -337,7 +335,7 @@ function App({ user }: { user: any }) {
     const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
     if (user && initialPointsLoaded && sessionPoints >= 330 && !hasReachedPointsThreshold && isPlaying && protectedRoutes.includes(location)) {
       setHasReachedPointsThreshold(true);
-      setShowPremiumPopup(true);
+
       setLastPopupTime(Date.now());
     }
   }, [user, initialPointsLoaded, sessionPoints, hasReachedPointsThreshold, isPlaying, location]);
@@ -345,7 +343,7 @@ function App({ user }: { user: any }) {
   // Show popup every 75 seconds (1:15 min) after reaching 330 points (only if logged in and playing)
   useEffect(() => {
     const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
-    if (user && hasReachedPointsThreshold && !showPremiumPopup && isPlaying && protectedRoutes.includes(location)) {
+    if (user && hasReachedPointsThreshold && isPlaying && protectedRoutes.includes(location)) {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -355,7 +353,7 @@ function App({ user }: { user: any }) {
       intervalRef.current = setInterval(() => {
         // Only show if still playing and not on home page
         if (isPlaying && protectedRoutes.includes(location)) {
-          setShowPremiumPopup(true);
+    
           setLastPopupTime(Date.now());
         }
       }, 75000); // 75 seconds (1:15 min)
@@ -371,15 +369,8 @@ function App({ user }: { user: any }) {
         clearInterval(intervalRef.current);
       }
     }
-  }, [user, hasReachedPointsThreshold, showPremiumPopup, isPlaying, location]);
+  }, [user, hasReachedPointsThreshold, isPlaying, location]);
 
-  const handlePremiumPopupClose = (open: boolean) => {
-    setShowPremiumPopup(open);
-    if (!open) {
-      // Reset the timer when popup is closed
-      setLastPopupTime(Date.now());
-    }
-  };
 
   // Celebration Toast - Show when user reaches 20 points for the first time
   useEffect(() => {
@@ -400,7 +391,7 @@ function App({ user }: { user: any }) {
     const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
     if (user && initialPointsLoaded && sessionPoints >= 100 && !hasShown100PointsPopup && isPlaying && protectedRoutes.includes(location)) {
       setHasShown100PointsPopup(true);
-      setShowPremiumPopup(true);
+
       setLastPopupTime(Date.now());
     }
   }, [user, initialPointsLoaded, sessionPoints, hasShown100PointsPopup, isPlaying, location]);
@@ -813,8 +804,6 @@ function App({ user }: { user: any }) {
     setSessionPoints,
     balance,
     setBalance,
-    showPremiumPopup,
-    setShowPremiumPopup: handlePremiumPopupClose,
     userName,
     setUserName,
     refreshPoints,
@@ -1105,13 +1094,6 @@ function App({ user }: { user: any }) {
               </nav>
             )}
             
-            {/* Premium Popup - Only show when logged in AND not on home page */}
-            {user && location !== "/" && location !== "/login" && location !== "/register" && (
-              <PremiumPopup 
-                open={showPremiumPopup} 
-                onOpenChange={handlePremiumPopupClose}
-              />
-            )}
             
             
           </div>

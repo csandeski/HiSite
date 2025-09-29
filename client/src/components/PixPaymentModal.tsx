@@ -105,7 +105,7 @@ export default function PixPaymentModal({ open, onOpenChange, type = 'premium', 
           
           if (type === 'premium') {
             toastTitle = "Premium ativado!";
-            toastDescription = "Sua assinatura Premium foi ativada com sucesso. Aproveite o multiplicador 3x!";
+            toastDescription = "Sua assinatura Premium foi ativada com sucesso!";
           } else if (type === 'credits') {
             toastTitle = "Créditos adicionados!";
             toastDescription = `R$ ${finalAmount.toFixed(2)} foram adicionados ao seu saldo.`;

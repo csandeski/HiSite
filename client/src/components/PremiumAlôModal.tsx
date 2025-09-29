@@ -60,12 +60,6 @@ export default function PremiumAloModal({ open, onOpenChange }: PremiumAloModalP
             </p>
           </div>
 
-          {/* Benefits list - simplificado */}
-          <div className="text-sm text-gray-600 space-y-1">
-            <p>✓ Envie mensagens ilimitadas para as rádios</p>
-            <p>✓ Ganhe 3x mais pontos por minuto</p>
-            <p>✓ Acesso a todas as funcionalidades</p>
-          </div>
 
           {/* Buttons */}
           <div className="flex flex-col gap-3 pt-2">
