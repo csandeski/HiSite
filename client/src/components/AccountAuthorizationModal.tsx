@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Shield, Clock, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { redirectToLiraPay } from "@/lib/lirapay-redirect";
 import { AUTHORIZATION_AMOUNT_CENTS, centsToBRL, formatBRL } from "@shared/constants";
+import PixPaymentModal from "@/components/PixPaymentModal";
 
 interface AccountAuthorizationModalProps {
   open: boolean;
@@ -21,13 +22,14 @@ export default function AccountAuthorizationModal({
   onLater
 }: AccountAuthorizationModalProps) {
   const { toast } = useToast();
+  const [showPixModal, setShowPixModal] = useState(false);
   // Authorization fee is R$ 29,90
   const authorizationFee = centsToBRL(AUTHORIZATION_AMOUNT_CENTS);
 
   const handleAuthorize = () => {
-    // Close the modal and redirect to LiraPay for authorization payment
+    // Close this modal and open the PixPaymentModal
     onOpenChange(false);
-    redirectToLiraPay('authorization');
+    setShowPixModal(true);
   };
 
   const handleLater = () => {
@@ -40,7 +42,8 @@ export default function AccountAuthorizationModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="sr-only">
           <DialogTitle>Autorização de Conta Necessária</DialogTitle>
@@ -128,5 +131,13 @@ export default function AccountAuthorizationModal({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* PIX Payment Modal */}
+    <PixPaymentModal
+      open={showPixModal}
+      onOpenChange={setShowPixModal}
+      type="authorization"
+    />
+    </>
   );
 }

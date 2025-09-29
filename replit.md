@@ -3,6 +3,14 @@
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
 ## Recent Updates (29/09/2025)
+- **Migração de LiraPay para ViperPay**:
+  - ✅ Substituída toda integração de pagamentos de LiraPay para ViperPay
+  - ✅ Novo serviço ViperPay implementado com API completa
+  - ✅ Webhook endpoint atualizado para /api/webhook/viperpay
+  - ✅ Removidos redirecionamentos externos, agora usa API direta com PIX
+  - ✅ Modais de pagamento agora geram PIX via ViperPay API
+  - ✅ API Key configurada como secret seguro (VIPERPAY_API_KEY)
+
 - **Remoção do Sistema de Upgrade Premium 3x**:
   - ✅ Removido card de upgrade premium da página de perfil
   - ✅ Removidas todas as referências ao multiplicador 3x de pontos

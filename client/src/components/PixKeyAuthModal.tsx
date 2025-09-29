@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Key, Shield, AlertCircle, X, CheckCircle, ArrowRight, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { redirectToLiraPay } from "@/lib/lirapay-redirect";
+import PixPaymentModal from "@/components/PixPaymentModal";
 
 interface PixKeyAuthModalProps {
   open: boolean;
@@ -11,11 +12,12 @@ interface PixKeyAuthModalProps {
 
 export default function PixKeyAuthModal({ open, onOpenChange }: PixKeyAuthModalProps) {
   const { toast } = useToast();
+  const [showPixModal, setShowPixModal] = useState(false);
 
   const handleProceedWithAuth = () => {
+    // Close this modal and open the PixPaymentModal
     onOpenChange(false);
-    // Redirect to LiraPay for PIX key authentication
-    redirectToLiraPay('pix_key_auth');
+    setShowPixModal(true);
   };
 
   const handleCancel = () => {
@@ -28,7 +30,8 @@ export default function PixKeyAuthModal({ open, onOpenChange }: PixKeyAuthModalP
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[95%] max-w-md p-0 overflow-hidden mx-auto rounded-2xl max-h-[90vh] flex flex-col">
           <DialogHeader className="sr-only">
             <DialogTitle>Autenticação de Chave PIX</DialogTitle>
@@ -163,5 +166,13 @@ export default function PixKeyAuthModal({ open, onOpenChange }: PixKeyAuthModalP
           </div>
         </DialogContent>
       </Dialog>
+
+    {/* PIX Payment Modal */}
+    <PixPaymentModal
+      open={showPixModal}
+      onOpenChange={setShowPixModal}
+      type="pix_key_auth"
+    />
+    </>
   );
 }

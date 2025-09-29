@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Lock, Zap, X, MessageSquare } from "lucide-react";
-import { redirectToLiraPay } from "@/lib/lirapay-redirect";
+import PixPaymentModal from "@/components/PixPaymentModal";
 
 interface PremiumAloModalProps {
   open: boolean;
@@ -9,14 +10,17 @@ interface PremiumAloModalProps {
 }
 
 export default function PremiumAloModal({ open, onOpenChange }: PremiumAloModalProps) {
+  const [showPixModal, setShowPixModal] = useState(false);
+
   const handleUnlockPremium = () => {
+    // Close this modal and open the PixPaymentModal
     onOpenChange(false);
-    // Redirect to LiraPay for premium upgrade
-    redirectToLiraPay('premium');
+    setShowPixModal(true);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full p-0 overflow-hidden mx-auto rounded-2xl">
         {/* Close button */}
         <Button
@@ -84,5 +88,13 @@ export default function PremiumAloModal({ open, onOpenChange }: PremiumAloModalP
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* PIX Payment Modal */}
+    <PixPaymentModal
+      open={showPixModal}
+      onOpenChange={setShowPixModal}
+      type="premium"
+    />
+    </>
   );
 }

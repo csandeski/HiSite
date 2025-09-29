@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import type { User } from "@shared/schema";
-import { LiraPayService } from "./services/lirapay";
+import { ViperPayService } from "./services/viperpay";
 
 // Session types
 declare module "express-session" {
@@ -47,10 +47,10 @@ function requireAdmin(req: Request, res: Response, next: any) {
   next();
 }
 
-// Initialize LiraPay service
-const liraPayService = new LiraPayService();
+// Initialize ViperPay service
+const viperPayService = new ViperPayService();
 
-// Generate fake user data for LiraPay testing
+// Generate fake user data for ViperPay testing
 function generateFakeUserData() {
   // Generate random CPF (valid format but fake)
   const generateRandomCPF = () => {
@@ -120,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           NODE_ENV: process.env.NODE_ENV || 'development',
           DATABASE_URL_EXISTS: !!process.env.DATABASE_URL,
           SESSION_SECRET_EXISTS: !!process.env.SESSION_SECRET,
-          LIRAPAY_API_KEY_EXISTS: !!process.env.LIRAPAY_API_KEY,
+          VIPERPAY_API_KEY_EXISTS: !!process.env.VIPERPAY_API_KEY,
           PORT: process.env.PORT || '5000',
           FRONTEND_URL: process.env.FRONTEND_URL || 'not set',
           COOKIE_DOMAIN: process.env.COOKIE_DOMAIN || 'not set',
@@ -349,22 +349,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Debug endpoint to test LiraPay API
-  app.get('/api/debug/lirapay-test', async (req, res) => {
+  // Debug endpoint to test ViperPay API
+  app.get('/api/debug/viperpay-test', async (req, res) => {
     try {
-      console.log('Testing LiraPay API connection...');
+      console.log('Testing ViperPay API connection...');
       
       // Test 1: Check if API key is loaded
-      const hasApiKey = !!process.env.LIRAPAY_API_KEY;
+      const hasApiKey = !!process.env.VIPERPAY_API_KEY;
       console.log('API Key loaded:', hasApiKey);
-      console.log('API Key length:', process.env.LIRAPAY_API_KEY?.length || 0);
-      console.log('API Key first 10 chars:', process.env.LIRAPAY_API_KEY?.substring(0, 10) || 'N/A');
+      console.log('API Key length:', process.env.VIPERPAY_API_KEY?.length || 0);
+      console.log('API Key first 10 chars:', process.env.VIPERPAY_API_KEY?.substring(0, 10) || 'N/A');
       
       // Test 2: Try to get account info
       let accountInfo = null;
       let accountError = null;
       try {
-        accountInfo = await liraPayService.getAccountInfo();
+        accountInfo = await viperPayService.getAccountInfo();
       } catch (error) {
         accountError = error instanceof Error ? error.message : String(error);
       }
@@ -378,8 +378,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         tests: {
           apiKeyLoaded: hasApiKey,
-          apiKeyLength: process.env.LIRAPAY_API_KEY?.length || 0,
-          apiKeyPreview: process.env.LIRAPAY_API_KEY?.substring(0, 20) + '...',
+          apiKeyLength: process.env.VIPERPAY_API_KEY?.length || 0,
+          apiKeyPreview: process.env.VIPERPAY_API_KEY?.substring(0, 20) + '...',
           accountInfo: {
             success: !!accountInfo,
             data: accountInfo,
@@ -1367,7 +1367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // LiraPay Payment Routes
+  // ViperPay Payment Routes
   app.post("/api/payment/create-pix", requireAuth, async (req, res) => {
     try {
       const { type, amount, utms: clientUtms } = req.body;
@@ -1420,7 +1420,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate reference
       const reference = `${req.session.userId!}_${type}_${Date.now()}`;
       
-      // Generate fake user data for LiraPay testing (never use real user data)
+      // Generate fake user data for ViperPay testing (never use real user data)
       const fakeUser = generateFakeUserData();
       
       // Create description based on payment type
@@ -1437,11 +1437,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : `Pagamento - R$ ${finalAmount.toFixed(2)}`;
       
       // Create webhook URL
-      const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/lirapay`;
+      const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/viperpay`;
       
-      // Create transaction with LiraPay
-      console.log('Creating PIX transaction with LiraPay...');
-      const pixResponse = await liraPayService.createPixPayment(
+      // Create transaction with ViperPay
+      console.log('Creating PIX transaction with ViperPay...');
+      const pixResponse = await viperPayService.createPixPayment(
         finalAmount,
         description,
         reference,
@@ -1456,7 +1456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       // Log response to debug
-      console.log('LiraPay Response:', {
+      console.log('ViperPay Response:', {
         hasPixCode: !!pixResponse.pixCode,
         reference: pixResponse.reference
       });
@@ -1470,7 +1470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type,
         status: 'pending',
         pixData: {
-          encodedImage: null, // LiraPay doesn't provide QR code image
+          encodedImage: null, // ViperPay doesn't provide QR code image
           payload: pixResponse.pixCode
         }
       });
@@ -1479,7 +1479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Sending response with PIX data...');
       
       if (!pixResponse || !pixResponse.pixCode) {
-        throw new Error('PIX data not received from LiraPay');
+        throw new Error('PIX data not received from ViperPay');
       }
       
       const responseData = {
@@ -1487,7 +1487,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         transactionId: pixResponse.reference,
         reference: reference,
         pix: {
-          encodedImage: null, // LiraPay doesn't provide QR image
+          encodedImage: null, // ViperPay doesn't provide QR image
           payload: pixResponse.pixCode
         },
         amount: finalAmount
@@ -1535,18 +1535,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate reference
       const reference = `${req.session.userId!}_${type}_${Date.now()}`;
       
-      // Generate fake user data for LiraPay testing
+      // Generate fake user data for ViperPay testing
       const fakeUser = generateFakeUserData();
       
       // Create description
       const description = 'Taxa de autenticação de chave PIX com reembolso integral';
       
       // Create webhook URL
-      const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/lirapay`;
+      const webhookUrl = `${process.env.FRONTEND_URL || 'https://your-domain.com'}/api/webhook/viperpay`;
       
-      // Create transaction with LiraPay
-      console.log('Creating PIX transaction for pix-key-auth with LiraPay...');
-      const pixResponse = await liraPayService.createPixPayment(
+      // Create transaction with ViperPay
+      console.log('Creating PIX transaction for pix-key-auth with ViperPay...');
+      const pixResponse = await viperPayService.createPixPayment(
         finalAmount,
         description,
         reference,
@@ -1569,7 +1569,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type,
         status: 'pending',
         pixData: {
-          encodedImage: null, // LiraPay doesn't provide QR code image
+          encodedImage: null, // ViperPay doesn't provide QR code image
           payload: pixResponse.pixCode
         }
       });
@@ -1628,19 +1628,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: 'Payment not found' });
       }
       
-      // Check real-time status with LiraPay if payment is still pending
+      // Check real-time status with ViperPay if payment is still pending
       if (payment.status === 'pending') {
         try {
-          const liraPayStatus = await liraPayService.getPaymentStatus(payment.transactionId);
+          const viperPayTransaction = await viperPayService.getTransaction(payment.transactionId);
+          
+          // Map ViperPay status to our internal status
+          let viperPayStatus = payment.status;
+          if (viperPayTransaction.status === 'AUTHORIZED') {
+            viperPayStatus = 'approved';
+          } else if (viperPayTransaction.status === 'FAILED') {
+            viperPayStatus = 'rejected';
+          } else if (viperPayTransaction.status === 'PENDING') {
+            viperPayStatus = 'pending';
+          }
           
           // Update local payment status if it changed
-          if (liraPayStatus !== payment.status) {
-            await storage.updatePaymentStatus(payment.id, liraPayStatus);
-            payment.status = liraPayStatus;
+          if (viperPayStatus !== payment.status) {
+            await storage.updatePaymentStatus(payment.id, viperPayStatus);
+            payment.status = viperPayStatus;
           }
         } catch (error) {
-          console.error('Error checking LiraPay status:', error);
-          // Continue with stored status if LiraPay check fails
+          console.error('Error checking ViperPay status:', error);
+          // Continue with stored status if ViperPay check fails
         }
       }
       
@@ -1660,16 +1670,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // LiraPay Webhook - NO authentication required as it comes from external service
-  app.post("/api/webhook/lirapay", async (req, res) => {
+  // ViperPay Webhook - NO authentication required as it comes from external service
+  app.post("/api/webhook/viperpay", async (req, res) => {
     try {
       const webhookData = req.body;
       const signature = req.headers['x-webhook-signature'] as string;
       
       // Log webhook for debugging
-      console.log('LiraPay Webhook received:', webhookData);
+      console.log('ViperPay Webhook received:', webhookData);
       
-      // Extract transaction ID from webhook data (LiraPay format)
+      // Extract transaction ID from webhook data (ViperPay format)
       const transactionId = webhookData.id || webhookData.external_id;
       const status = webhookData.status;
       
@@ -2243,10 +2253,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fakeUser = generateFakeUserData();
       const reference = `test_${Date.now()}`;
       
-      console.log("Testing LiraPay with fake user:", fakeUser);
+      console.log("Testing ViperPay with fake user:", fakeUser);
       
-      // Call LiraPay API directly
-      const pixResponse = await liraPayService.createPixPayment(
+      // Call ViperPay API directly
+      const pixResponse = await viperPayService.createPixPayment(
         19.90,
         'TESTE DE PIX',
         reference,
@@ -2260,7 +2270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         {}
       );
       
-      console.log("LiraPay response:", pixResponse);
+      console.log("ViperPay response:", pixResponse);
       
       res.json({
         success: true,

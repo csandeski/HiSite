@@ -23,10 +23,10 @@ if (process.env.NODE_ENV === 'production') {
     console.log('[CONFIG] SESSION_SECRET is configured');
   }
   
-  if (!process.env.LIRAPAY_API_KEY) {
-    console.warn('[WARNING] LIRAPAY_API_KEY is not set, payments will not work');
+  if (!process.env.VIPERPAY_API_KEY) {
+    console.warn('[WARNING] VIPERPAY_API_KEY is not set, payments will not work');
   } else {
-    console.log('[CONFIG] LIRAPAY_API_KEY is configured');
+    console.log('[CONFIG] VIPERPAY_API_KEY is configured');
   }
   
   console.log('[CONFIG] Running in PRODUCTION mode');

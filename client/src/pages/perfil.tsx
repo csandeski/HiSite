@@ -40,7 +40,6 @@ import logoUrl from '@/assets/logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { NotificationSettings } from '@/components/NotificationSettings';
-import { redirectToLiraPay } from '@/lib/lirapay-redirect';
 
 interface Achievement {
   achievementId: string;
