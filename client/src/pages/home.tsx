@@ -416,8 +416,8 @@ export default function Home({ setUserName }: HomeProps) {
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    <Star className="w-4 h-4 text-gray-300" />
-                    <Star className="w-4 h-4 text-gray-300" />
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                   </div>
                 </div>
               </div>
