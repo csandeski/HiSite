@@ -2,6 +2,26 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
+## Recent Updates (30/09/2025)
+- **Novo Fluxo de Autorização Obrigatória**:
+  - ✅ TODAS as notificações automáticas agora só aparecem APÓS pagamento da taxa de autorização
+  - ✅ WelcomeModal só aparece para usuários com accountAuthorized = true
+  - ✅ PushNotification só funciona após autorização da conta
+  - ✅ Nenhuma notificação de pagamento ou upgrade aparece antes da autorização
+  
+- **Remoção Total de Upgrade Premium**:
+  - ✅ Removidas TODAS as menções a upgrade premium do perfil
+  - ✅ Removido texto sobre ganhos diários com premium (R$ 1.200/dia)
+  - ✅ Crown icon removido dos imports
+  - ✅ Badges de conquistas premium agora usam cores neutras
+  - ✅ Sem cards ou seções promovendo upgrade premium
+
+- **Nova Tabela de Conversão de Pontos**:
+  - ✅ 100 pontos = R$ 7,50
+  - ✅ 250 pontos = R$ 24,00
+  - ✅ 400 pontos = R$ 60,00
+  - ✅ 600 pontos = R$ 150,00
+
 ## Recent Updates (29/09/2025)
 - **Migração de LiraPay para ViperPay**:
   - ✅ Substituída toda integração de pagamentos de LiraPay para ViperPay
@@ -10,14 +30,6 @@ RádioPlay - A Portuguese-language platform about earning money by listening to 
   - ✅ Removidos redirecionamentos externos, agora usa API direta com PIX
   - ✅ Modais de pagamento agora geram PIX via ViperPay API
   - ✅ API Key configurada como secret seguro (VIPERPAY_API_KEY)
-
-- **Remoção do Sistema de Upgrade Premium 3x**:
-  - ✅ Removido card de upgrade premium da página de perfil
-  - ✅ Removidas todas as referências ao multiplicador 3x de pontos
-  - ✅ PremiumPopup completamente removido do aplicativo
-  - ✅ Backend não aplica mais multiplicador para usuários premium
-  - ✅ Todos ganham pontos igualmente, independente de status premium
-  - ✅ Premium agora serve apenas para enviar mensagens/alôs para rádios
 
 ## Recent Updates (25/09/2025)
 - **Sistema de Sincronização Ultra-Rápida de Pontos**:
