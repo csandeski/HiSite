@@ -48,11 +48,11 @@ RádioPlay - A Portuguese-language platform about earning money by listening to 
 
 ## Recent Updates (23/09/2025)
 - **Correção Completa do Sistema de Autorização PIX**:
-  - ✅ Valor de autorização corrigido para R$ 29,90 (conforme solicitado)
+  - ✅ Valor de autorização ajustado para R$ 19,99 
   - ✅ Criado arquivo shared/constants.ts para valores únicos em toda aplicação
-  - ✅ AccountAuthorizationModal mostra corretamente R$ 29,90
+  - ✅ AccountAuthorizationModal mostra corretamente R$ 19,99
   - ✅ PixPaymentModal não força mais valores incorretos
-  - ✅ Backend valida corretamente R$ 29,90 para autorização
+  - ✅ Backend valida corretamente R$ 19,99 para autorização
   - ✅ PIX gerado com sucesso via IronPay (OrinPay) com QR Code funcional
   - ✅ Fluxo testado e funcionando completamente end-to-end
 

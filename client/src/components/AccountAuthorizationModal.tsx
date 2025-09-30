@@ -111,11 +111,10 @@ export default function AccountAuthorizationModal({
           {/* Action Buttons */}
           <div className="space-y-3 pt-2">
             <Button
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-5 text-sm shadow-lg flex items-center justify-center gap-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-5 text-sm shadow-lg"
               onClick={handleAuthorize}
               data-testid="button-authorize-account"
             >
-              <Shield className="w-4 h-4" />
               Autorizar Conta - {formatBRL(AUTHORIZATION_AMOUNT_CENTS)}
             </Button>
             
