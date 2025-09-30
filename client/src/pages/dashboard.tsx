@@ -68,13 +68,13 @@ export default function Dashboard({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   
-  // Check if it's the first visit
+  // Check if it's the first visit and user has accountAuthorized
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
-    if (!hasSeenWelcome) {
+    if (!hasSeenWelcome && user?.accountAuthorized) {
       setShowWelcomeModal(true);
     }
-  }, []);
+  }, [user?.accountAuthorized]);
   
   const handleWelcomeComplete = () => {
     localStorage.setItem('hasSeenWelcome', 'true');

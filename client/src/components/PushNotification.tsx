@@ -35,7 +35,9 @@ export default function PushNotification({ sessionPoints = 0 }: PushNotification
   const [hasShownFirstNotification, setHasShownFirstNotification] = useState(false);
 
   useEffect(() => {
-    // Só exibir notificações se o usuário tiver 200 pontos ou mais
+    // PushNotification component already checks for accountAuthorized in App.tsx
+    // So we only need to check points here since this component won't be rendered
+    // unless user has accountAuthorized
     if (sessionPoints >= 200) {
       // Show first notification after 3 seconds if not shown yet
       if (!hasShownFirstNotification) {

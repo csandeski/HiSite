@@ -85,7 +85,6 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
   const [showFAQModal, setShowFAQModal] = useState(false);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showPasswordFields, setShowPasswordFields] = useState(false);
-  const [highlightPremium, setHighlightPremium] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -127,26 +126,6 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
     }
   };
 
-  // Check for highlight parameter in URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('highlight') === 'premium') {
-      setHighlightPremium(true);
-      // Scroll to the premium card after a short delay
-      setTimeout(() => {
-        const premiumCard = document.getElementById('premium-upgrade-card');
-        if (premiumCard) {
-          premiumCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
-      // Remove highlight after animation
-      setTimeout(() => {
-        setHighlightPremium(false);
-        // Clean URL without reloading
-        window.history.replaceState({}, document.title, '/perfil');
-      }, 3000);
-    }
-  }, []);
   
   // Get initials from name
   const getInitials = (name: string) => {

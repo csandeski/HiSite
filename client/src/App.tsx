@@ -843,11 +843,11 @@ function App({ user }: { user: any }) {
               </Route>
               <Route path="/dashboard">
                 <DashboardComp {...playerProps} totalListeningTime={totalListeningTime} />
-                {user && <PushNotification sessionPoints={sessionPoints} />}
+                {user && user.accountAuthorized && <PushNotification sessionPoints={sessionPoints} />}
               </Route>
               <Route path="/resgatar">
                 <Resgatar {...playerProps} />
-                {user && <PushNotification sessionPoints={sessionPoints} />}
+                {user && user.accountAuthorized && <PushNotification sessionPoints={sessionPoints} />}
               </Route>
               <Route path="/perfil">
                 <Perfil 
@@ -857,7 +857,7 @@ function App({ user }: { user: any }) {
                   totalListeningTime={totalListeningTime}
                   memberSince={memberSince}
                 />
-                {user && <PushNotification sessionPoints={sessionPoints} />}
+                {user && user.accountAuthorized && <PushNotification sessionPoints={sessionPoints} />}
               </Route>
               <Route path="/adm/login">
                 <AdminLoginPage />

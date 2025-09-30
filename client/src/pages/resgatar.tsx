@@ -335,21 +335,21 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       badge: null,
     },
     {
-      points: 300,
+      points: 250,
       value: 24.00,
-      conversionRate: "R$ 0,08/pt",
+      conversionRate: "R$ 0,096/pt",
       badge: null,
     },
     {
-      points: 600,
+      points: 400,
       value: 60.00,
-      conversionRate: "R$ 0,10/pt",
+      conversionRate: "R$ 0,15/pt",
       badge: "Popular",
     },
     {
-      points: 1200,
+      points: 600,
       value: 150.00,
-      conversionRate: "R$ 0,125/pt",
+      conversionRate: "R$ 0,25/pt",
       badge: "Melhor taxa",
     }
   ];
