@@ -1176,10 +1176,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Define conversion rates (server-controlled for security)
       const conversionRates = {
-        100: 7.50,   // R$ 0,075/pt
-        300: 24.00,  // R$ 0,08/pt  
-        600: 60.00,  // R$ 0,10/pt
-        1200: 150.00 // R$ 0,125/pt
+        100: 7.50,    // R$ 0,075/pt
+        250: 24.00,   // R$ 0,096/pt  
+        400: 60.00,   // R$ 0,15/pt
+        600: 150.00   // R$ 0,25/pt
       };
       
       // Check if points amount is valid
