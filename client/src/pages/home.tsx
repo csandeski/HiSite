@@ -434,11 +434,11 @@ export default function Home({ setUserName }: HomeProps) {
                 <div className="flex-1">
                   <h3 className="font-bold text-lg md:text-xl mb-2 text-gray-900">Saques Rápidos</h3>
                   <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                    Receba seus ganhos via PIX em até 24 horas após solicitar o saque. Simples e rápido!
+                    Receba seus ganhos via PIX em até 1 hora após solicitar o saque. Simples e rápido!
                   </p>
                   <div className="mt-4 flex items-center gap-3">
                     <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">PIX</span>
-                    <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">24h</span>
+                    <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">1h</span>
                     <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">R$ 10+</span>
                   </div>
                 </div>
