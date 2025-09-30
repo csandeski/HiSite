@@ -8,7 +8,6 @@ import {
   User, 
   Trophy, 
   Wallet, 
-  Crown,
   Settings,
   LogOut,
   ChevronRight,
@@ -358,7 +357,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
                       case 'listening': return 'bg-blue-100 text-blue-700';
                       case 'points': return 'bg-green-100 text-green-700';
                       case 'referral': return 'bg-purple-100 text-purple-700';
-                      case 'premium': return 'bg-orange-100 text-orange-700';
+                      case 'premium': return 'bg-gray-100 text-gray-700';
                       default: return 'bg-gray-100 text-gray-700';
                     }
                   };
@@ -795,8 +794,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
                   Quanto posso ganhar por dia?
                 </h3>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  Usuários gratuitos podem ganhar até R$ 200/dia. Com o Premium, você pode ganhar até R$ 
-                  1.200/dia ouvindo suas rádios favoritas.
+                  Você pode ganhar dinheiro ouvindo suas rádios favoritas!
                 </p>
               </div>
               
