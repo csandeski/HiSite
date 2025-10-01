@@ -272,8 +272,8 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
           newBalance: result.newBalance
         });
         
-        // Update local state with server response
-        setSessionPoints(result.newPoints);
+        // Update only balance - points are managed by the main timer
+        // Removed: setSessionPoints(result.newPoints) to avoid conflicts
         setBalance(result.newBalance);
         
         // Clear conversion data
@@ -318,7 +318,8 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                 newPoints: userData.user.points,
                 difference: userData.user.points - sessionPoints
               });
-              setSessionPoints(userData.user.points);
+              // Removed: setSessionPoints(userData.user.points) to avoid conflicts
+              // Points should only be updated via refreshPoints from the main timer
             }
           } catch (err) {
             console.error('[RESGATAR] Failed to fetch updated points:', err);
