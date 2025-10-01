@@ -8,7 +8,7 @@ export default function Header() {
   const [, setLocation] = useLocation();
   
   // Fetch user data including balance
-  const { data: userData, isLoading } = useQuery({
+  const { data: userData, isLoading } = useQuery<{user: {balance: number}}>({
     queryKey: ['/api/auth/me'],
     refetchInterval: 30000, // Refresh every 30 seconds to keep balance updated
   });
