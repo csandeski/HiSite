@@ -8,8 +8,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import {
   Accordion,
   AccordionContent,
@@ -51,10 +49,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const { toast } = useToast();
   const { user } = useAuth();
   const [showInsufficientModal, setShowInsufficientModal] = useState(false);
-  const [showOnlyAvailable, setShowOnlyAvailable] = useState(() => {
-    const saved = localStorage.getItem('resgatar-showOnlyAvailable');
-    return saved === 'true';
-  });
   const [accordionValue, setAccordionValue] = useState<string | undefined>(() => {
     const saved = localStorage.getItem('resgatar-accordionValue');
     return saved || undefined;
@@ -73,12 +67,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
   // Don't refresh points on mount - keep the current state
   // Points are already being tracked and saved in real-time
-
-  // Save checkbox state to localStorage whenever it changes
-  const handleShowOnlyAvailableChange = (checked: boolean) => {
-    setShowOnlyAvailable(checked);
-    localStorage.setItem('resgatar-showOnlyAvailable', checked.toString());
-  };
 
   // Save accordion state to localStorage whenever it changes
   const handleAccordionChange = (value: string) => {
@@ -363,9 +351,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     }
   ];
 
-  const filteredOptions = showOnlyAvailable 
-    ? exchangeOptions.filter(option => sessionPoints >= option.points)
-    : exchangeOptions;
+  const filteredOptions = exchangeOptions;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -425,82 +411,106 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             </Button>
           </div>
 
-          {/* Title and Filter */}
+          {/* Title */}
           <div className="mb-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">
+            <h2 className="text-xl font-bold text-gray-900">
               Converter Pontos em Dinheiro
             </h2>
-            
-            {/* Filter Toggle - Estilizado */}
-            <div className="bg-gray-50 rounded-lg p-2.5 flex items-center space-x-3">
-              <Switch
-                id="filter-available"
-                checked={showOnlyAvailable}
-                onCheckedChange={handleShowOnlyAvailableChange}
-                data-testid="filter-toggle"
-                className="scale-90"
-              />
-              <Label htmlFor="filter-available" className="text-xs font-medium text-gray-700 cursor-pointer">
-                Mostrar apenas disponíveis
-              </Label>
-            </div>
           </div>
 
-          {/* Exchange Options Grid - Simples e Compacto */}
-          <div className="grid grid-cols-2 gap-2.5 mb-6">
+          {/* Exchange Options - Elegante e Horizontal */}
+          <div className="space-y-3 mb-6">
             {filteredOptions.map((option, index) => {
               const hasEnoughPoints = sessionPoints >= option.points;
               const missingPoints = Math.max(option.points - sessionPoints, 0);
+              const percentage = Math.min((sessionPoints / option.points) * 100, 100);
               
               return (
                 <Card 
                   key={index}
-                  className={`p-3 border transition-all relative ${
+                  className={`relative overflow-hidden transition-all ${
                     hasEnoughPoints 
-                      ? 'border-green-200 bg-gradient-to-br from-white to-green-50/30 hover:shadow-lg cursor-pointer' 
-                      : 'border-gray-200 bg-gray-50/50'
+                      ? 'hover:shadow-lg cursor-pointer border-green-200' 
+                      : 'opacity-75 border-gray-200'
                   }`}
                   data-testid={`exchange-option-${option.points}`}
                   onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
                 >
-                  {/* Badge no topo */}
+                  {/* Gradient Background */}
+                  <div className={`absolute inset-0 ${
+                    hasEnoughPoints 
+                      ? 'bg-gradient-to-r from-green-50/50 via-white to-emerald-50/30' 
+                      : 'bg-gradient-to-r from-gray-50 to-gray-50/50'
+                  }`} />
+                  
+                  {/* Badge */}
                   {option.badge && (
                     <Badge 
-                      className="absolute -top-2 right-2 text-[10px] bg-amber-100 text-amber-700 border-amber-200 px-1.5 py-0"
+                      className="absolute top-2 right-2 text-[10px] bg-amber-100 text-amber-700 border-amber-200 px-2 py-0.5"
                     >
                       {option.badge}
                     </Badge>
                   )}
                   
-                  {/* Valor principal em destaque */}
-                  <div className="text-center mb-2">
-                    <p className="text-2xl font-bold text-green-600">
-                      R$ {option.value.toFixed(2)}
-                    </p>
-                    <p className="text-xs text-gray-500">por</p>
-                    <p className="text-sm font-semibold text-gray-700">
-                      {option.points} pontos
-                    </p>
-                  </div>
-                  
-                  {/* Status simples */}
-                  <div className="text-center">
-                    {hasEnoughPoints ? (
-                      <div className="flex items-center justify-center gap-1 text-green-600">
-                        <CheckCircle className="w-4 h-4" />
-                        <span className="text-xs font-semibold">Disponível</span>
+                  <div className="relative p-4 flex items-center gap-4">
+                    {/* Left: Value Section */}
+                    <div className="flex-shrink-0">
+                      <div className={`w-20 h-20 rounded-xl flex flex-col items-center justify-center ${
+                        hasEnoughPoints 
+                          ? 'bg-gradient-to-br from-green-500 to-emerald-500 text-white shadow-md' 
+                          : 'bg-gradient-to-br from-gray-300 to-gray-400 text-gray-100'
+                      }`}>
+                        <p className="text-xs font-medium opacity-90">R$</p>
+                        <p className="text-xl font-bold">{option.value.toFixed(0)}</p>
                       </div>
-                    ) : (
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-center gap-1 text-gray-400">
-                          <Lock className="w-3.5 h-3.5" />
-                          <span className="text-xs">Bloqueado</span>
+                    </div>
+                    
+                    {/* Middle: Details */}
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <span className="text-lg font-semibold text-gray-900">
+                          {option.points} pontos
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          = R$ {option.value.toFixed(2)}
+                        </span>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="w-full max-w-xs">
+                        <div className="flex items-center justify-between text-[10px] text-gray-600 mb-1">
+                          <span>{Math.round(percentage)}% completo</span>
+                          {!hasEnoughPoints && <span>Faltam {missingPoints} pts</span>}
                         </div>
-                        <p className="text-[10px] text-gray-500">
-                          Faltam {missingPoints} pts
-                        </p>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                          <div 
+                            className={`h-1.5 rounded-full transition-all ${
+                              hasEnoughPoints ? 'bg-green-500' : 'bg-gray-300'
+                            }`}
+                            style={{width: `${percentage}%`}}
+                          />
+                        </div>
                       </div>
-                    )}
+                    </div>
+                    
+                    {/* Right: Status */}
+                    <div className="flex-shrink-0">
+                      {hasEnoughPoints ? (
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                          </div>
+                          <span className="text-xs font-semibold text-green-600">Disponível</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                            <Lock className="w-5 h-5 text-gray-400" />
+                          </div>
+                          <span className="text-xs text-gray-500">Bloqueado</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </Card>
               );
