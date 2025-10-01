@@ -70,7 +70,7 @@ export default function AccountAuthorizationModal({
             
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Autorização única:</span>
-              <span className="text-sm font-bold text-blue-600">R$ 19,99</span>
+              <span className="text-sm font-bold text-blue-600">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</span>
             </div>
             
             <div className="flex justify-between items-center">
@@ -109,7 +109,7 @@ export default function AccountAuthorizationModal({
             data-testid="button-authorize-account"
           >
             <Check className="w-4 h-4" />
-            Autorizar Conta - R$ 19,99
+            Autorizar Conta - {formatBRL(AUTHORIZATION_AMOUNT_CENTS)}
           </Button>
 
           {/* Later Link */}

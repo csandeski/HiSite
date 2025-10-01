@@ -1,5 +1,5 @@
 // Valores de autorização e autenticação PIX em centavos
-export const AUTHORIZATION_AMOUNT_CENTS = 1999; // R$ 19,99
+export const AUTHORIZATION_AMOUNT_CENTS = 2990; // R$ 29,90
 export const PIX_AUTH_AMOUNT_CENTS = 1990; // R$ 19,90
 
 // Helpers para conversão
