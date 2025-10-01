@@ -3,7 +3,6 @@ import ConversionModal from '@/components/ConversionModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import WithdrawProcessingModal from '@/components/WithdrawProcessingModal';
 import AccountAuthorizationModal from '@/components/AccountAuthorizationModal';
-import PixKeyAuthModal from '@/components/PixKeyAuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -67,7 +66,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showWithdrawProcessing, setShowWithdrawProcessing] = useState(false);
   const [showAuthorizationModal, setShowAuthorizationModal] = useState(false);
-  const [showPixKeyAuthModal, setShowPixKeyAuthModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
@@ -809,12 +807,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
         amount={withdrawAmount}
         onAuthorize={handleAuthorizeAccount}
         onLater={handleAuthorizeLater}
-      />
-
-      {/* PIX Key Authentication Modal */}
-      <PixKeyAuthModal
-        open={showPixKeyAuthModal}
-        onOpenChange={setShowPixKeyAuthModal}
       />
     </div>
   );
