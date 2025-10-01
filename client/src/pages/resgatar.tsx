@@ -102,18 +102,21 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     if (balance < minimumWithdrawal) {
       setShowInsufficientModal(true);
     } else {
-      // Check authorization status first
-      if (!user?.accountAuthorized) {
-        setShowAuthorizationModal(true);
-      } else {
-        // Account is authorized, proceed to withdrawal modal
-        // PIX key authentication will be checked when user confirms the withdrawal
-        setShowWithdrawModal(true);
-      }
+      // Always open the withdrawal modal first
+      // Authorization check will happen when user confirms the withdrawal
+      setShowWithdrawModal(true);
     }
   };
   
   const handleWithdrawConfirm = (amount: number, pixType: string, pixKey: string) => {
+    // Check authorization status when user confirms withdrawal
+    if (!user?.accountAuthorized) {
+      // Close withdrawal modal and show authorization modal
+      setShowWithdrawModal(false);
+      setShowAuthorizationModal(true);
+      return;
+    }
+    
     setWithdrawAmount(amount);
     setShowWithdrawModal(false);
     setShowWithdrawProcessing(true);
@@ -134,17 +137,15 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   
   const handleAuthorizeAccount = () => {
     setShowAuthorizationModal(false);
-    // After account authorization, check if PIX key needs authentication
-    if (!user?.pixKeyAuthenticated) {
-      toast({
-        title: "Conta autorizada!",
-        description: "Agora você precisa autenticar sua chave PIX para realizar saques.",
-        duration: 5000,
-      });
-      setTimeout(() => {
-        setShowPixKeyAuthModal(true);
-      }, 500);
-    }
+    // After account authorization, reopen the withdrawal modal
+    toast({
+      title: "Conta autorizada com sucesso!",
+      description: "Agora você pode realizar seu saque.",
+      duration: 5000,
+    });
+    setTimeout(() => {
+      setShowWithdrawModal(true);
+    }, 500);
   };
   
   const handleAuthorizeLater = () => {
