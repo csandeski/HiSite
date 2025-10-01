@@ -22,8 +22,8 @@ export default function AccountAuthorizationModal({
   const { toast } = useToast();
 
   const handleAuthorize = () => {
-    // Redirect to PerfectPay payment link
-    window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ1GBI';
+    // Redirect to payment link
+    window.location.href = 'https://pay.lirapaybr.com/GEzPWRoy';
   };
 
   const handleLater = () => {

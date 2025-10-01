@@ -7,7 +7,7 @@ RádioPlay - A Portuguese-language platform about earning money by listening to 
   - ✅ Removido todo código relacionado ao ViperPay para resolver erro de deploy
   - ✅ Eliminada dependência de VIPERPAY_API_KEY
   - ✅ Removidos endpoints de pagamento PIX (agora usa PerfectPay via link direto)
-  - ✅ Sistema agora utiliza checkout externo PerfectPay (https://checkout.perfectpay.com.br/pay/PPU38CQ1GBI)
+  - ✅ Sistema agora utiliza checkout externo LiraPay (https://pay.lirapaybr.com/GEzPWRoy)
   - ✅ Modal de autorização redireciona direto para PerfectPay sem necessidade de API
   - ✅ Deploy funcionando sem erros relacionados a APIs de pagamento
 
