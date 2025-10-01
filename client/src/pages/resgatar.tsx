@@ -19,7 +19,10 @@ import {
   Calendar,
   Star,
   DollarSign,
-  Check
+  Check,
+  Download,
+  Info,
+  Sparkles
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
@@ -351,46 +354,47 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       <main className="flex-1 overflow-y-auto pb-8">
         <div className="container mx-auto px-4 py-6 max-w-4xl">
           
-          {/* Como Funciona Section */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8 shadow-sm">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-500" />
-                <h2 className="text-lg font-bold text-gray-900">Como funciona</h2>
+          {/* Hero Section - Two Cards Side by Side */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            {/* Balance Card */}
+            <Card className="bg-white p-4 border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 mb-1">
+                <Wallet className="w-5 h-5 text-green-600" />
+                <span className="text-sm text-gray-600">Saldo disponível</span>
               </div>
-              <div className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full">
-                <Coins className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-primary">{sessionPoints} pts</span>
-              </div>
-            </div>
+              <p className="text-2xl font-bold text-gray-900">R$ {balance.toFixed(2)}</p>
+            </Card>
             
-            <div className="space-y-3 text-sm text-gray-600">
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <p>Ouça suas rádios favoritas e acumule pontos</p>
+            {/* Points Card */}
+            <Card className="bg-white p-4 border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+                <span className="text-sm text-gray-600">Pontos acumulados</span>
               </div>
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <p>Troque seus pontos por dinheiro real</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <p>Receba o pagamento via PIX em até 24h</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <p>Quanto mais pontos, melhor a taxa de conversão</p>
-              </div>
-            </div>
+              <p className="text-2xl font-bold text-gray-900">{sessionPoints}</p>
+            </Card>
           </div>
 
-          {/* Title */}
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Opções de Troca
-          </h2>
+          {/* Large Withdrawal Button */}
+          <Button 
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-semibold mb-8 shadow-lg hover:shadow-xl transition-all"
+            onClick={handleWithdraw}
+            data-testid="button-realizar-saque"
+          >
+            <Download className="w-5 h-5 mr-2" />
+            Realizar Saque
+          </Button>
 
-          {/* Exchange Options Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          {/* Title with Icon */}
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <Sparkles className="w-6 h-6 text-yellow-500" />
+            <h2 className="text-2xl font-bold text-gray-900">
+              Escolha um valor para resgatar
+            </h2>
+          </div>
+
+          {/* Exchange Options Cards - Professional Design */}
+          <div className="space-y-4 mb-8">
             {exchangeOptions.map((option, index) => {
               const hasEnoughPoints = sessionPoints >= option.points;
               const Icon = option.icon;
@@ -398,73 +402,97 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
               return (
                 <Card 
                   key={index}
-                  className={`relative p-5 transition-all duration-200 ${
+                  className={`relative bg-white border-2 transition-all p-5 ${
                     hasEnoughPoints 
-                      ? `bg-white hover:shadow-lg cursor-pointer ${option.badge === 'Popular' ? 'border-green-500 border-2' : 'border-gray-200'}` 
-                      : 'bg-gray-50/50 opacity-75 border-gray-100'
+                      ? `hover:border-primary hover:shadow-lg ${option.badge === 'Popular' ? 'border-primary' : 'border-gray-200'}` 
+                      : 'border-gray-100 opacity-60'
                   }`}
                   data-testid={`exchange-option-${option.points}`}
                 >
                   {/* Popular Badge */}
                   {option.badge === 'Popular' && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-green-500 text-white border-0 px-3 py-1 text-xs font-semibold">
-                        {option.badge}
+                      <Badge className="bg-primary text-white border-0 px-4 py-1 text-xs font-bold shadow-sm">
+                        Popular
                       </Badge>
                     </div>
                   )}
                   
-                  <div className="flex items-center gap-4">
-                    {/* Icon */}
-                    <div 
-                      className={`w-14 h-14 rounded-full flex items-center justify-center ${option.iconBgColor}`}
-                      style={{ backgroundColor: hasEnoughPoints ? undefined : '#f3f4f6' }}
-                    >
-                      <Icon 
-                        className="w-7 h-7" 
-                        style={{ color: hasEnoughPoints ? option.color : '#9ca3af' }}
-                      />
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-lg font-bold text-gray-900">
-                          {option.label}
-                        </span>
-                        <span 
-                          className="text-sm font-semibold"
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      {/* Icon in colored circle */}
+                      <div 
+                        className={`w-12 h-12 rounded-full flex items-center justify-center ${option.iconBgColor}`}
+                      >
+                        <Icon 
+                          className="w-6 h-6" 
                           style={{ color: hasEnoughPoints ? option.color : '#9ca3af' }}
-                        >
-                          {option.percentage}
-                        </span>
+                        />
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="font-medium text-gray-600">{option.points}pts</span>
-                        <span className="text-gray-400">=</span>
-                        <span className="font-bold" style={{ color: hasEnoughPoints ? option.color : '#9ca3af' }}>
-                          R$ {option.value.toFixed(2)}
-                        </span>
+                      
+                      {/* Points and Label Info */}
+                      <div>
+                        <p className="text-lg font-bold text-gray-900">
+                          {option.points} pontos
+                        </p>
+                        <p className="text-sm text-gray-600">{option.label}</p>
                       </div>
                     </div>
                     
-                    {/* Button */}
-                    <Button
-                      className={`px-6 py-2 font-semibold text-white transition-all ${
-                        hasEnoughPoints 
-                          ? option.buttonColor
-                          : 'bg-gray-300 cursor-not-allowed'
-                      }`}
-                      disabled={!hasEnoughPoints}
-                      onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
-                      data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
-                    >
-                      Trocar
-                    </Button>
+                    {/* Value and Button */}
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-green-600">
+                          R$ {option.value.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-500">{option.percentage}</p>
+                      </div>
+                      <Button
+                        className={`px-5 py-2 font-semibold text-white min-w-[90px] ${
+                          hasEnoughPoints 
+                            ? `${option.buttonColor}`
+                            : 'bg-gray-300 cursor-not-allowed'
+                        }`}
+                        disabled={!hasEnoughPoints}
+                        onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
+                        data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
+                      >
+                        Trocar
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               );
             })}
+          </div>
+
+          {/* Como Funciona Section - Moved to Bottom */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Info className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold text-gray-900">Como funciona</h2>
+              </div>
+            </div>
+            
+            <div className="space-y-3 text-sm text-gray-600">
+              <div className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
+                <p>Ouça suas rádios favoritas e acumule pontos automaticamente</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
+                <p>Troque seus pontos por dinheiro real com as melhores taxas</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
+                <p>Receba o pagamento via PIX em até 24 horas úteis</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
+                <p>Quanto mais pontos você troca, melhor a taxa de conversão</p>
+              </div>
+            </div>
           </div>
 
         </div>
