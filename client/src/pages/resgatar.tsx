@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
-import logoUrl from '@/assets/logo.png';
+import Header from '@/components/Header';
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 
@@ -336,19 +336,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-center">
-            <img 
-              src={logoUrl} 
-              alt="RádioPlay" 
-              className="h-8 md:h-10 w-auto object-contain" 
-              data-testid="resgatar-logo"
-            />
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto pb-8">

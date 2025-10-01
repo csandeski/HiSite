@@ -35,7 +35,7 @@ import {
   Bell
 } from "lucide-react";
 import { useLocation } from "wouter";
-import logoUrl from '@/assets/logo.png';
+import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/api';
 import { NotificationSettings } from '@/components/NotificationSettings';
@@ -198,27 +198,7 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-20">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center">
-              <img src={logoUrl} alt="RádioPlay" className="h-7 object-contain" />
-            </div>
-            
-            {/* Settings Icon */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-9 h-9 rounded-full"
-              data-testid="button-settings"
-            >
-              <Settings className="w-5 h-5 text-gray-600" />
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-4 max-w-lg pb-24">

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Wallet, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download } from "lucide-react";
-import logoUrl from '@/assets/logo.png';
+import { TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download } from "lucide-react";
+import Header from '@/components/Header';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
 import hitsFmLogo from '@/assets/hits-fm-logo.png';
@@ -154,42 +154,7 @@ export default function Dashboard({
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <BannerCarousel />
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center">
-              <img 
-                src={logoUrl} 
-                alt="RádioPlay" 
-                className="h-7 md:h-9 w-auto object-contain" 
-                data-testid="dashboard-logo"
-              />
-            </div>
-
-            {/* Balance and Settings */}
-            <div className="flex items-center gap-2 md:gap-3">
-              <div 
-                className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-semibold text-sm md:text-base"
-                data-testid="balance-display"
-              >
-                R$ {balance.toFixed(2)}
-              </div>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-9 h-9"
-                data-testid="wallet-button"
-                aria-label="Saque"
-                onClick={() => setLocation('/resgatar')}
-              >
-                <Wallet className="w-5 h-5 text-gray-600" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-1 pb-32">
