@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
-import PushNotification from "@/components/PushNotification";
 import { useUTMTracking } from "@/hooks/useUTMTracking";
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
@@ -167,17 +166,9 @@ function App({ user }: { user: any }) {
   const [balance, setBalance] = useState(0); // Will be synced with user data via useEffect
   const [activeTab, setActiveTab] = useState("radio");
   const [location, setLocation] = useLocation();
-  const [hasReachedPointsThreshold, setHasReachedPointsThreshold] = useState(false);
-  const [lastPopupTime, setLastPopupTime] = useState<number | null>(null);
   const [initialPointsLoaded, setInitialPointsLoaded] = useState(false);
-  const [hasShown100PointsPopup, setHasShown100PointsPopup] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isRefreshingPoints, setIsRefreshingPoints] = useState(false);
   
-  // Celebration toast states
-  const [hasReached20Points, setHasReached20Points] = useState(false);
-  const [lastCelebrationTime, setLastCelebrationTime] = useState<number | null>(null);
-  const celebrationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [userName, setUserName] = useState(() => {
@@ -235,13 +226,6 @@ function App({ user }: { user: any }) {
       setSessionPoints(0);
       setBalance(0);
       setInitialPointsLoaded(false);
-      setHasReachedPointsThreshold(false);
-      setHasReached20Points(false);
-      setHasShown100PointsPopup(false);
-      setLastCelebrationTime(null);
-      if (celebrationIntervalRef.current) {
-        clearInterval(celebrationIntervalRef.current);
-      }
     }
   }, [user?.id]); // Only run when user ID changes (login/logout)
 
@@ -324,112 +308,6 @@ function App({ user }: { user: any }) {
     }
   }, [location]);
 
-  // Detect when user reaches 25 points for the first time (only if logged in)
-  useEffect(() => {
-    // Only show popup if:
-    // 1. User is logged in
-    // 2. We've already loaded initial points (not first load)
-    // 3. User has earned points during this session (not just loaded with 330+ points)
-    // 4. User hasn't seen the popup yet in this session
-    // 5. User is on dashboard/resgatar/perfil (not on home page)
-    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
-    if (user && initialPointsLoaded && sessionPoints >= 330 && !hasReachedPointsThreshold && isPlaying && protectedRoutes.includes(location)) {
-      setHasReachedPointsThreshold(true);
-
-      setLastPopupTime(Date.now());
-    }
-  }, [user, initialPointsLoaded, sessionPoints, hasReachedPointsThreshold, isPlaying, location]);
-
-  // Show popup every 75 seconds (1:15 min) after reaching 330 points (only if logged in and playing)
-  useEffect(() => {
-    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
-    if (user && hasReachedPointsThreshold && isPlaying && protectedRoutes.includes(location)) {
-      // Clear any existing interval
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-
-      // Set up new interval
-      intervalRef.current = setInterval(() => {
-        // Only show if still playing and not on home page
-        if (isPlaying && protectedRoutes.includes(location)) {
-    
-          setLastPopupTime(Date.now());
-        }
-      }, 75000); // 75 seconds (1:15 min)
-
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-      };
-    } else {
-      // Clear interval if not playing or not logged in or on home page
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
-  }, [user, hasReachedPointsThreshold, isPlaying, location]);
-
-
-  // Celebration Toast - Show when user reaches 20 points for the first time
-  useEffect(() => {
-    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
-    if (user && initialPointsLoaded && sessionPoints >= 20 && !hasReached20Points && isPlaying && protectedRoutes.includes(location)) {
-      setHasReached20Points(true);
-      toast({
-        title: "🎉 RádioPlay COMEMORA!",
-        description: "A RádioPlay atingiu o marco de mais de 53.000 usuários ativos! E mais de 8.300 usuários simultâneos neste exato momento!",
-        duration: 8000,
-      });
-      setLastCelebrationTime(Date.now());
-    }
-  }, [user, initialPointsLoaded, sessionPoints, hasReached20Points, isPlaying, location, toast]);
-
-  // Show premium popup when user reaches 100 points for the first time
-  useEffect(() => {
-    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
-    if (user && initialPointsLoaded && sessionPoints >= 100 && !hasShown100PointsPopup && isPlaying && protectedRoutes.includes(location)) {
-      setHasShown100PointsPopup(true);
-
-      setLastPopupTime(Date.now());
-    }
-  }, [user, initialPointsLoaded, sessionPoints, hasShown100PointsPopup, isPlaying, location]);
-
-  // Show celebration toast every 3 minutes after reaching 20 points
-  useEffect(() => {
-    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
-    if (user && hasReached20Points && isPlaying && protectedRoutes.includes(location)) {
-      // Clear any existing interval
-      if (celebrationIntervalRef.current) {
-        clearInterval(celebrationIntervalRef.current);
-      }
-
-      // Set up new interval for 3 minutes
-      celebrationIntervalRef.current = setInterval(() => {
-        // Only show if still playing and not on home page
-        if (isPlaying && protectedRoutes.includes(location)) {
-          toast({
-            title: "🎉 RádioPlay COMEMORA!",
-            description: "A RádioPlay atingiu o marco de mais de 53.000 usuários ativos! E mais de 8.300 usuários simultâneos neste exato momento!",
-            duration: 8000,
-          });
-          setLastCelebrationTime(Date.now());
-        }
-      }, 180000); // 3 minutes (180 seconds)
-
-      return () => {
-        if (celebrationIntervalRef.current) {
-          clearInterval(celebrationIntervalRef.current);
-        }
-      };
-    } else {
-      // Clear interval if not playing or not logged in or on home page
-      if (celebrationIntervalRef.current) {
-        clearInterval(celebrationIntervalRef.current);
-      }
-    }
-  }, [user, hasReached20Points, isPlaying, location, toast]);
 
   // Helper function to refresh points from backend
   const refreshPoints = useCallback(async () => {
@@ -843,11 +721,9 @@ function App({ user }: { user: any }) {
               </Route>
               <Route path="/dashboard">
                 <DashboardComp {...playerProps} totalListeningTime={totalListeningTime} />
-                {user && user.accountAuthorized && <PushNotification sessionPoints={sessionPoints} />}
               </Route>
               <Route path="/resgatar">
                 <Resgatar {...playerProps} />
-                {user && user.accountAuthorized && <PushNotification sessionPoints={sessionPoints} />}
               </Route>
               <Route path="/perfil">
                 <Perfil 
@@ -857,7 +733,6 @@ function App({ user }: { user: any }) {
                   totalListeningTime={totalListeningTime}
                   memberSince={memberSince}
                 />
-                {user && user.accountAuthorized && <PushNotification sessionPoints={sessionPoints} />}
               </Route>
               <Route path="/adm/login">
                 <AdminLoginPage />

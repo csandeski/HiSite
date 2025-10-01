@@ -75,14 +75,7 @@ export default function MessagePaymentModal({
         const data = await response.json();
         
         if (data.status === 'approved') {
-          // Payment approved!
-          toast({
-            title: "Pagamento aprovado!",
-            description: "Seu alô será enviado na rádio selecionada.",
-            duration: 5000,
-          });
-          
-          // Close modal and refresh user data
+          // Payment approved - close modal and refresh user data
           onOpenChange(false);
           
           // Refresh the page to update user status
