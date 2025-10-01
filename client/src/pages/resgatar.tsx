@@ -25,7 +25,8 @@ import {
   Clock,
   PiggyBank,
   ArrowRight,
-  TrendingUp
+  TrendingUp,
+  Lock
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
@@ -426,120 +427,81 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
 
           {/* Title and Filter */}
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Escolha um valor para resgatar
+            <h2 className="text-xl font-bold text-gray-900 mb-3">
+              Converter Pontos em Dinheiro
             </h2>
             
             {/* Filter Toggle - Estilizado */}
-            <div className="bg-gray-50 rounded-lg p-3 flex items-center space-x-3">
+            <div className="bg-gray-50 rounded-lg p-2.5 flex items-center space-x-3">
               <Switch
                 id="filter-available"
                 checked={showOnlyAvailable}
                 onCheckedChange={handleShowOnlyAvailableChange}
                 data-testid="filter-toggle"
+                className="scale-90"
               />
-              <Label htmlFor="filter-available" className="text-sm font-medium text-gray-700 cursor-pointer">
+              <Label htmlFor="filter-available" className="text-xs font-medium text-gray-700 cursor-pointer">
                 Mostrar apenas disponíveis
               </Label>
             </div>
           </div>
 
-          {/* Exchange Options Grid - Compacto */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          {/* Exchange Options Grid - Simples e Compacto */}
+          <div className="grid grid-cols-2 gap-2.5 mb-6">
             {filteredOptions.map((option, index) => {
-              const percentage = Math.min((sessionPoints / option.points) * 100, 100);
-              const missingPoints = Math.max(option.points - sessionPoints, 0);
               const hasEnoughPoints = sessionPoints >= option.points;
+              const missingPoints = Math.max(option.points - sessionPoints, 0);
               
               return (
                 <Card 
                   key={index}
-                  className={`p-4 border transition-all ${
+                  className={`p-3 border transition-all relative ${
                     hasEnoughPoints 
-                      ? 'border-gray-200 hover:border-gray-300 hover:shadow-md bg-white' 
-                      : 'border-gray-100 bg-gray-50/50'
+                      ? 'border-green-200 bg-gradient-to-br from-white to-green-50/30 hover:shadow-lg cursor-pointer' 
+                      : 'border-gray-200 bg-gray-50/50'
                   }`}
                   data-testid={`exchange-option-${option.points}`}
+                  onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
                 >
-                  {/* Header - Points and Value */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <Coins className={`w-4 h-4 ${hasEnoughPoints ? 'text-gray-600' : 'text-gray-400'}`} />
-                        <span className="text-base font-semibold text-gray-900">
-                          {option.points} pontos
-                        </span>
-                      </div>
-                      {option.badge && (
-                        <Badge 
-                          variant="secondary" 
-                          className="text-[9px] mt-1 bg-amber-100 text-amber-700 border-amber-200 px-1.5 py-0"
-                        >
-                          {option.badge}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] text-gray-500">Você recebe</p>
-                      <p className="text-lg font-bold text-green-600">
-                        R$ {option.value.toFixed(2)}
-                      </p>
-                    </div>
+                  {/* Badge no topo */}
+                  {option.badge && (
+                    <Badge 
+                      className="absolute -top-2 right-2 text-[10px] bg-amber-100 text-amber-700 border-amber-200 px-1.5 py-0"
+                    >
+                      {option.badge}
+                    </Badge>
+                  )}
+                  
+                  {/* Valor principal em destaque */}
+                  <div className="text-center mb-2">
+                    <p className="text-2xl font-bold text-green-600">
+                      R$ {option.value.toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-500">por</p>
+                    <p className="text-sm font-semibold text-gray-700">
+                      {option.points} pontos
+                    </p>
                   </div>
                   
-                  {/* Conversion Rate */}
-                  <div className="text-xs text-gray-600 mb-3">
-                    Taxa de conversão: <span className="font-medium text-gray-900">{option.conversionRate}</span>
-                  </div>
-                  
-                  {/* Progress Section */}
-                  <div className="space-y-1.5 mb-3">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-gray-500">
-                        Progresso: {Math.round(percentage)}%
-                      </span>
-                      {!hasEnoughPoints && (
-                        <span className="text-gray-600">
-                          Faltam {missingPoints} pts
-                        </span>
-                      )}
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                      <div 
-                        className={`h-1.5 rounded-full transition-all ${
-                          hasEnoughPoints 
-                            ? 'bg-green-500' 
-                            : 'bg-gray-300'
-                        }`}
-                        style={{width: `${percentage}%`}}
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Action Button */}
-                  <Button
-                    variant={hasEnoughPoints ? "default" : "ghost"}
-                    className={`w-full h-9 font-medium transition-all text-sm ${
-                      hasEnoughPoints 
-                        ? 'bg-primary hover:bg-primary/90 text-white' 
-                        : 'bg-transparent text-gray-400 cursor-not-allowed border border-gray-200'
-                    }`}
-                    disabled={!hasEnoughPoints}
-                    onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
-                    data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
-                  >
+                  {/* Status simples */}
+                  <div className="text-center">
                     {hasEnoughPoints ? (
-                      <>
-                        <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
-                        Converter
-                      </>
+                      <div className="flex items-center justify-center gap-1 text-green-600">
+                        <CheckCircle className="w-4 h-4" />
+                        <span className="text-xs font-semibold">Disponível</span>
+                      </div>
                     ) : (
-                      <>
-                        <Clock className="w-3.5 h-3.5 mr-1.5" />
-                        Bloqueado
-                      </>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-center gap-1 text-gray-400">
+                          <Lock className="w-3.5 h-3.5" />
+                          <span className="text-xs">Bloqueado</span>
+                        </div>
+                        <p className="text-[10px] text-gray-500">
+                          Faltam {missingPoints} pts
+                        </p>
+                      </div>
                     )}
-                  </Button>
+                  </div>
                 </Card>
               );
             })}
