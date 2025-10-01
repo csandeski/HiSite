@@ -262,6 +262,31 @@ export default function Dashboard({
             )}
           </Card>
 
+          {/* Balance Card with Withdraw Button */}
+          <Card className="bg-gradient-to-r from-white to-green-50/50 border border-green-200 p-3.5 mb-5 shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-full shadow-sm">
+                  <Download className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-600 font-medium mb-0.5">Saldo disponível</p>
+                  <p className="text-lg font-bold text-gray-900">
+                    R$ {balance.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+              <Button
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-3.5 py-2 h-auto rounded-lg transition-all transform hover:scale-105 shadow-sm"
+                onClick={() => setLocation('/resgatar')}
+                data-testid="withdraw-button"
+              >
+                <Download className="w-3.5 h-3.5 mr-1.5" />
+                Sacar
+              </Button>
+            </div>
+          </Card>
+
           {/* Radio List */}
           <div className="space-y-3">
             
