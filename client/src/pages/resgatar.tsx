@@ -12,16 +12,9 @@ import {
   Wallet, 
   Coins, 
   AlertCircle, 
-  CheckCircle,
-  ArrowRight,
   TrendingUp,
-  Link2,
-  Calendar,
-  Star,
-  DollarSign,
-  Check,
   Download,
-  Info,
+  ArrowRight,
   Sparkles
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -278,94 +271,66 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     }
   };
 
-  // Exchange options with new design
+  // Exchange options - simplified
   const exchangeOptions = [
     {
       points: 100,
       value: 7.50,
       label: "Iniciante",
-      icon: Link2,
-      color: "#3B82F6", // Blue
-      bgColor: "from-blue-50 to-blue-100",
-      borderColor: "border-blue-200",
-      buttonColor: "bg-blue-500 hover:bg-blue-600",
-      iconBgColor: "bg-blue-100",
-      percentage: "+400%",
-      badge: null,
+      percentage: "400"
     },
     {
       points: 250,
       value: 24.00,
       label: "Econômico",
-      icon: Calendar,
-      color: "#10B981", // Green
-      bgColor: "from-green-50 to-green-100",
-      borderColor: "border-green-200",
-      buttonColor: "bg-green-500 hover:bg-green-600",
-      iconBgColor: "bg-green-100",
-      percentage: "+433%",
-      badge: null,
+      percentage: "433"
     },
     {
       points: 400,
       value: 60.00,
       label: "Vantajoso",
-      icon: Star,
-      color: "#8B5CF6", // Purple
-      bgColor: "from-purple-50 to-purple-100",
-      borderColor: "border-purple-200",
-      buttonColor: "bg-purple-500 hover:bg-purple-600",
-      iconBgColor: "bg-purple-100",
-      percentage: "+567%",
-      badge: "Popular",
+      percentage: "567"
     },
     {
       points: 600,
       value: 150.00,
       label: "Máximo",
-      icon: DollarSign,
-      color: "#F97316", // Orange
-      bgColor: "from-orange-50 to-orange-100",
-      borderColor: "border-orange-200",
-      buttonColor: "bg-orange-500 hover:bg-orange-600",
-      iconBgColor: "bg-orange-100",
-      percentage: "+733%",
-      badge: null,
+      percentage: "733"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto pb-8">
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
+      {/* Main Content - Dashboard pattern */}
+      <main className="flex-1 pb-32">
+        <div className="container mx-auto px-4 py-6 max-w-2xl">
           
-          {/* Hero Section - Two Cards Side by Side */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            {/* Balance Card */}
-            <Card className="bg-white p-4 border border-gray-200 hover:shadow-md transition-shadow">
+          {/* Grid de 2 colunas para Saldo e Pontos */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            {/* Card Saldo */}
+            <Card className="bg-white shadow-sm border border-gray-200 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Wallet className="w-5 h-5 text-green-600" />
-                <span className="text-sm text-gray-600">Saldo disponível</span>
+                <span className="text-xs text-gray-500 uppercase tracking-wide">Saldo disponível</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">R$ {balance.toFixed(2)}</p>
             </Card>
             
-            {/* Points Card */}
-            <Card className="bg-white p-4 border border-gray-200 hover:shadow-md transition-shadow">
+            {/* Card Pontos */}
+            <Card className="bg-white shadow-sm border border-gray-200 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
-                <span className="text-sm text-gray-600">Pontos acumulados</span>
+                <Coins className="w-5 h-5 text-blue-600" />
+                <span className="text-xs text-gray-500 uppercase tracking-wide">Pontos acumulados</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">{sessionPoints}</p>
             </Card>
           </div>
 
-          {/* Large Withdrawal Button */}
+          {/* Botão de Saque - simplificado */}
           <Button 
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-semibold mb-8 shadow-lg hover:shadow-xl transition-all"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 text-base rounded-xl mb-6"
             onClick={handleWithdraw}
             data-testid="button-realizar-saque"
           >
@@ -373,119 +338,70 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             Realizar Saque
           </Button>
 
-          {/* Title with Icon */}
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Sparkles className="w-6 h-6 text-yellow-500" />
-            <h2 className="text-2xl font-bold text-gray-900">
-              Escolha um valor para resgatar
-            </h2>
-          </div>
+          {/* Título simples */}
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Escolha um valor para resgatar</h2>
 
-          {/* Exchange Options Cards - Professional Design */}
-          <div className="space-y-4 mb-8">
-            {exchangeOptions.map((option, index) => {
-              const hasEnoughPoints = sessionPoints >= option.points;
-              const Icon = option.icon;
-              
-              return (
-                <Card 
-                  key={index}
-                  className={`relative bg-white border-2 transition-all p-5 ${
-                    hasEnoughPoints 
-                      ? `hover:border-primary hover:shadow-lg ${option.badge === 'Popular' ? 'border-primary' : 'border-gray-200'}` 
-                      : 'border-gray-100 opacity-60'
-                  }`}
-                  data-testid={`exchange-option-${option.points}`}
-                >
-                  {/* Popular Badge */}
-                  {option.badge === 'Popular' && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-primary text-white border-0 px-4 py-1 text-xs font-bold shadow-sm">
-                        Popular
-                      </Badge>
+          {/* Cards de opções de troca - design simplificado */}
+          <div className="space-y-3 mb-6">
+            {exchangeOptions.map((option) => (
+              <Card key={option.points} className="bg-white shadow-sm border border-gray-200 rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-blue-600" />
                     </div>
-                  )}
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      {/* Icon in colored circle */}
-                      <div 
-                        className={`w-12 h-12 rounded-full flex items-center justify-center ${option.iconBgColor}`}
-                      >
-                        <Icon 
-                          className="w-6 h-6" 
-                          style={{ color: hasEnoughPoints ? option.color : '#9ca3af' }}
-                        />
-                      </div>
-                      
-                      {/* Points and Label Info */}
-                      <div>
-                        <p className="text-lg font-bold text-gray-900">
-                          {option.points} pontos
-                        </p>
-                        <p className="text-sm text-gray-600">{option.label}</p>
-                      </div>
-                    </div>
-                    
-                    {/* Value and Button */}
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-green-600">
-                          R$ {option.value.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-gray-500">{option.percentage}</p>
-                      </div>
-                      <Button
-                        className={`px-5 py-2 font-semibold text-white min-w-[90px] ${
-                          hasEnoughPoints 
-                            ? `${option.buttonColor}`
-                            : 'bg-gray-300 cursor-not-allowed'
-                        }`}
-                        disabled={!hasEnoughPoints}
-                        onClick={() => hasEnoughPoints && handleExchange(option.points, option.value)}
-                        data-testid={hasEnoughPoints ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
-                      >
-                        Trocar
-                      </Button>
+                    <div>
+                      <p className="text-base font-semibold text-gray-900">{option.points} pontos</p>
+                      <p className="text-sm text-gray-500">{option.label}</p>
                     </div>
                   </div>
-                </Card>
-              );
-            })}
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-green-600">R$ {option.value.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500">+{option.percentage}%</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      className={sessionPoints >= option.points ? 
+                        "bg-blue-600 hover:bg-blue-700 text-white" : 
+                        "bg-gray-100 text-gray-400 cursor-not-allowed"}
+                      disabled={sessionPoints < option.points}
+                      onClick={() => handleExchange(option.points, option.value)}
+                      data-testid={sessionPoints >= option.points ? `button-exchange-${option.points}` : `button-missing-${option.points}`}
+                    >
+                      Trocar
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
 
-          {/* Como Funciona Section - Moved to Bottom */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Info className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-gray-900">Como funciona</h2>
+          {/* Seção Como Funciona - simplificada e opcional */}
+          <Card className="bg-white shadow-sm border border-gray-200 rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Como funciona</h3>
+            <div className="space-y-2 text-xs text-gray-600">
+              <div className="flex items-start gap-2">
+                <div className="w-1 h-1 bg-gray-400 rounded-full mt-1"></div>
+                <p>Ouça rádios e acumule pontos</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-1 h-1 bg-gray-400 rounded-full mt-1"></div>
+                <p>Troque pontos por dinheiro real</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-1 h-1 bg-gray-400 rounded-full mt-1"></div>
+                <p>Receba via PIX em até 24h</p>
               </div>
             </div>
-            
-            <div className="space-y-3 text-sm text-gray-600">
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <p>Ouça suas rádios favoritas e acumule pontos automaticamente</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <p>Troque seus pontos por dinheiro real com as melhores taxas</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <p>Receba o pagamento via PIX em até 24 horas úteis</p>
-              </div>
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <p>Quanto mais pontos você troca, melhor a taxa de conversão</p>
-              </div>
-            </div>
-          </div>
+          </Card>
 
         </div>
       </main>
 
+      {/* Modais - mantendo todos com a mesma lógica */}
+      
       {/* Insufficient Balance Modal */}
       <Dialog open={showInsufficientModal} onOpenChange={setShowInsufficientModal}>
         <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
@@ -581,139 +497,94 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                 Confirmar Conversão
               </h2>
               <p className="text-sm text-gray-600">
-                Você está prestes a converter seus pontos em dinheiro real!
+                Você está prestes a converter seus pontos em saldo
               </p>
             </div>
-
+            
             {/* Conversion Details */}
-            <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-4 border border-green-200">
-              <div className="space-y-4">
+            {selectedExchange && (
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 space-y-3 border border-gray-200">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Coins className="w-5 h-5 text-gray-600" />
-                    <span className="text-sm text-gray-600">Pontos a converter</span>
-                  </div>
-                  <span className="text-lg font-bold text-gray-900">{selectedExchange?.points} pts</span>
+                  <span className="text-sm text-gray-600 font-medium">Pontos a converter:</span>
+                  <span className="text-lg font-bold text-gray-900">{selectedExchange.points} pts</span>
                 </div>
-                
-                <div className="flex justify-center">
-                  <div className="bg-white rounded-full p-2">
-                    <ArrowRight className="w-4 h-4 text-green-600 transform rotate-90" />
-                  </div>
-                </div>
-                
+                <div className="w-full h-px bg-gray-300"></div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Wallet className="w-5 h-5 text-green-600" />
-                    <span className="text-sm text-gray-600">Valor em dinheiro</span>
-                  </div>
-                  <span className="text-xl font-bold text-green-600">R$ {selectedExchange?.value.toFixed(2)}</span>
-                </div>
-
-                <div className="border-t border-green-200 pt-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Taxa de conversão</span>
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3 text-green-600" />
-                      <span className="text-xs font-medium text-green-600">
-                        R$ {selectedExchange?.value && selectedExchange?.points ? 
-                          (selectedExchange.value / selectedExchange.points).toFixed(3) : '0.000'}/pt
-                      </span>
-                    </div>
-                  </div>
+                  <span className="text-sm text-gray-600 font-medium">Valor a receber:</span>
+                  <span className="text-lg font-bold text-green-600">R$ {selectedExchange.value.toFixed(2)}</span>
                 </div>
               </div>
-            </div>
-
-            {/* Warning */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-              <div className="text-xs">
-                <span className="font-semibold text-amber-800">Atenção:</span>
-                <span className="text-amber-700"> Esta ação não pode ser desfeita. Os pontos serão removidos da sua conta e o valor será adicionado à sua carteira.</span>
-              </div>
-            </div>
+            )}
             
             {/* Action Buttons */}
-            <div className="flex flex-col gap-3 pt-2">
-              <Button
-                className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold py-5"
-                onClick={confirmExchange}
-                data-testid="button-confirm-exchange"
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Confirmar Conversão
-              </Button>
+            <div className="flex gap-3">
               <Button
                 variant="outline"
-                className="w-full border-gray-300 hover:bg-gray-50 py-5"
+                className="flex-1 py-5 border-gray-300 hover:bg-gray-50"
                 onClick={() => setShowConfirmationModal(false)}
                 data-testid="button-cancel-exchange"
               >
                 Cancelar
+              </Button>
+              <Button
+                className="flex-1 py-5 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold"
+                onClick={confirmExchange}
+                data-testid="button-confirm-exchange"
+              >
+                Confirmar
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Conversion Processing Modal */}
-      <ConversionModal
-        open={showConversionModal}
-        onOpenChange={setShowConversionModal}
-        points={conversionData?.points || selectedExchange?.points || 0}
-        value={conversionData?.value || selectedExchange?.value || 0}
-        onSuccess={handleConversionSuccess}
-      />
-
-      {/* Withdraw Modal */}
-      <WithdrawModal
-        open={showWithdrawModal}
-        onOpenChange={setShowWithdrawModal}
-        balance={balance}
-        onConfirm={handleWithdrawConfirm}
-      />
-
-      {/* Withdraw Processing Modal */}
-      <WithdrawProcessingModal
-        open={showWithdrawProcessing}
-        onOpenChange={setShowWithdrawProcessing}
-      />
-
-      {/* Processing Before Authorization Modal */}
-      {showProcessingBeforeAuth && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-[90%] flex flex-col items-center space-y-6">
-            {/* Loading spinner */}
-            <div className="relative w-20 h-20">
-              <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-green-500 rounded-full border-t-transparent animate-spin"></div>
-            </div>
-            
-            {/* Loading text */}
-            <div className="text-center space-y-2">
-              <h3 className="text-xl font-bold text-gray-900">Processando seu Saque!</h3>
-              <p className="text-sm text-gray-600">Aguarde enquanto verificamos suas informações...</p>
-            </div>
-            
-            {/* Progress dots */}
-            <div className="flex gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-            </div>
-          </div>
-        </div>
+      {/* Conversion Success Modal */}
+      {showConversionModal && conversionData && (
+        <ConversionModal
+          open={showConversionModal}
+          onOpenChange={setShowConversionModal}
+          points={conversionData.points}
+          value={conversionData.value}
+          onSuccess={handleConversionSuccess}
+        />
       )}
-
+      
+      {/* Withdraw Modal */}
+      {showWithdrawModal && (
+        <WithdrawModal
+          open={showWithdrawModal}
+          onOpenChange={setShowWithdrawModal}
+          balance={balance}
+          onConfirm={handleWithdrawConfirm}
+        />
+      )}
+      
+      {/* Processing Modal (before auth) */}
+      {showProcessingBeforeAuth && (
+        <WithdrawProcessingModal
+          open={showProcessingBeforeAuth}
+          onOpenChange={setShowProcessingBeforeAuth}
+        />
+      )}
+      
+      {/* Withdraw Processing Modal */}
+      {showWithdrawProcessing && (
+        <WithdrawProcessingModal
+          open={showWithdrawProcessing}
+          onOpenChange={setShowWithdrawProcessing}
+        />
+      )}
+      
       {/* Account Authorization Modal */}
-      <AccountAuthorizationModal
-        open={showAuthorizationModal}
-        onOpenChange={setShowAuthorizationModal}
-        amount={withdrawAmount}
-        onAuthorize={handleAuthorizeAccount}
-        onLater={handleAuthorizeLater}
-      />
+      {showAuthorizationModal && (
+        <AccountAuthorizationModal
+          open={showAuthorizationModal}
+          onOpenChange={setShowAuthorizationModal}
+          amount={withdrawAmount}
+          onAuthorize={handleAuthorizeAccount}
+          onLater={handleAuthorizeLater}
+        />
+      )}
     </div>
   );
 }
