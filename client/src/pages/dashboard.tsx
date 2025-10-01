@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download } from "lucide-react";
-import Header from '@/components/Header';
+import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download } from "lucide-react";
+import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
 import hitsFmLogo from '@/assets/hits-fm-logo.png';
@@ -154,7 +154,42 @@ export default function Dashboard({
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <BannerCarousel />
-      <Header />
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center">
+              <img 
+                src={logoUrl} 
+                alt="RádioPlay" 
+                className="h-7 md:h-9 w-auto object-contain" 
+                data-testid="dashboard-logo"
+              />
+            </div>
+
+            {/* Balance and Settings */}
+            <div className="flex items-center gap-2 md:gap-3">
+              <div 
+                className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-semibold text-sm md:text-base"
+                data-testid="balance-display"
+              >
+                R$ {balance.toFixed(2)}
+              </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="w-9 h-9"
+                data-testid="settings-button"
+                aria-label="Configurações"
+                onClick={() => setLocation('/perfil')}
+              >
+                <Settings className="w-5 h-5 text-gray-600" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
 
       {/* Main Content */}
       <main className="flex-1 pb-32">
@@ -225,31 +260,6 @@ export default function Dashboard({
                 </div>
               )
             )}
-          </Card>
-
-          {/* Balance Card with Withdraw Button */}
-          <Card className="bg-gradient-to-r from-white to-green-50/50 border border-green-200 p-3.5 mb-5 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-full shadow-sm">
-                  <Download className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-600 font-medium mb-0.5">Saldo disponível</p>
-                  <p className="text-lg font-bold text-gray-900">
-                    R$ {balance.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-              <Button
-                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-3.5 py-2 h-auto rounded-lg transition-all transform hover:scale-105 shadow-sm"
-                onClick={() => setLocation('/resgatar')}
-                data-testid="withdraw-button"
-              >
-                <Download className="w-3.5 h-3.5 mr-1.5" />
-                Sacar
-              </Button>
-            </div>
           </Card>
 
           {/* Radio List */}
