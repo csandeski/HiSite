@@ -979,7 +979,7 @@ function App({ user }: { user: any }) {
                         data-testid="tab-resgatar"
                       >
                         <Gift className="w-5 h-5" />
-                        <span className="text-xs font-medium">Resgatar</span>
+                        <span className="text-xs font-medium">Saldo</span>
                       </Button>
                     </div>
 
