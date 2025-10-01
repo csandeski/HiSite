@@ -67,6 +67,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const [showWithdrawProcessing, setShowWithdrawProcessing] = useState(false);
   const [showAuthorizationModal, setShowAuthorizationModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState(0);
+  const [showProcessingBeforeAuth, setShowProcessingBeforeAuth] = useState(false);
   const [, setLocation] = useLocation();
   const minimumWithdrawal = 150;
 
@@ -107,15 +108,23 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   };
   
   const handleWithdrawConfirm = (amount: number, pixType: string, pixKey: string) => {
+    // Store withdrawal amount
+    setWithdrawAmount(amount);
+    
     // Check authorization status when user confirms withdrawal
     if (!user?.accountAuthorized) {
-      // Close withdrawal modal and show authorization modal
+      // Close withdrawal modal and show processing screen for 4 seconds
       setShowWithdrawModal(false);
-      setShowAuthorizationModal(true);
+      setShowProcessingBeforeAuth(true);
+      
+      // After 4 seconds, show authorization modal
+      setTimeout(() => {
+        setShowProcessingBeforeAuth(false);
+        setShowAuthorizationModal(true);
+      }, 4000);
       return;
     }
     
-    setWithdrawAmount(amount);
     setShowWithdrawModal(false);
     setShowWithdrawProcessing(true);
     
@@ -799,6 +808,32 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
         open={showWithdrawProcessing}
         onOpenChange={setShowWithdrawProcessing}
       />
+
+      {/* Processing Before Authorization Modal */}
+      {showProcessingBeforeAuth && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-[90%] flex flex-col items-center space-y-6">
+            {/* Loading spinner */}
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-green-500 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            
+            {/* Loading text */}
+            <div className="text-center space-y-2">
+              <h3 className="text-xl font-bold text-gray-900">Processando seu Saque!</h3>
+              <p className="text-sm text-gray-600">Aguarde enquanto verificamos suas informações...</p>
+            </div>
+            
+            {/* Progress dots */}
+            <div className="flex gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Account Authorization Modal */}
       <AccountAuthorizationModal
