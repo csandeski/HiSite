@@ -21,7 +21,6 @@ import {
   Download, 
   Coins, 
   AlertCircle, 
-  Settings,
   CheckCircle,
   Clock,
   PiggyBank,
@@ -383,16 +382,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
               />
             </div>
 
-            {/* Settings */}
-            <Button
-              size="icon"
-              variant="ghost"
-              className="w-9 h-9"
-              data-testid="settings-button"
-              aria-label="Configurações"
-            >
-              <Settings className="w-5 h-5 text-gray-600" />
-            </Button>
           </div>
         </div>
       </header>

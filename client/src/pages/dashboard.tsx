@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Settings, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download } from "lucide-react";
+import { Wallet, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
@@ -180,11 +180,11 @@ export default function Dashboard({
                 size="icon"
                 variant="ghost"
                 className="w-9 h-9"
-                data-testid="settings-button"
-                aria-label="Configurações"
-                onClick={() => setLocation('/perfil')}
+                data-testid="wallet-button"
+                aria-label="Carteira"
+                onClick={() => setLocation('/resgatar')}
               >
-                <Settings className="w-5 h-5 text-gray-600" />
+                <Wallet className="w-5 h-5 text-gray-600" />
               </Button>
             </div>
           </div>

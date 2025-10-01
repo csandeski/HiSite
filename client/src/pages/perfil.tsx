@@ -207,14 +207,15 @@ export default function Perfil({ userName, sessionPoints, balance, totalListenin
               <img src={logoUrl} alt="RádioPlay" className="h-7 object-contain" />
             </div>
             
-            {/* Settings Icon */}
+            {/* Wallet Icon */}
             <Button
               variant="ghost"
               size="icon"
               className="w-9 h-9 rounded-full"
-              data-testid="button-settings"
+              data-testid="button-wallet"
+              onClick={() => setLocation('/resgatar')}
             >
-              <Settings className="w-5 h-5 text-gray-600" />
+              <Wallet className="w-5 h-5 text-gray-600" />
             </Button>
           </div>
         </div>
