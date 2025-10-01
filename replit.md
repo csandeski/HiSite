@@ -2,6 +2,15 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
+## Recent Updates (01/10/2025)
+- **Remoção Completa do ViperPay**:
+  - ✅ Removido todo código relacionado ao ViperPay para resolver erro de deploy
+  - ✅ Eliminada dependência de VIPERPAY_API_KEY
+  - ✅ Removidos endpoints de pagamento PIX (agora usa PerfectPay via link direto)
+  - ✅ Sistema agora utiliza checkout externo PerfectPay (https://checkout.perfectpay.com.br/pay/PPU38CQ1GBI)
+  - ✅ Modal de autorização redireciona direto para PerfectPay sem necessidade de API
+  - ✅ Deploy funcionando sem erros relacionados a APIs de pagamento
+
 ## Recent Updates (30/09/2025)
 - **Novo Fluxo de Autorização Obrigatória**:
   - ✅ TODAS as notificações automáticas agora só aparecem APÓS pagamento da taxa de autorização
@@ -21,15 +30,6 @@ RádioPlay - A Portuguese-language platform about earning money by listening to 
   - ✅ 250 pontos = R$ 24,00
   - ✅ 400 pontos = R$ 60,00
   - ✅ 600 pontos = R$ 150,00
-
-## Recent Updates (29/09/2025)
-- **Migração de LiraPay para ViperPay**:
-  - ✅ Substituída toda integração de pagamentos de LiraPay para ViperPay
-  - ✅ Novo serviço ViperPay implementado com API completa
-  - ✅ Webhook endpoint atualizado para /api/webhook/viperpay
-  - ✅ Removidos redirecionamentos externos, agora usa API direta com PIX
-  - ✅ Modais de pagamento agora geram PIX via ViperPay API
-  - ✅ API Key configurada como secret seguro (VIPERPAY_API_KEY)
 
 ## Recent Updates (25/09/2025)
 - **Sistema de Sincronização Ultra-Rápida de Pontos**:
