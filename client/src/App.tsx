@@ -171,6 +171,7 @@ function App({ user }: { user: any }) {
   
   const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const pointsIntervalRef = useRef<NodeJS.Timeout | null>(null); // Control points timer uniquely
   const [userName, setUserName] = useState(() => {
     return localStorage.getItem('userName') || '';
   });
@@ -349,6 +350,13 @@ function App({ user }: { user: any }) {
 
   // Helper function to end listening session
   const endListeningSession = useCallback(async () => {
+    // CRITICAL: Clear points timer immediately to avoid duplicate points
+    if (pointsIntervalRef.current) {
+      console.log('[TIMER] Clearing points interval in endListeningSession');
+      clearInterval(pointsIntervalRef.current);
+      pointsIntervalRef.current = null;
+    }
+    
     if (sessionInfoRef.current.sessionId && sessionInfoRef.current.sessionStartTime) {
       const duration = Math.floor((Date.now() - sessionInfoRef.current.sessionStartTime) / 1000);
       const sessionId = sessionInfoRef.current.sessionId;
@@ -435,12 +443,19 @@ function App({ user }: { user: any }) {
   
   // Effect to track listening time and points while playing
   useEffect(() => {
-    let pointsInterval: NodeJS.Timeout | null = null;
+    // CRITICAL: Clear any existing points interval FIRST
+    if (pointsIntervalRef.current) {
+      console.log('[TIMER] Clearing existing points interval before creating new one');
+      clearInterval(pointsIntervalRef.current);
+      pointsIntervalRef.current = null;
+    }
+    
     let timeInterval: NodeJS.Timeout | null = null;
     let syncInterval: NodeJS.Timeout | null = null; // Auto-sync interval
     
     // Only start counting points when playing and NOT syncing
     if (isPlaying && playingRadioId !== null && !isSyncing) {
+      console.log('[TIMER] Creating new points interval');
       console.log('[SYNC] Starting listening session...', {
         radioId: playingRadioId,
         currentPoints: sessionPoints,
@@ -567,7 +582,7 @@ function App({ user }: { user: any }) {
       (window as any).syncCurrentPoints = syncCurrentPoints;
       
       // Increment points by 1 at calculated intervals
-      pointsInterval = setInterval(() => {
+      pointsIntervalRef.current = setInterval(() => {
         setSessionPoints((prev) => {
           const newPoints = prev + 1; // Always increment by 1
           sessionInfoRef.current.sessionPoints = newPoints;
@@ -576,6 +591,7 @@ function App({ user }: { user: any }) {
           return newPoints;
         });
       }, intervalMs);
+      console.log('[TIMER] Points interval created with interval:', intervalMs, 'ms');
       
       // Update total listening time every second
       timeInterval = setInterval(() => {
@@ -632,17 +648,38 @@ function App({ user }: { user: any }) {
       }, 3000); // Every 3 seconds
       
     } else {
-      // Radio not playing - but don't end session here
-      // The session will be ended properly when user actually stops the radio
+      // Radio not playing - reset sessionInfoRef but keep current points
+      console.log('[TIMER] Radio not playing, resetting sessionInfoRef');
       setListeningStartTime(null);
+      
+      // Reset sessionInfoRef when not playing, but maintain current points
+      sessionInfoRef.current = {
+        sessionId: null,
+        sessionStartTime: 0,
+        sessionPoints: sessionPoints, // Keep current points
+        baselinePoints: 0
+      };
     }
     
     return () => {
-      if (pointsInterval) clearInterval(pointsInterval);
-      if (timeInterval) clearInterval(timeInterval);
-      if (syncInterval) clearInterval(syncInterval);
+      // CRITICAL: Clean up ALL timers properly
+      console.log('[TIMER] Cleanup: Clearing all intervals');
+      
+      if (pointsIntervalRef.current) {
+        console.log('[TIMER] Cleanup: Clearing points interval');
+        clearInterval(pointsIntervalRef.current);
+        pointsIntervalRef.current = null;
+      }
+      
+      if (timeInterval) {
+        clearInterval(timeInterval);
+      }
+      
+      if (syncInterval) {
+        clearInterval(syncInterval);
+      }
     };
-  }, [isPlaying, playingRadioId, isSyncing, endListeningSession]); // Add endListeningSession to deps
+  }, [isPlaying, playingRadioId, isSyncing, endListeningSession, sessionPoints]); // Add sessionPoints for sessionInfoRef reset
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 
