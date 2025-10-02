@@ -192,7 +192,7 @@ export default function AccountAuthorization() {
                 <p className="text-sm text-red-800">
                   As vagas encerram dia <strong className="text-red-900 uppercase">{deadline}</strong>
                 </p>
-                <p className="text-sm text-red-700 mt-1">Após esta data, novas vagas só abrirão em 2025.</p>
+                <p className="text-sm text-red-700 mt-1">Após esta data, novas vagas só abrirão em 2026.</p>
               </div>
             </div>
           </Card>
