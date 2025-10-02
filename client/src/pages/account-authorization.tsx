@@ -1,14 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Clock, Check, AlertCircle, Timer, ChevronLeft } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Shield, Clock, Check, AlertCircle, Timer, ChevronLeft, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AUTHORIZATION_AMOUNT_CENTS, formatBRL } from "@shared/constants";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import logoUrl from '@/assets/logo.png';
 
 export default function AccountAuthorization() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const [timeRemaining, setTimeRemaining] = useState(600); // 10 minutes in seconds
 
   // Get user data to check account status
@@ -59,149 +63,187 @@ export default function AccountAuthorization() {
     year: 'numeric' 
   });
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Fixed Header with Back Button */}
-      <div className="sticky top-0 bg-white shadow-sm z-50">
-        <div className="flex items-center p-4">
-          <button
-            onClick={handleBack}
-            className="p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="Voltar"
-            data-testid="button-back-navigation"
-          >
-            <ChevronLeft className="w-6 h-6 text-gray-700" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900 ml-2">Autorização de Conta</h1>
-        </div>
-      </div>
+  // Calculate user balance
+  const balance = user ? (user.points * 0.125) : 0;
 
-      {/* Red Discount Banner */}
-      <div className="bg-gradient-to-r from-red-600 to-red-500 text-white px-4 py-5">
-        <div className="max-w-lg mx-auto">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex-1">
-              <p className="text-xs uppercase tracking-wider opacity-90">Oferta Exclusiva</p>
-              <p className="text-3xl font-bold">62% OFF</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-sm line-through opacity-75">R$ 79,90</span>
-                <span className="text-2xl font-bold">R$ 29,90</span>
-              </div>
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header - exactly like dashboard */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            {/* Left side: Back button and Logo */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleBack}
+                className="p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Voltar"
+                data-testid="button-back-navigation"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-600" />
+              </button>
+              <img 
+                src={logoUrl} 
+                alt="RádioPlay" 
+                className="h-7 md:h-9 w-auto object-contain" 
+                data-testid="authorization-logo"
+              />
             </div>
-            <div className="bg-white/20 backdrop-blur rounded-lg px-3 py-2 text-center">
-              <Timer className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-sm font-mono font-bold">{formatTime(timeRemaining)}</span>
+
+            {/* Right side: Balance display */}
+            <div className="flex items-center gap-2 md:gap-3">
+              <div 
+                className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg font-semibold text-sm md:text-base"
+                data-testid="balance-display"
+              >
+                R$ {balance.toFixed(2)}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="px-4 py-6 pb-24 max-w-lg mx-auto">
-        {/* Icon and Title */}
-        <div className="text-center mb-6">
-          <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-14 h-14 text-blue-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Autorização de Conta</h2>
-          <p className="text-gray-600 mt-2">Ative sua conta com uma taxa única de segurança</p>
-        </div>
-
-        {/* Official App Badge */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl p-5 mb-6 shadow-lg">
-          <p className="text-lg font-bold text-center">APP OFICIAL RADIOPLAY BRASIL</p>
-          <p className="text-sm text-center mt-2 opacity-95">Plataforma 100% verificada e segura com proteção total dos dados</p>
-        </div>
-
-        {/* Info Box */}
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg">
-          <h3 className="font-bold text-blue-900 text-lg mb-2">
-            Conta Pendente de Autorização
-          </h3>
-          <p className="text-sm text-blue-700 leading-relaxed">
-            Sua conta está em modo básico. Para acessar recursos avançados e funcionalidades completas, é necessário autorizar sua conta.
-          </p>
-        </div>
-
-        {/* Warning */}
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
-          <div className="flex gap-3">
-            <AlertCircle className="w-6 h-6 text-red-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="text-base font-bold text-red-800">
-                Importante: Prazo Limite
-              </p>
-              <p className="text-sm text-red-700 mt-2 leading-relaxed">
-                Se não for verificada até dia <strong>{today}</strong>, sua conta será deletada para ceder vaga a novos ouvintes.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Transaction Details */}
-        <div className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-4">Detalhes da Transação</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between text-base">
-              <span className="text-gray-600">Taxa de autorização:</span>
-              <span className="font-bold text-blue-600">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</span>
-            </div>
-            <div className="flex justify-between text-base">
-              <span className="text-gray-600">Status da conta:</span>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-orange-500" />
-                <span className="font-semibold text-orange-500 whitespace-nowrap">Aguardando Autorização</span>
+      <main className="flex-1 pb-24">
+        <div className="container mx-auto px-4 py-6 max-w-2xl">
+          
+          {/* Page Title Card */}
+          <Card className="p-6 mb-6 bg-white border-0 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                <Shield className="w-9 h-9 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h1 className="text-2xl font-bold text-gray-900">Autorização de Conta</h1>
+                <p className="text-gray-600 mt-1">Ative sua conta com segurança</p>
               </div>
             </div>
-            <div className="flex justify-between text-base">
-              <span className="text-gray-600">Validade:</span>
-              <span className="font-semibold text-green-600">Vitalício</span>
-            </div>
-          </div>
-        </div>
+          </Card>
 
-        {/* Guarantees */}
-        <div className="space-y-4 mb-8">
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-              <Check className="w-5 h-5 text-green-600" />
+          {/* Promotional Offer Card */}
+          <Card className="p-5 mb-6 bg-white border-0 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Oferta Especial</p>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl font-bold text-primary">62% OFF</span>
+                  <span className="text-sm text-gray-400 line-through">R$ 79,90</span>
+                </div>
+                <p className="text-2xl font-bold text-green-600 mt-1">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</p>
+              </div>
+              <div className="bg-primary/10 rounded-lg px-4 py-3">
+                <Timer className="w-5 h-5 text-primary mx-auto mb-1" />
+                <span className="text-sm font-mono font-bold text-primary">{formatTime(timeRemaining)}</span>
+              </div>
             </div>
-            <div>
-              <p className="text-base font-semibold text-gray-900">30 Dias de Garantia Total</p>
-              <p className="text-sm text-gray-600 leading-relaxed mt-1">Você tem 30 dias para solicitar o reembolso completo do valor pago.</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-              <Check className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-base font-semibold text-gray-900">Ativação Instantânea</p>
-              <p className="text-sm text-gray-600 leading-relaxed mt-1">Após o pagamento, sua conta é ativada imediatamente e os saques são liberados em até 5 minutos.</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-              <Check className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-base font-semibold text-gray-900">Suporte Prioritário</p>
-              <p className="text-sm text-gray-600 leading-relaxed mt-1">Acesso ao suporte exclusivo com atendimento prioritário 24/7.</p>
-            </div>
-          </div>
-        </div>
+          </Card>
 
-        {/* Fixed Bottom Action Button */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-          <div className="max-w-lg mx-auto">
-            <Button
-              className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-6 text-xl rounded-2xl shadow-lg transform transition-transform hover:scale-[1.02]"
-              onClick={handleAuthorize}
-              data-testid="button-authorize-account"
-            >
-              Aproveitar Desconto de 62%
-            </Button>
-          </div>
+          {/* Account Status Card */}
+          <Card className="p-5 mb-6 bg-white border-0 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Status da Conta</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2">
+                <span className="text-gray-600">Status atual:</span>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-orange-500" />
+                  <span className="font-medium text-orange-600">Aguardando Autorização</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-gray-600">Taxa de autorização:</span>
+                <span className="font-bold text-primary">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-gray-600">Validade:</span>
+                <span className="font-medium text-green-600">Vitalício</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Important Notice Card */}
+          <Card className="p-5 mb-6 bg-white border-l-4 border-l-orange-500 shadow-sm">
+            <div className="flex gap-3">
+              <AlertCircle className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-gray-900 mb-2">Prazo Importante</p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Sua conta precisa ser autorizada até <strong>{today}</strong> para manter acesso completo aos recursos da plataforma.
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Benefits Card */}
+          <Card className="p-5 mb-6 bg-white border-0 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Benefícios da Autorização</h3>
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">30 Dias de Garantia</p>
+                  <p className="text-sm text-gray-600 mt-0.5">Solicite reembolso completo em até 30 dias</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Ativação Instantânea</p>
+                  <p className="text-sm text-gray-600 mt-0.5">Conta ativada imediatamente após o pagamento</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Saques Liberados</p>
+                  <p className="text-sm text-gray-600 mt-0.5">Realize saques sem restrições em até 5 minutos</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Suporte Prioritário</p>
+                  <p className="text-sm text-gray-600 mt-0.5">Atendimento exclusivo disponível 24/7</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Platform Info Card */}
+          <Card className="p-5 mb-6 bg-white border-0 shadow-sm">
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-500 mb-2">PLATAFORMA OFICIAL</p>
+              <p className="text-lg font-bold text-primary">RadioPlay Brasil</p>
+              <p className="text-sm text-gray-600 mt-2">Aplicativo verificado com proteção total de dados</p>
+            </div>
+          </Card>
+
+        </div>
+      </main>
+
+      {/* Fixed Bottom Action Area */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+        <div className="max-w-2xl mx-auto">
+          <Button
+            className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-6 text-lg rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
+            onClick={handleAuthorize}
+            data-testid="button-authorize-account"
+          >
+            Autorizar Conta Agora
+          </Button>
+          <p className="text-xs text-center text-gray-500 mt-2">
+            Pagamento seguro • Garantia de 30 dias
+          </p>
         </div>
       </div>
     </div>
