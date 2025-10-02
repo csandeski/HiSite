@@ -821,8 +821,12 @@ export default function Chat() {
       <div className="h-[68px]"></div>
       
       {/* Messages Area */}
-      <ScrollArea className="flex-1 px-4 py-3 bg-gray-100" ref={scrollAreaRef}>
-        <div className="max-w-2xl mx-auto space-y-3">
+      <ScrollArea 
+        className="flex-1 px-4 py-3 bg-gray-100" 
+        ref={scrollAreaRef}
+        style={{ overflowAnchor: 'none' }}
+      >
+        <div className="max-w-2xl mx-auto space-y-3" style={{ overflowAnchor: 'none' }}>
           {messages.map((msg, index) => (
             <div
               key={msg.id}
