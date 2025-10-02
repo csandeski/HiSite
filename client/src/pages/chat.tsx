@@ -295,7 +295,55 @@ export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const lastAdminMessageTimeRef = useRef<number>(0);
+  const usedAdminMessagesRef = useRef<string[]>([]);
+  
+  // Admin messages array - expanded for more variety
+  const adminMessages = [
+    "Todos os saques foram concluídos com sucesso pessoal! Qualquer dúvida basta chamar no suporte WhatsApp ou abrir um ticket!",
+    "Lembrete: Mantenha seu app sempre atualizado para melhor experiência!",
+    "Sistema funcionando 100% sem instabilidades. Bons ganhos a todos!",
+    "Nova atualização disponível com melhorias de desempenho!",
+    "Suporte online 24/7 para ajudar vocês. Não hesitem em perguntar!",
+    "Atenção: Processamento de saques hoje está mais rápido que o normal! 🚀",
+    "Parabéns aos novos usuários que começaram hoje! Bem-vindos à comunidade!",
+    "Informamos que todos os pagamentos PIX estão sendo processados normalmente.",
+    "Dica do Admin: Ouçam as rádios premium para ganhar mais pontos!",
+    "Aviso: Manutenção programada para domingo às 3h da manhã. Durará apenas 15 minutos.",
+    "Estatística do dia: Mais de R$ 50.000 em saques processados nas últimas 24h!",
+    "Lembrete: Verificação de conta é obrigatória para saques acima de R$ 100.",
+    "Novidade: Em breve teremos novas rádios parceiras com pontos extras!",
+    "Importante: Sempre use a versão oficial do app para evitar problemas.",
+    "Comunicado: Taxa de autorização continua em R$ 29,90 sem alterações!",
+    "Pessoal, estamos monitorando todos os saques. Tudo funcionando perfeitamente!",
+    "Boa notícia: Tempo médio de aprovação de saques reduzido para 5 minutos!",
+    "Segurança: Nunca compartilhem suas senhas com ninguém!",
+    "Atualização: Novo sistema de pontos implementado com sucesso!",
+    "Feedback positivo: 98% de aprovação dos usuários este mês! Obrigado!",
+    "Alerta: Cuidado com apps falsos. Use apenas o RádioPlay oficial!",
+    "Informativo: Nosso suporte responde em até 2 horas via WhatsApp.",
+    "Conquista: Batemos recorde de usuários ativos simultaneamente!",
+    "Melhoria: Sistema de chat atualizado para melhor performance.",
+    "Esclarecimento: Não há limite diário para saques após autorização!"
+  ];
+  
+  // Get next unique admin message
+  const getNextAdminMessage = () => {
+    // Reset if all messages have been used
+    if (usedAdminMessagesRef.current.length >= adminMessages.length) {
+      usedAdminMessagesRef.current = [];
+    }
+    
+    // Find unused messages
+    const unusedMessages = adminMessages.filter(
+      msg => !usedAdminMessagesRef.current.includes(msg)
+    );
+    
+    // Pick a random unused message
+    const selectedMessage = unusedMessages[Math.floor(Math.random() * unusedMessages.length)];
+    usedAdminMessagesRef.current.push(selectedMessage);
+    
+    return selectedMessage;
+  };
   
   // Auto-generate messages
   useEffect(() => {
@@ -318,31 +366,10 @@ export default function Chat() {
       }
     }
     
-    // Set up interval for new messages
+    // Set up interval for regular messages
     const generateRandomMessage = () => {
-      const now = Date.now();
-      
-      // Add admin message every 30-60 seconds
-      if (now - lastAdminMessageTimeRef.current > 30000 + Math.random() * 30000) {
-        const adminMessages = [
-          "Todos os saques foram concluídos com sucesso pessoal! Qualquer dúvida basta chamar no suporte WhatsApp ou abrir um ticket!",
-          "Lembrete: Mantenha seu app sempre atualizado para melhor experiência!",
-          "Sistema funcionando 100% sem instabilidades. Bons ganhos a todos!",
-          "Nova atualização disponível com melhorias de desempenho!",
-          "Suporte online 24/7 para ajudar vocês. Não hesitem em perguntar!"
-        ];
-        
-        addMessage({
-          name: "Administrador RádioPlay",
-          message: adminMessages[Math.floor(Math.random() * adminMessages.length)],
-          isVerified: false,
-          isOwnMessage: false,
-          isAdmin: true
-        });
-        
-        lastAdminMessageTimeRef.current = now;
-      } else if (Math.random() < 0.7) {
-        // 70% chance to generate a regular message
+      // 70% chance to generate a regular message
+      if (Math.random() < 0.7) {
         const randomName = brazilianNames[Math.floor(Math.random() * brazilianNames.length)];
         const randomMessage = messageTemplates[Math.floor(Math.random() * messageTemplates.length)];
         
@@ -374,12 +401,38 @@ export default function Chat() {
       }
     };
     
-    // Random interval between 2-5 seconds
-    const intervalId = setInterval(() => {
+    // Random interval between 2-5 seconds for regular messages
+    const regularIntervalId = setInterval(() => {
       generateRandomMessage();
     }, 2000 + Math.random() * 3000);
     
-    return () => clearInterval(intervalId);
+    // Set up separate interval for admin messages every 2 minutes
+    const adminIntervalId = setInterval(() => {
+      addMessage({
+        name: "Administrador RádioPlay",
+        message: getNextAdminMessage(),
+        isVerified: false,
+        isOwnMessage: false,
+        isAdmin: true
+      });
+    }, 120000); // Exactly 2 minutes
+    
+    // Send first admin message after 30 seconds
+    const initialAdminTimeout = setTimeout(() => {
+      addMessage({
+        name: "Administrador RádioPlay",
+        message: getNextAdminMessage(),
+        isVerified: false,
+        isOwnMessage: false,
+        isAdmin: true
+      });
+    }, 30000); // 30 seconds for first admin message
+    
+    return () => {
+      clearInterval(regularIntervalId);
+      clearInterval(adminIntervalId);
+      clearTimeout(initialAdminTimeout);
+    };
   }, [addMessage, messages.length]);
   
   // Auto scroll disabled per user request
