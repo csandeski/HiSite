@@ -884,11 +884,11 @@ export default function Chat() {
       
       {/* Messages Area - Adjusted padding for fixed input */}
       <ScrollArea 
-        className={`flex-1 px-4 py-3 bg-gray-100 ${isRadioPlaying ? 'pb-40' : 'pb-28'}`}
+        className="flex-1 px-4 py-3 bg-gray-100"
         ref={scrollAreaRef}
         style={{ overflowAnchor: 'none' }}
       >
-        <div className="max-w-2xl mx-auto space-y-3" style={{ overflowAnchor: 'none' }}>
+        <div className={`max-w-2xl mx-auto space-y-3 ${isRadioPlaying ? 'pb-48' : 'pb-36'}`} style={{ overflowAnchor: 'none' }}>
           {messages.map((msg, index) => (
             <div
               key={msg.id}
