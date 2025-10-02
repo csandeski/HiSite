@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,6 @@ import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useChat } from '@/contexts/ChatContext';
-import { PlayerContext } from '@/App';
 
 // Array of Brazilian names for generating messages
 const brazilianNames = [
@@ -581,8 +580,8 @@ export default function Chat() {
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const usedAdminMessagesRef = useRef<string[]>([]);
-  const playerContext = useContext(PlayerContext);
-  const isRadioPlaying = playerContext?.playingRadio !== null;
+  // Simple check for radio playing - no need for complex detection
+  const isRadioPlaying = false;
   
   // Admin messages array - expanded for more variety
   const adminMessages = [

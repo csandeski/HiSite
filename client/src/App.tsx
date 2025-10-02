@@ -796,7 +796,7 @@ function App({ user }: { user: any }) {
             
             {/* Global Player - Above bottom navigation */}
             {playingRadio && (
-              <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 z-30">
+              <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 z-30" data-radio-player="true">
                 <div className="px-4 py-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-1">
