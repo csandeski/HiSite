@@ -579,18 +579,12 @@ const additionalMessageTemplates = [
 // Combine all message templates
 const allMessageTemplates = [...messageTemplates, ...additionalMessageTemplates];
 
-// Payment proof messages data
+// Payment proof messages data - sem repetir imagens
 const paymentProofMessages = [
   { image: paymentProof1, text: "Caiu aqui galera!!! 🎉", name: "Roberto Carlos", amount: "R$ 386,00" },
   { image: paymentProof2, text: "Pingou aqui pessoal, to feliz demais", name: "Marina Santos", amount: "PIX" },
   { image: paymentProof3, text: "Mais um pra conta família 💰", name: "João Paulo", amount: "R$ 632,44" },
-  { image: paymentProof4, text: "Bora pra cima time!! Recebi agora", name: "Ana Clara", amount: "Caixa PIX" },
-  { image: paymentProof5, text: "Chegou certinho aqui tbm gente", name: "Carlos Silva", amount: "Transferência" },
-  { image: paymentProof1, text: "Olha só que maravilha 😍", name: "Fernanda Lima", amount: "R$ 386,00" },
-  { image: paymentProof2, text: "Confirmado!! Entrou na conta", name: "Pedro Henrique", amount: "PIX" },
-  { image: paymentProof3, text: "Valeu RadioPlay, pix caiu", name: "Lucia Ferreira", amount: "R$ 632,44" },
-  { image: paymentProof4, text: "Esse app é top demais galera", name: "Ricardo Souza", amount: "Caixa PIX" },
-  { image: paymentProof5, text: "Recebi agora mesmo pessoal!!!", name: "Beatriz Costa", amount: "Transferência" }
+  { image: paymentProof4, text: "Bora pra cima time!! Recebi agora", name: "Ana Clara", amount: "Caixa PIX" }
 ];
 
 
@@ -605,6 +599,7 @@ export default function Chat() {
   const usedPaymentProofsRef = useRef<number[]>([]);
   const hasAddedInitialProofRef = useRef(false);
   const joinTimeRef = useRef(Date.now());
+  const messagesSinceLastImageRef = useRef(0);
   // Simple check for radio playing - no need for complex detection
   const isRadioPlaying = false;
   
@@ -708,24 +703,8 @@ export default function Chat() {
         const messageTime = new Date(now.getTime() - (minutesAgo * 60 * 1000));
         const timestamp = `${messageTime.getHours().toString().padStart(2, '0')}:${messageTime.getMinutes().toString().padStart(2, '0')}`;
         
-        // Add payment proof message at position 5
-        if (i === 5) {
-          const proofIndex = Math.floor(Math.random() * paymentProofMessages.length);
-          const proof = paymentProofMessages[proofIndex];
-          usedPaymentProofsRef.current.push(proofIndex);
-          
-          addMessage({
-            name: proof.name,
-            message: proof.text,
-            isVerified: true,
-            isOwnMessage: false,
-            isAdmin: false,
-            timestamp: timestamp,
-            image: proof.image
-          });
-        }
         // Add admin messages at positions 3 and 7
-        else if (i === 3 || i === 7) {
+        if (i === 3 || i === 7) {
           addMessage({
             name: "ADMINISTRADOR",
             message: i === 3 ? 
@@ -756,25 +735,38 @@ export default function Chat() {
       const timeSinceJoin = Date.now() - joinTimeRef.current;
       const isWithinFirst2Minutes = timeSinceJoin < 120000; // 2 minutes
       
-      // 15% chance to show payment proof in first 2 minutes
-      if (isWithinFirst2Minutes && Math.random() < 0.15 && usedPaymentProofsRef.current.length < paymentProofMessages.length) {
+      // Incrementa contador de mensagens
+      messagesSinceLastImageRef.current++;
+      
+      // Só mostra imagem após pelo menos 7 mensagens e se ainda tem imagens disponíveis
+      if (isWithinFirst2Minutes && 
+          messagesSinceLastImageRef.current >= 7 && 
+          Math.random() < 0.1 && // Reduzido para 10% de chance
+          usedPaymentProofsRef.current.length < paymentProofMessages.length) {
+        
         // Find an unused payment proof
         let proofIndex = Math.floor(Math.random() * paymentProofMessages.length);
-        while (usedPaymentProofsRef.current.includes(proofIndex)) {
+        let attempts = 0;
+        while (usedPaymentProofsRef.current.includes(proofIndex) && attempts < 10) {
           proofIndex = Math.floor(Math.random() * paymentProofMessages.length);
+          attempts++;
         }
         
-        const proof = paymentProofMessages[proofIndex];
-        usedPaymentProofsRef.current.push(proofIndex);
-        
-        addMessage({
-          name: proof.name,
-          message: proof.text,
-          isVerified: true,
-          isOwnMessage: false,
-          isAdmin: false,
-          image: proof.image
-        });
+        // Se encontrou uma imagem não usada
+        if (!usedPaymentProofsRef.current.includes(proofIndex)) {
+          const proof = paymentProofMessages[proofIndex];
+          usedPaymentProofsRef.current.push(proofIndex);
+          messagesSinceLastImageRef.current = 0; // Reset counter
+          
+          addMessage({
+            name: proof.name,
+            message: proof.text,
+            isVerified: true,
+            isOwnMessage: false,
+            isAdmin: false,
+            image: proof.image
+          });
+        }
       }
       // Regular message generation
       else if (Math.random() < 0.7) {
