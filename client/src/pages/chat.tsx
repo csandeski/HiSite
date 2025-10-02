@@ -593,14 +593,6 @@ const paymentProofMessages = [
   { image: paymentProof5, text: "Recebi agora mesmo pessoal!!!", name: "Beatriz Costa", amount: "Transferência" }
 ];
 
-// Debug: Check if images are loaded
-console.log('Payment proof images loaded:', {
-  paymentProof1,
-  paymentProof2,
-  paymentProof3,
-  paymentProof4,
-  paymentProof5
-});
 
 export default function Chat() {
   const [, setLocation] = useLocation();
@@ -722,8 +714,6 @@ export default function Chat() {
           const proof = paymentProofMessages[proofIndex];
           usedPaymentProofsRef.current.push(proofIndex);
           
-          console.log('Adding payment proof message with image:', proof.image);
-          
           addMessage({
             name: proof.name,
             message: proof.text,
@@ -776,8 +766,6 @@ export default function Chat() {
         
         const proof = paymentProofMessages[proofIndex];
         usedPaymentProofsRef.current.push(proofIndex);
-        
-        console.log('Adding random payment proof with image:', proof.image);
         
         addMessage({
           name: proof.name,
@@ -995,20 +983,16 @@ export default function Chat() {
                     [{msg.timestamp}] {msg.name} {msg.isVerified ? '✅' : ''}
                   </div>
                   <div className="text-sm break-words">{msg.message}</div>
-                  {msg.image && (() => {
-                    console.log('Rendering image:', msg.image);
-                    return (
-                      <div className="mt-2 rounded-lg overflow-hidden">
-                        <img 
-                          src={msg.image} 
-                          alt="Payment proof" 
-                          className="w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                          onClick={() => window.open(msg.image, '_blank')}
-                          loading="lazy"
-                        />
-                      </div>
-                    );
-                  })()}
+                  {msg.image && (
+                    <div className="mt-2 rounded-lg overflow-hidden">
+                      <img 
+                        src={msg.image} 
+                        alt="Payment proof" 
+                        className="w-full h-auto object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
