@@ -2,6 +2,17 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
+## Recent Updates (02/10/2025 - Part 3)
+- **Página de Autorização de Conta Dedicada**:
+  - ✅ AccountAuthorizationModal convertido em página dedicada (/account-authorization)
+  - ✅ Design totalmente otimizado para mobile com layout responsivo
+  - ✅ Botão de voltar no canto superior esquerdo com ícone Chevron
+  - ✅ Header fixo com sombra para melhor navegação
+  - ✅ Banner de desconto vermelho com timer (62% OFF)
+  - ✅ Botão de ação fixo no rodapé para fácil acesso
+  - ✅ Página integrada ao sistema de rotas da aplicação
+  - ✅ Fluxo atualizado: resgatar.tsx agora navega para página ao invés de modal
+
 ## Recent Updates (02/10/2025 - Part 2)
 - **Modal de Limite de 800 Pontos Implementado**:
   - ✅ Novo modal aparece quando usuário atinge 800 pontos sem conta autorizada
