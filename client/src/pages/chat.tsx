@@ -361,12 +361,13 @@ export default function Chat() {
     return () => clearInterval(intervalId);
   }, [addMessage, messages.length]);
   
-  // Auto scroll to bottom
-  useEffect(() => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
+  // Auto scroll disabled per user request
+  // User wants to manually control scroll position
+  // useEffect(() => {
+  //   if (lastMessageRef.current) {
+  //     lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+  //   }
+  // }, [messages]);
   
   // Handle send message
   const handleSendMessage = () => {
