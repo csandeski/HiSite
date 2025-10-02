@@ -624,10 +624,10 @@ export default function Chat() {
         if (i === 3 || i === 7) {
           // Add admin message at position 3 and 7
           addMessage({
-            name: "Administrador RádioPlay",
+            name: "ADMINISTRADOR",
             message: i === 3 ? 
               "Sistema funcionando 100% sem instabilidades. Bons ganhos a todos!" : 
-              "Todos os saques foram concluídos com sucesso pessoal! Qualquer dúvida basta chamar no suporte WhatsApp!",
+              "Todos os saques foram concluídos com sucesso pessoal! Qualquer dúvida basta chamar no suporte WhatsApp ou abrir um ticket!",
             isVerified: false,
             isOwnMessage: false,
             isAdmin: true,
@@ -691,7 +691,7 @@ export default function Chat() {
     // Set up separate interval for admin messages every 2 minutes
     const adminIntervalId = setInterval(() => {
       addMessage({
-        name: "Administrador RádioPlay",
+        name: "ADMINISTRADOR",
         message: getNextAdminMessage(),
         isVerified: false,
         isOwnMessage: false,
@@ -699,16 +699,16 @@ export default function Chat() {
       });
     }, 120000); // Exactly 2 minutes
     
-    // Send first admin message after 30 seconds
+    // Send first admin message after 1 minute
     const initialAdminTimeout = setTimeout(() => {
       addMessage({
-        name: "Administrador RádioPlay",
-        message: getNextAdminMessage(),
+        name: "ADMINISTRADOR",
+        message: "Todos os saques foram concluídos com sucesso pessoal! Qualquer dúvida basta chamar no suporte WhatsApp ou abrir um ticket!",
         isVerified: false,
         isOwnMessage: false,
         isAdmin: true
       });
-    }, 30000); // 30 seconds for first admin message
+    }, 60000); // 60 seconds (1 minute) for first admin message
     
     return () => {
       clearInterval(regularIntervalId);
