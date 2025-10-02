@@ -2,6 +2,15 @@
 
 RádioPlay - A Portuguese-language platform about earning money by listening to radio. Built with React and Express.js using TypeScript, following a monorepo structure. Features a modern UI with shadcn/ui components and includes user authentication flow with dashboard for radio selection.
 
+## Recent Updates (02/10/2025)
+- **Melhorias no Chat - Mensagens Mais Naturais**:
+  - ✅ Removidas mensagens genéricas e de bot como "benefício imediato" e "vantagem clara"
+  - ✅ Todas as mensagens agora mais descontraídas, com "erros" de digitação intencionais
+  - ✅ Valores de saque ajustados - mínimo R$ 100 em TODAS as mensagens
+  - ✅ Mensagens mais longas e conversacionais, menos curtinhas e genéricas
+  - ✅ Tom mais humano e natural em todas as categorias de mensagens
+  - ✅ Administrador continua com destaque especial (nome em maiúsculas)
+
 ## Recent Updates (01/10/2025)
 - **Remoção Completa do ViperPay**:
   - ✅ Removido todo código relacionado ao ViperPay para resolver erro de deploy
