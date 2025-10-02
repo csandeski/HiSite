@@ -104,127 +104,132 @@ export default function AccountAuthorization() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 pb-24">
-        <div className="container mx-auto px-4 py-6 max-w-2xl">
+      <main className="flex-1 pb-20">
+        <div className="container mx-auto px-4 py-4 md:py-6 max-w-2xl">
           
           {/* Page Title Card */}
-          <Card className="p-6 mb-6 bg-white border-0 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <Shield className="w-9 h-9 text-primary" />
+          <Card className="p-4 md:p-5 mb-4 bg-white border-0 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <Shield className="w-6 h-6 md:w-7 md:h-7 text-primary" />
               </div>
               <div className="flex-1">
-                <h1 className="text-2xl font-bold text-gray-900">Autorização de Conta</h1>
-                <p className="text-gray-600 mt-1">Ative sua conta com segurança</p>
+                <h1 className="text-lg md:text-xl font-bold text-gray-900">Autorização de Conta</h1>
+                <p className="text-xs md:text-sm text-gray-600 mt-0.5">Ative sua conta com segurança</p>
               </div>
             </div>
           </Card>
 
           {/* Promotional Offer Card */}
-          <Card className="p-5 mb-6 bg-white border-0 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Oferta Especial</p>
-                <div className="flex items-baseline gap-3">
-                  <span className="text-3xl font-bold text-primary">62% OFF</span>
-                  <span className="text-sm text-gray-400 line-through">R$ 79,90</span>
+          <Card className="p-4 md:p-5 mb-4 bg-white border-0 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1">
+                <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-wider font-medium mb-1.5">Oferta Especial</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xl md:text-2xl font-bold text-primary">62% OFF</span>
+                  <span className="text-xs md:text-sm text-gray-400 line-through">R$ 79,90</span>
                 </div>
-                <p className="text-2xl font-bold text-green-600 mt-1">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</p>
+                <p className="text-lg md:text-xl font-bold text-green-600 mt-1">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</p>
               </div>
-              <div className="bg-primary/10 rounded-lg px-4 py-3">
-                <Timer className="w-5 h-5 text-primary mx-auto mb-1" />
-                <span className="text-sm font-mono font-bold text-primary">{formatTime(timeRemaining)}</span>
+              <div className="bg-gray-50 rounded-xl px-3 py-2.5 md:px-4 md:py-3 border border-gray-200">
+                <div className="flex flex-col items-center">
+                  <Timer className="w-4 h-4 md:w-5 md:h-5 text-primary mb-1" />
+                  <span className="text-xs md:text-sm font-mono font-semibold text-gray-900">{formatTime(timeRemaining)}</span>
+                </div>
               </div>
             </div>
           </Card>
 
           {/* Account Status Card */}
-          <Card className="p-5 mb-6 bg-white border-0 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Status da Conta</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between py-2">
-                <span className="text-gray-600">Status atual:</span>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-orange-500" />
-                  <span className="font-medium text-orange-600">Aguardando Autorização</span>
+          <Card className="p-4 md:p-5 mb-4 bg-white border-0 shadow-sm">
+            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Status da Conta</h3>
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                <span className="text-sm text-gray-600">Status atual:</span>
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-orange-500" />
+                  <span className="text-sm font-medium text-orange-600">Aguardando Autorização</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-gray-600">Taxa de autorização:</span>
-                <span className="font-bold text-primary">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</span>
+              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                <span className="text-sm text-gray-600">Taxa de autorização:</span>
+                <span className="text-sm font-bold text-gray-900">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</span>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-gray-600">Validade:</span>
-                <span className="font-medium text-green-600">Vitalício</span>
+              <div className="flex items-center justify-between py-1.5">
+                <span className="text-sm text-gray-600">Validade:</span>
+                <span className="text-sm font-medium text-green-600">Vitalício</span>
               </div>
             </div>
           </Card>
 
           {/* Important Notice Card */}
-          <Card className="p-5 mb-6 bg-white border-l-4 border-l-orange-500 shadow-sm">
-            <div className="flex gap-3">
-              <AlertCircle className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-gray-900 mb-2">Prazo Importante</p>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Sua conta precisa ser autorizada até <strong>{today}</strong> para manter acesso completo aos recursos da plataforma.
+          <Card className="p-4 md:p-5 mb-4 bg-amber-50 border border-amber-200 shadow-sm">
+            <div className="flex gap-2.5">
+              <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-amber-900 mb-1">Prazo Importante</p>
+                <p className="text-xs md:text-sm text-amber-800 leading-relaxed">
+                  Autorize até <strong className="text-amber-900">{today}</strong> para manter seu acesso completo.
                 </p>
               </div>
             </div>
           </Card>
 
           {/* Benefits Card */}
-          <Card className="p-5 mb-6 bg-white border-0 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Benefícios da Autorização</h3>
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-4 h-4 text-green-600" />
+          <Card className="p-4 md:p-5 mb-4 bg-white border-0 shadow-sm">
+            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Benefícios da Autorização</h3>
+            <div className="space-y-3">
+              <div className="flex gap-2.5">
+                <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" />
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900">30 Dias de Garantia</p>
-                  <p className="text-sm text-gray-600 mt-0.5">Solicite reembolso completo em até 30 dias</p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">30 Dias de Garantia</p>
+                  <p className="text-xs text-gray-600 mt-0.5">Reembolso completo garantido</p>
                 </div>
               </div>
               
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-4 h-4 text-green-600" />
+              <div className="flex gap-2.5">
+                <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" />
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900">Ativação Instantânea</p>
-                  <p className="text-sm text-gray-600 mt-0.5">Conta ativada imediatamente após o pagamento</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-4 h-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Saques Liberados</p>
-                  <p className="text-sm text-gray-600 mt-0.5">Realize saques sem restrições em até 5 minutos</p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Ativação Instantânea</p>
+                  <p className="text-xs text-gray-600 mt-0.5">Conta ativada na hora</p>
                 </div>
               </div>
 
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-4 h-4 text-green-600" />
+              <div className="flex gap-2.5">
+                <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" />
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900">Suporte Prioritário</p>
-                  <p className="text-sm text-gray-600 mt-0.5">Atendimento exclusivo disponível 24/7</p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Saques Liberados</p>
+                  <p className="text-xs text-gray-600 mt-0.5">Sem restrições em 5 minutos</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2.5">
+                <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Suporte Prioritário</p>
+                  <p className="text-xs text-gray-600 mt-0.5">Atendimento 24/7</p>
                 </div>
               </div>
             </div>
           </Card>
 
           {/* Platform Info Card */}
-          <Card className="p-5 mb-6 bg-white border-0 shadow-sm">
+          <Card className="p-4 md:p-5 mb-4 bg-gradient-to-br from-gray-50 to-white border-0 shadow-sm">
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-500 mb-2">PLATAFORMA OFICIAL</p>
-              <p className="text-lg font-bold text-primary">RadioPlay Brasil</p>
-              <p className="text-sm text-gray-600 mt-2">Aplicativo verificado com proteção total de dados</p>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 rounded-full mb-2">
+                <Shield className="w-3.5 h-3.5 text-primary" />
+                <p className="text-[10px] font-semibold text-primary uppercase tracking-wider">Plataforma Oficial</p>
+              </div>
+              <p className="text-base md:text-lg font-bold text-gray-900">RadioPlay Brasil</p>
+              <p className="text-xs md:text-sm text-gray-600 mt-1">App verificado • Dados protegidos</p>
             </div>
           </Card>
 
@@ -232,16 +237,16 @@ export default function AccountAuthorization() {
       </main>
 
       {/* Fixed Bottom Action Area */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 md:p-4 shadow-lg">
         <div className="max-w-2xl mx-auto">
           <Button
-            className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-6 text-lg rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
+            className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold py-4 md:py-5 text-base md:text-lg rounded-xl shadow-md transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02]"
             onClick={handleAuthorize}
             data-testid="button-authorize-account"
           >
-            Autorizar Conta Agora
+            Autorizar por {formatBRL(AUTHORIZATION_AMOUNT_CENTS)}
           </Button>
-          <p className="text-xs text-center text-gray-500 mt-2">
+          <p className="text-[10px] md:text-xs text-center text-gray-500 mt-1.5">
             Pagamento seguro • Garantia de 30 dias
           </p>
         </div>
