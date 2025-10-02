@@ -299,14 +299,19 @@ export default function WelcomeModal({ open, onOpenChange, onComplete }: Welcome
                     <span className="text-xs font-bold text-blue-600">R$ 7,50</span>
                   </div>
                   <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2">
-                    <span className="text-xs font-medium text-gray-700">200 pontos</span>
+                    <span className="text-xs font-medium text-gray-700">250 pontos</span>
                     <ChevronRight className="w-3 h-3 text-gray-400" />
-                    <span className="text-xs font-bold text-blue-600">R$ 15,00</span>
+                    <span className="text-xs font-bold text-blue-600">R$ 24,00</span>
                   </div>
                   <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2">
-                    <span className="text-xs font-medium text-gray-700">500 pontos</span>
+                    <span className="text-xs font-medium text-gray-700">400 pontos</span>
                     <ChevronRight className="w-3 h-3 text-gray-400" />
-                    <span className="text-xs font-bold text-blue-600">R$ 37,50</span>
+                    <span className="text-xs font-bold text-blue-600">R$ 60,00</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-white rounded-lg px-3 py-2">
+                    <span className="text-xs font-medium text-gray-700">600 pontos</span>
+                    <ChevronRight className="w-3 h-3 text-gray-400" />
+                    <span className="text-xs font-bold text-blue-600">R$ 150,00</span>
                   </div>
                 </div>
               </div>
