@@ -61,32 +61,25 @@ export default function AccountAuthorizationModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl p-6 border-0 max-h-[90vh] flex flex-col">
-        <div className="space-y-4 overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {/* Discount Banner */}
-          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-5 text-white shadow-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Gift className="w-6 h-6" />
-              <span className="text-sm font-bold uppercase">Desconto Exclusivo!</span>
-            </div>
-            <p className="text-xs mb-3">
-              Parabéns! Por já ter conquistado pontos no RádioPlay, você ganhou um desconto especial:
-            </p>
-            <div className="flex items-center justify-between">
+      <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl p-0 border-0 max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Red Discount Bar */}
+        <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-3 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Gift className="w-5 h-5" />
               <div>
-                <p className="text-xs line-through opacity-70">De R$ 79,90</p>
-                <p className="text-xl font-bold">Por R$ 29,90</p>
+                <p className="text-xs font-bold">DESCONTO ESPECIAL</p>
+                <p className="text-lg font-bold">De R$ 79,90 por R$ 29,90</p>
               </div>
-              <div className="bg-white/20 rounded-lg px-3 py-2">
-                <div className="flex items-center gap-1">
-                  <Timer className="w-5 h-5" />
-                  <span className="font-mono text-base font-bold">{formatTime(timeRemaining)}</span>
-                </div>
-                <p className="text-[10px] text-center mt-0.5">restantes</p>
-              </div>
+            </div>
+            <div className="bg-white/20 rounded-lg px-3 py-2 text-center">
+              <Timer className="w-4 h-4 mx-auto mb-1" />
+              <span className="font-mono text-sm font-bold">{formatTime(timeRemaining)}</span>
             </div>
           </div>
+        </div>
 
+        <div className="space-y-4 overflow-y-auto scrollbar-hide p-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Shield Icon */}
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
