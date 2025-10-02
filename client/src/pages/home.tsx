@@ -183,12 +183,9 @@ export default function Home({ setUserName }: HomeProps) {
 
           {/* Main Title */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2" data-testid="main-title">
-              Ganhe Dinheiro
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent leading-tight" data-testid="main-title">
+              Ganhe Pontos e Troque por PIX ao ouvir nossos Parceiros Oficiais!
             </h1>
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent" data-testid="subtitle">
-              Ouvindo Rádio
-            </h2>
             <p className="mt-4 text-base text-muted-foreground max-w-md mx-auto" data-testid="text-description">
               Escute suas rádios favoritas e acumule pontos que podem ser trocados por recompensas e PIX NA CONTA!
             </p>
