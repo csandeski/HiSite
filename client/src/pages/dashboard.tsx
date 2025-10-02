@@ -19,7 +19,6 @@ import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import WelcomeModal from '@/components/WelcomeModal';
 import BannerCarousel from '@/components/BannerCarousel';
-import MaxPointsModal from '@/components/MaxPointsModal';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -68,7 +67,6 @@ export default function Dashboard({
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-  const [showMaxPointsModal, setShowMaxPointsModal] = useState(false);
   const [unreadMessages] = useState(34); // Número de mensagens novas
   
   // Check if it's the first visit for new users
@@ -84,15 +82,6 @@ export default function Dashboard({
     localStorage.setItem('hasSeenWelcome', 'true');
     setShowWelcomeModal(false);
   };
-  
-  // Check when user reaches 800 points
-  useEffect(() => {
-    // Only show if user is not authorized and reaches exactly 800 points
-    if (sessionPoints >= 800 && !user?.accountAuthorized && !localStorage.getItem('hasSeenMaxPoints800')) {
-      setShowMaxPointsModal(true);
-      localStorage.setItem('hasSeenMaxPoints800', 'true');
-    }
-  }, [sessionPoints, user?.accountAuthorized]);
   
   // Estado para rastrear ouvintes por rádio
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
@@ -481,12 +470,6 @@ export default function Dashboard({
         open={showWelcomeModal}
         onOpenChange={setShowWelcomeModal}
         onComplete={handleWelcomeComplete}
-      />
-      
-      {/* Max Points Modal */}
-      <MaxPointsModal
-        open={showMaxPointsModal}
-        onOpenChange={setShowMaxPointsModal}
       />
       
       {/* Floating Chat Button */}
