@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useChat } from '@/contexts/ChatContext';
+import { PlayerContext } from '@/App';
 
 // Array of Brazilian names for generating messages
 const brazilianNames = [
@@ -580,6 +581,8 @@ export default function Chat() {
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const usedAdminMessagesRef = useRef<string[]>([]);
+  const playerContext = useContext(PlayerContext);
+  const isRadioPlaying = playerContext?.playingRadio !== null;
   
   // Admin messages array - expanded for more variety
   const adminMessages = [
@@ -880,9 +883,9 @@ export default function Chat() {
       {/* Spacer for fixed header */}
       <div className="h-[68px]"></div>
       
-      {/* Messages Area */}
+      {/* Messages Area - Adjusted padding for fixed input */}
       <ScrollArea 
-        className="flex-1 px-4 py-3 bg-gray-100" 
+        className={`flex-1 px-4 py-3 bg-gray-100 ${isRadioPlaying ? 'pb-40' : 'pb-28'}`}
         ref={scrollAreaRef}
         style={{ overflowAnchor: 'none' }}
       >
@@ -924,8 +927,8 @@ export default function Chat() {
         </div>
       </ScrollArea>
       
-      {/* Input Area */}
-      <div className="bg-white border-t p-3 pb-20 md:pb-3">
+      {/* Input Area - Adjusted for Radio Player */}
+      <div className={`fixed left-0 right-0 bg-white border-t p-3 z-40 ${isRadioPlaying ? 'bottom-[112px]' : 'bottom-16'}`}>
         <div className="max-w-2xl mx-auto">
           <div className="flex gap-2">
             <Input
