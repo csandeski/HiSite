@@ -295,7 +295,6 @@ export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const lastMessageRef = useRef<HTMLDivElement>(null);
   const lastAdminMessageTimeRef = useRef<number>(0);
   
   // Auto-generate messages
@@ -489,7 +488,6 @@ export default function Chat() {
           {messages.map((msg, index) => (
             <div
               key={msg.id}
-              ref={index === messages.length - 1 ? lastMessageRef : undefined}
               className={`flex ${msg.isOwnMessage ? 'justify-end' : msg.isAdmin ? 'justify-center' : 'justify-start'}`}
               data-testid={`message-${msg.id}`}
             >
