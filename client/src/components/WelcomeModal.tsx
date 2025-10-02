@@ -398,22 +398,6 @@ export default function WelcomeModal({ open, onOpenChange, onComplete }: Welcome
                 </div>
               </motion.div>
               
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex items-start gap-3 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-3 border border-orange-100"
-              >
-                <Shield className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-900">
-                    Autorize sua conta
-                  </h3>
-                  <p className="text-xs text-gray-600 mt-0.5">
-                    Necessário para realizar saques acima de R$ 30
-                  </p>
-                </div>
-              </motion.div>
             </div>
             
             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-3 flex items-center gap-2">
