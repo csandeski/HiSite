@@ -518,9 +518,9 @@ export default function WelcomeModal({ open, onOpenChange, onComplete }: Welcome
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95%] max-w-md p-0 overflow-hidden bg-white rounded-2xl border-0">
-        {/* Header with Logo */}
-        <div className="bg-gradient-to-br from-green-500 to-blue-600 px-6 pt-6 pb-4">
+      <DialogContent className="w-[95%] max-w-md p-0 bg-white rounded-2xl border-0 max-h-[90vh] flex flex-col">
+        {/* Header with Logo - Fixed at top */}
+        <div className="bg-gradient-to-br from-green-500 to-blue-600 px-6 pt-6 pb-4 flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
             <img src={logoUrl} alt="RádioPlay" className="h-8 object-contain" />
             <button
@@ -553,16 +553,16 @@ export default function WelcomeModal({ open, onOpenChange, onComplete }: Welcome
           </div>
         </div>
         
-        {/* Content */}
-        <div className="px-6 py-6 min-h-[380px]">
+        {/* Content - Scrollable */}
+        <div className="px-6 py-6 overflow-y-auto flex-1">
           <AnimatePresence mode="wait" custom={direction}>
             {renderStep()}
           </AnimatePresence>
         </div>
         
-        {/* Navigation Buttons */}
+        {/* Navigation Buttons - Fixed at bottom */}
         {currentStep < totalSteps - 1 && (
-          <div className="px-6 pb-6 flex items-center justify-between">
+          <div className="px-6 pb-6 flex items-center justify-between flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"

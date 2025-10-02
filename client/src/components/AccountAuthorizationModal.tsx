@@ -37,8 +37,8 @@ export default function AccountAuthorizationModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl p-6 border-0">
-        <div className="space-y-5">
+      <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl p-6 border-0 max-h-[90vh] flex flex-col">
+        <div className="space-y-5 overflow-y-auto">
           {/* Shield Icon */}
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
@@ -104,11 +104,11 @@ export default function AccountAuthorizationModal({
 
           {/* Authorize Button */}
           <Button
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 text-sm flex items-center justify-center gap-2"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 text-base flex items-center justify-center gap-2"
             onClick={handleAuthorize}
             data-testid="button-authorize-account"
           >
-            <Check className="w-4 h-4" />
+            <Check className="w-5 h-5" />
             Autorizar Conta - {formatBRL(AUTHORIZATION_AMOUNT_CENTS)}
           </Button>
 
