@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Users, Send, ChevronLeft } from "lucide-react";
+import { Users, Send, ChevronLeft, Shield } from "lucide-react";
 import { useLocation } from "wouter";
 import logoUrl from '@/assets/logo.png';
 import { useAuth } from '@/contexts/AuthContext';
@@ -296,6 +296,7 @@ export default function Chat() {
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const lastMessageRef = useRef<HTMLDivElement>(null);
+  const lastAdminMessageTimeRef = useRef<number>(0);
   
   // Auto-generate messages
   useEffect(() => {
@@ -320,8 +321,29 @@ export default function Chat() {
     
     // Set up interval for new messages
     const generateRandomMessage = () => {
-      // 70% chance to generate a message
-      if (Math.random() < 0.7) {
+      const now = Date.now();
+      
+      // Add admin message every 30-60 seconds
+      if (now - lastAdminMessageTimeRef.current > 30000 + Math.random() * 30000) {
+        const adminMessages = [
+          "Todos os saques foram concluídos com sucesso pessoal! Qualquer dúvida basta chamar no suporte WhatsApp ou abrir um ticket!",
+          "Lembrete: Mantenha seu app sempre atualizado para melhor experiência!",
+          "Sistema funcionando 100% sem instabilidades. Bons ganhos a todos!",
+          "Nova atualização disponível com melhorias de desempenho!",
+          "Suporte online 24/7 para ajudar vocês. Não hesitem em perguntar!"
+        ];
+        
+        addMessage({
+          name: "Administrador RádioPlay",
+          message: adminMessages[Math.floor(Math.random() * adminMessages.length)],
+          isVerified: false,
+          isOwnMessage: false,
+          isAdmin: true
+        });
+        
+        lastAdminMessageTimeRef.current = now;
+      } else if (Math.random() < 0.7) {
+        // 70% chance to generate a regular message
         const randomName = brazilianNames[Math.floor(Math.random() * brazilianNames.length)];
         const randomMessage = messageTemplates[Math.floor(Math.random() * messageTemplates.length)];
         
@@ -468,21 +490,35 @@ export default function Chat() {
             <div
               key={msg.id}
               ref={index === messages.length - 1 ? lastMessageRef : undefined}
-              className={`flex ${msg.isOwnMessage ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${msg.isOwnMessage ? 'justify-end' : msg.isAdmin ? 'justify-center' : 'justify-start'}`}
               data-testid={`message-${msg.id}`}
             >
-              <div
-                className={`max-w-[80%] md:max-w-[60%] rounded-2xl px-4 py-2 shadow-sm ${
-                  msg.isOwnMessage 
-                    ? 'bg-primary text-white rounded-br-sm' 
-                    : 'bg-white text-gray-800 rounded-bl-sm'
-                }`}
-              >
-                <div className="text-xs opacity-75 mb-1">
-                  [{msg.timestamp}] {msg.name} {msg.isVerified ? '✅' : ''}
+              {msg.isAdmin ? (
+                // Admin message with special styling
+                <div className="w-full max-w-[90%] md:max-w-[70%] bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-orange-300 rounded-xl px-4 py-3 shadow-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Shield className="w-4 h-4 text-orange-600" />
+                    <span className="text-xs font-bold text-orange-800">
+                      [{msg.timestamp}] {msg.name} 🛡️
+                    </span>
+                  </div>
+                  <div className="text-sm font-medium text-gray-800">{msg.message}</div>
                 </div>
-                <div className="text-sm break-words">{msg.message}</div>
-              </div>
+              ) : (
+                // Regular message
+                <div
+                  className={`max-w-[80%] md:max-w-[60%] rounded-2xl px-4 py-2 shadow-sm ${
+                    msg.isOwnMessage 
+                      ? 'bg-primary text-white rounded-br-sm' 
+                      : 'bg-white text-gray-800 rounded-bl-sm'
+                  }`}
+                >
+                  <div className="text-xs opacity-75 mb-1">
+                    [{msg.timestamp}] {msg.name} {msg.isVerified ? '✅' : ''}
+                  </div>
+                  <div className="text-sm break-words">{msg.message}</div>
+                </div>
+              )}
             </div>
           ))}
         </div>

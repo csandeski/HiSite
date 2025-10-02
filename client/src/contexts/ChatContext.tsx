@@ -7,6 +7,7 @@ export interface ChatMessage {
   timestamp: string;
   isVerified: boolean;
   isOwnMessage: boolean;
+  isAdmin?: boolean;
 }
 
 interface ChatContextType {
