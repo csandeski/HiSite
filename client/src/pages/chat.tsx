@@ -9,6 +9,13 @@ import logoUrl from '@/assets/logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useChat } from '@/contexts/ChatContext';
 
+// Payment proof images
+import paymentProof1 from '@/assets/payment-proof-1.png';
+import paymentProof2 from '@/assets/payment-proof-2.png';
+import paymentProof3 from '@/assets/payment-proof-3.png';
+import paymentProof4 from '@/assets/payment-proof-4.png';
+import paymentProof5 from '@/assets/payment-proof-5.png';
+
 // Array of Brazilian names for generating messages
 const brazilianNames = [
   "Marcelo Rocha", "Ana Silva", "Pedro Santos", "Julia Costa", "Lucas Oliveira",
@@ -572,6 +579,20 @@ const additionalMessageTemplates = [
 // Combine all message templates
 const allMessageTemplates = [...messageTemplates, ...additionalMessageTemplates];
 
+// Payment proof messages data
+const paymentProofMessages = [
+  { image: paymentProof1, text: "Caiu aqui galera!!! 🎉", name: "Roberto Carlos", amount: "R$ 386,00" },
+  { image: paymentProof2, text: "Pingou aqui pessoal, to feliz demais", name: "Marina Santos", amount: "PIX" },
+  { image: paymentProof3, text: "Mais um pra conta família 💰", name: "João Paulo", amount: "R$ 632,44" },
+  { image: paymentProof4, text: "Bora pra cima time!! Recebi agora", name: "Ana Clara", amount: "Caixa PIX" },
+  { image: paymentProof5, text: "Chegou certinho aqui tbm gente", name: "Carlos Silva", amount: "Transferência" },
+  { image: paymentProof1, text: "Olha só que maravilha 😍", name: "Fernanda Lima", amount: "R$ 386,00" },
+  { image: paymentProof2, text: "Confirmado!! Entrou na conta", name: "Pedro Henrique", amount: "PIX" },
+  { image: paymentProof3, text: "Valeu RadioPlay, pix caiu", name: "Lucia Ferreira", amount: "R$ 632,44" },
+  { image: paymentProof4, text: "Esse app é top demais galera", name: "Ricardo Souza", amount: "Caixa PIX" },
+  { image: paymentProof5, text: "Recebi agora mesmo pessoal!!!", name: "Beatriz Costa", amount: "Transferência" }
+];
+
 export default function Chat() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
@@ -580,6 +601,9 @@ export default function Chat() {
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const usedAdminMessagesRef = useRef<string[]>([]);
+  const usedPaymentProofsRef = useRef<number[]>([]);
+  const hasAddedInitialProofRef = useRef(false);
+  const joinTimeRef = useRef(Date.now());
   // Simple check for radio playing - no need for complex detection
   const isRadioPlaying = false;
   
@@ -634,7 +658,8 @@ export default function Chat() {
   // Auto-generate messages
   useEffect(() => {
     // Generate initial messages if chat is empty
-    if (messages.length === 0) {
+    if (messages.length === 0 && !hasAddedInitialProofRef.current) {
+      hasAddedInitialProofRef.current = true;
       // Success/payment focused messages for initial chat - mensagens mais naturais
       const successMessages = [
         "pessoall caiu R$150 aqui agora, confirmadoo!!!",
@@ -682,9 +707,24 @@ export default function Chat() {
         const messageTime = new Date(now.getTime() - (minutesAgo * 60 * 1000));
         const timestamp = `${messageTime.getHours().toString().padStart(2, '0')}:${messageTime.getMinutes().toString().padStart(2, '0')}`;
         
-        // Add regular user messages focusing on success
-        if (i === 3 || i === 7) {
-          // Add admin message at position 3 and 7
+        // Add payment proof message at position 5
+        if (i === 5) {
+          const proofIndex = Math.floor(Math.random() * paymentProofMessages.length);
+          const proof = paymentProofMessages[proofIndex];
+          usedPaymentProofsRef.current.push(proofIndex);
+          
+          addMessage({
+            name: proof.name,
+            message: proof.text,
+            isVerified: true,
+            isOwnMessage: false,
+            isAdmin: false,
+            timestamp: timestamp,
+            image: proof.image
+          });
+        }
+        // Add admin messages at positions 3 and 7
+        else if (i === 3 || i === 7) {
           addMessage({
             name: "ADMINISTRADOR",
             message: i === 3 ? 
@@ -712,8 +752,30 @@ export default function Chat() {
     
     // Set up interval for regular messages
     const generateRandomMessage = () => {
-      // 70% chance to generate a regular message
-      if (Math.random() < 0.7) {
+      const timeSinceJoin = Date.now() - joinTimeRef.current;
+      const isWithinFirst2Minutes = timeSinceJoin < 120000; // 2 minutes
+      
+      // 15% chance to show payment proof in first 2 minutes
+      if (isWithinFirst2Minutes && Math.random() < 0.15 && usedPaymentProofsRef.current.length < paymentProofMessages.length) {
+        // Find an unused payment proof
+        let proofIndex = Math.floor(Math.random() * paymentProofMessages.length);
+        while (usedPaymentProofsRef.current.includes(proofIndex)) {
+          proofIndex = Math.floor(Math.random() * paymentProofMessages.length);
+        }
+        
+        const proof = paymentProofMessages[proofIndex];
+        usedPaymentProofsRef.current.push(proofIndex);
+        
+        addMessage({
+          name: proof.name,
+          message: proof.text,
+          isVerified: true,
+          isOwnMessage: false,
+          image: proof.image
+        });
+      }
+      // Regular message generation
+      else if (Math.random() < 0.7) {
         const randomName = brazilianNames[Math.floor(Math.random() * brazilianNames.length)];
         const randomMessage = messageTemplates[Math.floor(Math.random() * messageTemplates.length)];
         
@@ -919,6 +981,17 @@ export default function Chat() {
                     [{msg.timestamp}] {msg.name} {msg.isVerified ? '✅' : ''}
                   </div>
                   <div className="text-sm break-words">{msg.message}</div>
+                  {msg.image && (
+                    <div className="mt-2 rounded-lg overflow-hidden">
+                      <img 
+                        src={msg.image} 
+                        alt="Payment proof" 
+                        className="w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => window.open(msg.image, '_blank')}
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>

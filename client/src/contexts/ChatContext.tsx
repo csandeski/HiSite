@@ -8,6 +8,7 @@ export interface ChatMessage {
   isVerified: boolean;
   isOwnMessage: boolean;
   isAdmin?: boolean;
+  image?: string;
 }
 
 interface ChatContextType {
