@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Wallet, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download } from "lucide-react";
+import { Wallet, TrendingUp, Play, Lock, Pause, Plus, Volume2, User, Users, Radio as RadioIcon, Zap, Clock, Download, MessageCircle } from "lucide-react";
 import logoUrl from '@/assets/logo.png';
 import jovemPanLogo from '@assets/channels4_profile-removebg-preview_1758313844024.png';
 import serraMarLogo from '@/assets/serra-mar-logo.png';
@@ -67,6 +67,7 @@ export default function Dashboard({
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [unreadMessages] = useState(34); // Número de mensagens novas
   
   // Check if it's the first visit for new users
   useEffect(() => {
@@ -470,6 +471,21 @@ export default function Dashboard({
         onOpenChange={setShowWelcomeModal}
         onComplete={handleWelcomeComplete}
       />
+      
+      {/* Floating Chat Button */}
+      <button
+        onClick={() => setLocation('/chat')}
+        className="fixed bottom-24 right-6 md:bottom-8 md:right-8 bg-primary hover:bg-primary/90 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 z-50"
+        aria-label="Abrir chat"
+        data-testid="floating-chat-button"
+      >
+        <MessageCircle className="w-6 h-6" />
+        {unreadMessages > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+            {unreadMessages > 99 ? '99+' : unreadMessages}
+          </span>
+        )}
+      </button>
     </div>
   );
 }
