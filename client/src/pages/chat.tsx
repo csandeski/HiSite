@@ -755,8 +755,8 @@ export default function Chat() {
   
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b z-50">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -788,6 +788,9 @@ export default function Chat() {
           </div>
         </div>
       </header>
+      
+      {/* Spacer for fixed header */}
+      <div className="h-[68px]"></div>
       
       {/* Messages Area */}
       <ScrollArea className="flex-1 px-4 py-3 bg-gray-100" ref={scrollAreaRef}>
