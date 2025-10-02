@@ -10,11 +10,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useChat } from '@/contexts/ChatContext';
 
 // Payment proof images
-import paymentProof1 from '@/assets/payment-proof-1.png';
-import paymentProof2 from '@/assets/payment-proof-2.png';
-import paymentProof3 from '@/assets/payment-proof-3.png';
-import paymentProof4 from '@/assets/payment-proof-4.png';
-import paymentProof5 from '@/assets/payment-proof-5.png';
+import pixProof1 from '@/assets/pix-proof-1.png';
+import pixProof2 from '@/assets/pix-proof-2.png';
+import pixProof3 from '@/assets/pix-proof-3.png';
+import pixProof4 from '@/assets/pix-proof-4.png';
+import pixProof5 from '@/assets/pix-proof-5.png';
+import pixProof6 from '@/assets/pix-proof-6.png';
 
 // Array of Brazilian names for generating messages
 const brazilianNames = [
@@ -579,12 +580,14 @@ const additionalMessageTemplates = [
 // Combine all message templates
 const allMessageTemplates = [...messageTemplates, ...additionalMessageTemplates];
 
-// Payment proof messages data - sem repetir imagens
+// Payment proof messages data - com novas imagens de notificação real
 const paymentProofMessages = [
-  { image: paymentProof1, text: "Caiu aqui galera!!! 🎉", name: "Roberto Carlos", amount: "R$ 386,00" },
-  { image: paymentProof2, text: "Pingou aqui pessoal, to feliz demais", name: "Marina Santos", amount: "PIX" },
-  { image: paymentProof3, text: "Mais um pra conta família 💰", name: "João Paulo", amount: "R$ 632,44" },
-  { image: paymentProof4, text: "Bora pra cima time!! Recebi agora", name: "Ana Clara", amount: "Caixa PIX" }
+  { image: pixProof1, text: "Caiu no BradescoO!!!! 🎉🎉", name: "Roberto Carlos" },
+  { image: pixProof2, text: "Galera olha só chegou aqui tbm", name: "Marina Santos" },
+  { image: pixProof3, text: "Recebiii pessoal, app paga mesmo", name: "João Paulo" },
+  { image: pixProof4, text: "640 reais direto na conta!!! Vale muito a pena", name: "Ana Clara" },
+  { image: pixProof5, text: "Rendimentos caindo toda semana aqui", name: "Pedro Henrique" },
+  { image: pixProof6, text: "980 reais recebido agora pessoal", name: "Carlos Eduardo" }
 ];
 
 
