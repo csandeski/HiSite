@@ -172,11 +172,11 @@ export default function AccountAuthorizationModal({
           {/* Action Buttons */}
           <div className="space-y-3">
             <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 text-lg rounded-xl shadow-lg"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-8 text-xl rounded-xl shadow-lg"
               onClick={handleAuthorize}
               data-testid="button-authorize-account"
             >
-              Aproveitar Desconto - R$ 29,90
+              Aproveitar Desconto
             </Button>
             
             <Button
