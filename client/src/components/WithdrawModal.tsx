@@ -184,15 +184,13 @@ export default function WithdrawModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90%] max-w-md bg-white rounded-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader className="flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-bold text-gray-900">Realizar Saque</DialogTitle>
-          </div>
+      <DialogContent className="sm:max-w-md p-0 max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-2">
+          <DialogTitle className="text-xl font-bold text-gray-900">Realizar Saque</DialogTitle>
           <p className="text-sm text-gray-600 mt-1">Transfira seu saldo para sua conta via Pix</p>
         </DialogHeader>
         
-        <div className="space-y-4 pt-4 overflow-y-auto flex-1">
+        <div className="space-y-4 px-6 pb-6 overflow-y-auto flex-1">
           {/* Balance Info */}
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
             <div className="flex items-center justify-between">
