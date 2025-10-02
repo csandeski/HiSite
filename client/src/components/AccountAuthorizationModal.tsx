@@ -180,13 +180,16 @@ export default function AccountAuthorizationModal({
 
           {/* Authorize Button */}
           <Button
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 text-base flex items-center justify-center gap-2 shadow-lg"
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-5 text-base flex items-center justify-center gap-2 shadow-lg"
             onClick={handleAuthorize}
             data-testid="button-authorize-account"
           >
             <Check className="w-5 h-5" />
             Aproveitar Desconto - R$ 29,90
           </Button>
+
+          {/* Extra space for scrolling */}
+          <div className="h-20"></div>
         </div>
       </DialogContent>
     </Dialog>
