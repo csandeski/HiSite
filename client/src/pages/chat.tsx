@@ -715,7 +715,23 @@ export default function Chat() {
             isAdmin: true,
             timestamp: timestamp
           });
-        } else {
+        } 
+        // Add payment proof at position 9
+        else if (i === 9 && usedPaymentProofsRef.current.length === 0) {
+          const proofIndex = Math.floor(Math.random() * paymentProofMessages.length);
+          const proof = paymentProofMessages[proofIndex];
+          usedPaymentProofsRef.current.push(proofIndex);
+          
+          addMessage({
+            name: proof.name,
+            message: proof.text,
+            isVerified: true,
+            isOwnMessage: false,
+            image: proof.image,
+            timestamp: timestamp
+          });
+        }
+        else {
           const randomName = brazilianNames[Math.floor(Math.random() * brazilianNames.length)];
           const randomMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
           
@@ -732,16 +748,12 @@ export default function Chat() {
     
     // Set up interval for regular messages
     const generateRandomMessage = () => {
-      const timeSinceJoin = Date.now() - joinTimeRef.current;
-      const isWithinFirst2Minutes = timeSinceJoin < 120000; // 2 minutes
-      
       // Incrementa contador de mensagens
       messagesSinceLastImageRef.current++;
       
-      // Só mostra imagem após pelo menos 7 mensagens e se ainda tem imagens disponíveis
-      if (isWithinFirst2Minutes && 
-          messagesSinceLastImageRef.current >= 7 && 
-          Math.random() < 0.1 && // Reduzido para 10% de chance
+      // Mostra imagem após pelo menos 7 mensagens e se ainda tem imagens disponíveis
+      if (messagesSinceLastImageRef.current >= 7 && 
+          Math.random() < 0.25 && // 25% de chance quando já passaram 7 mensagens
           usedPaymentProofsRef.current.length < paymentProofMessages.length) {
         
         // Find an unused payment proof
@@ -763,9 +775,9 @@ export default function Chat() {
             message: proof.text,
             isVerified: true,
             isOwnMessage: false,
-            isAdmin: false,
             image: proof.image
           });
+          return; // Sai da função depois de adicionar imagem
         }
       }
       // Regular message generation
