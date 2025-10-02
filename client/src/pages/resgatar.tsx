@@ -424,19 +424,19 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                     </div>
                   )}
                   
-                  <div className="p-5">
+                  <div className="p-4">
                     {/* Top Section - Value Display */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                           hasEnoughPoints 
                             ? 'bg-gradient-to-br from-primary/10 to-primary/20' 
                             : 'bg-gray-100'
                         }`}>
-                          <Coins className={`w-6 h-6 ${hasEnoughPoints ? 'text-primary' : 'text-gray-400'}`} />
+                          <Coins className={`w-5 h-5 ${hasEnoughPoints ? 'text-primary' : 'text-gray-400'}`} />
                         </div>
                         <div>
-                          <p className="text-2xl font-bold text-gray-900">
+                          <p className="text-lg font-bold text-gray-900">
                             {option.points}
                           </p>
                           <p className="text-xs text-gray-500">pontos</p>
@@ -444,16 +444,16 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                       </div>
                       
                       <div className="text-right">
-                        <p className="text-xs text-gray-500 mb-1">você recebe</p>
-                        <p className="text-2xl font-bold text-green-600">
+                        <p className="text-xs text-gray-500">você recebe</p>
+                        <p className="text-lg font-bold text-green-600">
                           R$ {option.value.toFixed(2)}
                         </p>
                       </div>
                     </div>
                     
                     {/* Progress Section */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between text-xs mb-2">
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
                         <span className="text-gray-600 font-medium">
                           {hasEnoughPoints ? (
                             <span className="text-green-600 flex items-center gap-1">
@@ -467,15 +467,15 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                           )}
                         </span>
                         {!hasEnoughPoints && (
-                          <span className="text-orange-600 font-semibold">
+                          <span className="text-orange-600 font-semibold text-xs">
                             Faltam {missingPoints} pts
                           </span>
                         )}
                       </div>
                       
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                         <div 
-                          className={`h-2.5 rounded-full transition-all duration-500 ${
+                          className={`h-2 rounded-full transition-all duration-500 ${
                             hasEnoughPoints 
                               ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
                               : 'bg-gray-300'
@@ -485,7 +485,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                       </div>
                       
                       {/* Conversion Rate */}
-                      <div className="mt-2 flex items-center justify-center">
+                      <div className="mt-1.5 flex items-center justify-center">
                         <span className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
                           Taxa: {option.conversionRate}
                         </span>
@@ -495,7 +495,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                     {/* Bottom Button */}
                     <Button
                       variant={hasEnoughPoints ? "default" : "outline"}
-                      className={`w-full py-2.5 font-semibold transition-all ${
+                      className={`w-full py-2 text-sm font-semibold transition-all ${
                         hasEnoughPoints 
                           ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg' 
                           : 'bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200 hover:bg-gray-50'
