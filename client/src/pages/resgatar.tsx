@@ -418,7 +418,7 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
             </h2>
           </div>
 
-          {/* Exchange Options - Cards com botão Converter */}
+          {/* Exchange Options - Cards Elegantes com Botão Inferior */}
           <div className="space-y-3 mb-6">
             {filteredOptions.map((option, index) => {
               const hasEnoughPoints = sessionPoints >= option.points;
@@ -430,89 +430,115 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
                   key={index}
                   className={`relative overflow-hidden transition-all ${
                     hasEnoughPoints 
-                      ? 'hover:shadow-md border-green-200' 
-                      : 'border-gray-200'
+                      ? 'hover:shadow-lg border-green-300/50' 
+                      : 'border-gray-200 opacity-90'
                   }`}
                   data-testid={`exchange-option-${option.points}`}
                 >
-                  {/* Gradient Background */}
-                  <div className={`absolute inset-0 ${
-                    hasEnoughPoints 
-                      ? 'bg-gradient-to-r from-green-50/30 via-white to-emerald-50/20' 
-                      : 'bg-gray-50/30'
-                  }`} />
-                  
                   {/* Badge */}
                   {option.badge && (
-                    <Badge 
-                      className="absolute top-3 right-3 text-[10px] bg-amber-100 text-amber-700 border-amber-200 px-2 py-0.5"
-                    >
-                      {option.badge}
-                    </Badge>
+                    <div className="absolute top-0 right-0">
+                      <div className="bg-gradient-to-br from-amber-400 to-orange-400 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm">
+                        {option.badge}
+                      </div>
+                    </div>
                   )}
                   
-                  <div className="relative p-4 flex items-center gap-4">
-                    {/* Left: Points and Value Info */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="flex items-center gap-2">
-                          <Coins className={`w-5 h-5 ${hasEnoughPoints ? 'text-primary' : 'text-gray-400'}`} />
-                          <span className="text-lg font-bold text-gray-900">
-                            {option.points} pontos
-                          </span>
+                  <div className="p-5">
+                    {/* Top Section - Value Display */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          hasEnoughPoints 
+                            ? 'bg-gradient-to-br from-primary/10 to-primary/20' 
+                            : 'bg-gray-100'
+                        }`}>
+                          <Coins className={`w-6 h-6 ${hasEnoughPoints ? 'text-primary' : 'text-gray-400'}`} />
                         </div>
-                        <span className="text-gray-400">→</span>
-                        <span className="text-lg font-bold text-green-600">
-                          R$ {option.value.toFixed(2)}
-                        </span>
+                        <div>
+                          <p className="text-2xl font-bold text-gray-900">
+                            {option.points}
+                          </p>
+                          <p className="text-xs text-gray-500">pontos</p>
+                        </div>
                       </div>
                       
-                      {/* Progress Bar */}
-                      <div className="w-full max-w-md">
-                        <div className="flex items-center justify-between text-[11px] text-gray-600 mb-1">
-                          <span>Progresso: {Math.round(percentage)}%</span>
-                          {!hasEnoughPoints && <span className="text-orange-600">Faltam {missingPoints} pontos</span>}
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div 
-                            className={`h-2 rounded-full transition-all ${
-                              hasEnoughPoints ? 'bg-green-500' : 'bg-gray-300'
-                            }`}
-                            style={{width: `${percentage}%`}}
-                          />
-                        </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500 mb-1">você recebe</p>
+                        <p className="text-2xl font-bold text-green-600">
+                          R$ {option.value.toFixed(2)}
+                        </p>
                       </div>
                     </div>
                     
-                    {/* Right: Convert Button */}
-                    <div className="flex-shrink-0">
-                      <Button
-                        variant={hasEnoughPoints ? "default" : "ghost"}
-                        className={`px-6 py-2 font-semibold ${
-                          hasEnoughPoints 
-                            ? 'bg-green-600 hover:bg-green-700 text-white' 
-                            : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
-                        }`}
-                        disabled={!hasEnoughPoints}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (hasEnoughPoints) handleExchange(option.points, option.value);
-                        }}
-                        data-testid={hasEnoughPoints ? `button-convert-${option.points}` : `button-blocked-${option.points}`}
-                      >
-                        {hasEnoughPoints ? (
-                          <>
-                            <CheckCircle className="w-4 h-4 mr-1.5" />
-                            Converter
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="w-4 h-4 mr-1.5" />
-                            Converter
-                          </>
+                    {/* Progress Section */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-xs mb-2">
+                        <span className="text-gray-600 font-medium">
+                          {hasEnoughPoints ? (
+                            <span className="text-green-600 flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3" />
+                              Disponível para conversão
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">
+                              Progresso: {Math.round(percentage)}%
+                            </span>
+                          )}
+                        </span>
+                        {!hasEnoughPoints && (
+                          <span className="text-orange-600 font-semibold">
+                            Faltam {missingPoints} pts
+                          </span>
                         )}
-                      </Button>
+                      </div>
+                      
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div 
+                          className={`h-2.5 rounded-full transition-all duration-500 ${
+                            hasEnoughPoints 
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
+                              : 'bg-gray-300'
+                          }`}
+                          style={{width: `${percentage}%`}}
+                        />
+                      </div>
+                      
+                      {/* Conversion Rate */}
+                      <div className="mt-2 flex items-center justify-center">
+                        <span className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
+                          Taxa: {option.conversionRate}
+                        </span>
+                      </div>
                     </div>
+                    
+                    {/* Bottom Button */}
+                    <Button
+                      variant={hasEnoughPoints ? "default" : "outline"}
+                      className={`w-full py-2.5 font-semibold transition-all ${
+                        hasEnoughPoints 
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg' 
+                          : 'bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200 hover:bg-gray-50'
+                      }`}
+                      disabled={!hasEnoughPoints}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (hasEnoughPoints) handleExchange(option.points, option.value);
+                      }}
+                      data-testid={hasEnoughPoints ? `button-convert-${option.points}` : `button-blocked-${option.points}`}
+                    >
+                      {hasEnoughPoints ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Converter Agora</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2">
+                          <Lock className="w-4 h-4" />
+                          <span>Bloqueado</span>
+                        </div>
+                      )}
+                    </Button>
                   </div>
                 </Card>
               );
