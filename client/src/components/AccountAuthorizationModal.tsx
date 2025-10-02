@@ -59,21 +59,21 @@ export default function AccountAuthorizationModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] w-[calc(100%-1rem)] max-w-full p-0 rounded-2xl overflow-hidden mx-2">
+      <DialogContent className="sm:max-w-[500px] w-full max-w-full p-0 rounded-none sm:rounded-2xl overflow-hidden">
         {/* Red Discount Header */}
-        <div className="bg-gradient-to-r from-red-600 to-red-500 text-white p-5">
+        <div className="bg-gradient-to-r from-red-600 to-red-500 text-white p-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex-1">
-              <p className="text-xs uppercase tracking-wider opacity-90 mb-1">Oferta Exclusiva</p>
-              <p className="text-3xl font-bold">62% OFF</p>
-              <div className="flex items-center gap-3 mt-2">
-                <span className="text-base line-through opacity-75">R$ 79,90</span>
-                <span className="text-2xl font-bold">R$ 29,90</span>
+              <p className="text-xs uppercase tracking-wider opacity-90">Oferta Exclusiva</p>
+              <p className="text-2xl font-bold">62% OFF</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-sm line-through opacity-75">R$ 79,90</span>
+                <span className="text-xl font-bold">R$ 29,90</span>
               </div>
             </div>
-            <div className="bg-white/20 rounded-xl px-4 py-3 text-center">
-              <Timer className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-base font-mono font-bold">{formatTime(timeRemaining)}</span>
+            <div className="bg-white/20 rounded-lg px-3 py-2 text-center">
+              <Timer className="w-4 h-4 mx-auto" />
+              <span className="text-sm font-mono font-bold">{formatTime(timeRemaining)}</span>
             </div>
           </div>
         </div>
