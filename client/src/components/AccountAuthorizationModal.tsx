@@ -141,7 +141,7 @@ export default function AccountAuthorizationModal({
                 <span className="text-gray-600">Status da conta:</span>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-orange-500" />
-                  <span className="font-bold text-orange-500">Aguardando Autorização</span>
+                  <span className="font-bold text-orange-500 whitespace-nowrap">Aguardando Autorização</span>
                 </div>
               </div>
             </div>
