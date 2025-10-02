@@ -190,8 +190,7 @@ export default function Home({ setUserName }: HomeProps) {
               Ouvindo Rádio
             </h2>
             <p className="mt-4 text-base text-muted-foreground max-w-md mx-auto" data-testid="text-description">
-              Transforme seu tempo livre em renda extra. Ouça suas rádios favoritas e 
-              acumule pontos que viram dinheiro real.
+              Escute suas rádios favoritas e acumule pontos que podem ser trocados por recompensas e PIX NA CONTA!
             </p>
           </div>
 
