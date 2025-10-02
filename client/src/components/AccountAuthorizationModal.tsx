@@ -112,13 +112,6 @@ export default function AccountAuthorizationModal({
             </div>
           </div>
 
-          {/* No Other Fees Badge */}
-          <div className="bg-green-500 text-white rounded-lg px-4 py-2 text-center shadow-sm">
-            <p className="text-xs font-bold">
-              ✓ VOCÊ NÃO PAGARÁ OUTRAS TAXAS
-            </p>
-          </div>
-
           {/* Blue Info Box */}
           <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
             <h3 className="text-sm font-semibold text-blue-900 mb-1">
