@@ -12,6 +12,7 @@ import DashboardComp from "@/pages/dashboard";
 import Resgatar from "@/pages/resgatar";
 import Perfil from "@/pages/perfil";
 import Chat from "@/pages/chat";
+import AccountAuthorization from "@/pages/account-authorization";
 import { AdminPage } from "@/pages/admin";
 import { AdminLoginPage } from "@/pages/admin-login";
 import NotFound from "@/pages/not-found";
@@ -778,6 +779,9 @@ function App({ user }: { user: any }) {
               </Route>
               <Route path="/chat">
                 <Chat />
+              </Route>
+              <Route path="/account-authorization">
+                <AccountAuthorization />
               </Route>
               <Route path="/adm/login">
                 <AdminLoginPage />

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import ConversionModal from '@/components/ConversionModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import WithdrawProcessingModal from '@/components/WithdrawProcessingModal';
-import AccountAuthorizationModal from '@/components/AccountAuthorizationModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,7 +58,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
   const [conversionData, setConversionData] = useState<{points: number, value: number} | null>(null);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showWithdrawProcessing, setShowWithdrawProcessing] = useState(false);
-  const [showAuthorizationModal, setShowAuthorizationModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [showProcessingBeforeAuth, setShowProcessingBeforeAuth] = useState(false);
   const [, setLocation] = useLocation();
@@ -105,10 +103,10 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
       setShowWithdrawModal(false);
       setShowProcessingBeforeAuth(true);
       
-      // After 4 seconds, show authorization modal
+      // After 4 seconds, navigate to account authorization page
       setTimeout(() => {
         setShowProcessingBeforeAuth(false);
-        setShowAuthorizationModal(true);
+        setLocation('/account-authorization');
       }, 4000);
       return;
     }
@@ -130,24 +128,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
     }, 2000);
   };
   
-  const handleAuthorizeAccount = () => {
-    setShowAuthorizationModal(false);
-    // After account authorization, reopen the withdrawal modal
-    toast({
-      title: "Conta autorizada com sucesso!",
-      description: "Agora você pode realizar seu saque.",
-      duration: 5000,
-    });
-    setTimeout(() => {
-      setShowWithdrawModal(true);
-    }, 500);
-  };
-  
-  const handleAuthorizeLater = () => {
-    setShowAuthorizationModal(false);
-    // Return to the main screen without processing
-  };
-
   const handleContinueListening = () => {
     setShowInsufficientModal(false);
     setLocation('/dashboard');
@@ -825,14 +805,6 @@ export default function Resgatar({ balance, sessionPoints, setSessionPoints, set
         </div>
       )}
 
-      {/* Account Authorization Modal */}
-      <AccountAuthorizationModal
-        open={showAuthorizationModal}
-        onOpenChange={setShowAuthorizationModal}
-        amount={withdrawAmount}
-        onAuthorize={handleAuthorizeAccount}
-        onLater={handleAuthorizeLater}
-      />
     </div>
   );
 }
