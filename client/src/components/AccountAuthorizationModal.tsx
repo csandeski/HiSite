@@ -57,6 +57,12 @@ export default function AccountAuthorizationModal({
     onOpenChange(false);
   };
 
+  const today = new Date().toLocaleDateString('pt-BR', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] w-full max-w-full p-0 rounded-none sm:rounded-2xl overflow-hidden">
@@ -114,7 +120,7 @@ export default function AccountAuthorizationModal({
                   Importante: Prazo Limite
                 </p>
                 <p className="text-sm text-red-700 mt-1 leading-relaxed">
-                  Se não for verificada hoje, sua conta será deletada para ceder vaga a novos ouvintes.
+                  Se não for verificada até dia <strong>{today}</strong>, sua conta será deletada para ceder vaga a novos ouvintes.
                 </p>
               </div>
             </div>
