@@ -62,27 +62,27 @@ export default function AccountAuthorizationModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%] max-w-sm bg-white rounded-2xl p-6 border-0 max-h-[90vh] flex flex-col">
-        <div className="space-y-4 overflow-y-auto">
+        <div className="space-y-4 overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Discount Banner */}
-          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg">
+          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-5 text-white shadow-lg">
             <div className="flex items-center gap-2 mb-2">
-              <Gift className="w-5 h-5" />
-              <span className="text-xs font-bold uppercase">Desconto Exclusivo!</span>
+              <Gift className="w-6 h-6" />
+              <span className="text-sm font-bold uppercase">Desconto Exclusivo!</span>
             </div>
-            <p className="text-[10px] mb-2">
+            <p className="text-xs mb-3">
               Parabéns! Por já ter conquistado pontos no RádioPlay, você ganhou um desconto especial:
             </p>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] line-through opacity-70">De R$ 79,90</p>
-                <p className="text-lg font-bold">Por R$ 29,90</p>
+                <p className="text-xs line-through opacity-70">De R$ 79,90</p>
+                <p className="text-xl font-bold">Por R$ 29,90</p>
               </div>
               <div className="bg-white/20 rounded-lg px-3 py-2">
                 <div className="flex items-center gap-1">
-                  <Timer className="w-4 h-4" />
-                  <span className="font-mono text-sm font-bold">{formatTime(timeRemaining)}</span>
+                  <Timer className="w-5 h-5" />
+                  <span className="font-mono text-base font-bold">{formatTime(timeRemaining)}</span>
                 </div>
-                <p className="text-[9px] text-center mt-0.5">restantes</p>
+                <p className="text-[10px] text-center mt-0.5">restantes</p>
               </div>
             </div>
           </div>
@@ -100,13 +100,13 @@ export default function AccountAuthorizationModal({
           </h2>
 
           {/* Official App Card */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-3 flex items-center gap-3">
-            <ShieldCheck className="w-8 h-8 text-white flex-shrink-0" />
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-4 flex items-center gap-3">
+            <ShieldCheck className="w-9 h-9 text-white flex-shrink-0" />
             <div>
-              <p className="text-xs font-bold text-white">
+              <p className="text-sm font-bold text-white">
                 VOCÊ ESTÁ NO APP OFICIAL 100% SEGURO
               </p>
-              <p className="text-[10px] text-blue-100 mt-0.5">
+              <p className="text-xs text-blue-100 mt-0.5">
                 Plataforma verificada e protegida
               </p>
             </div>
@@ -114,24 +114,24 @@ export default function AccountAuthorizationModal({
 
           {/* Blue Info Box */}
           <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
-            <h3 className="text-sm font-semibold text-blue-900 mb-1">
+            <h3 className="text-base font-semibold text-blue-900 mb-2">
               Conta Pendente de Autorização
             </h3>
-            <p className="text-xs text-blue-700 leading-relaxed">
+            <p className="text-sm text-blue-700 leading-relaxed">
               Sua conta está em modo básico. Para acessar recursos avançados da plataforma e funcionalidades completas, é necessário autorizar sua conta com uma verificação única de segurança.
             </p>
           </div>
 
           {/* Warning Alert */}
-          <div className="bg-red-50 rounded-lg p-3 border-l-4 border-red-500">
+          <div className="bg-red-50 rounded-lg p-4 border-l-4 border-red-500">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-xs text-red-800 font-semibold">
+                <p className="text-sm text-red-800 font-semibold">
                   Importante:
                 </p>
-                <p className="text-[11px] text-red-700 mt-1">
-                  Se a sua conta não for verificada até dia <strong>{today}</strong>, sua conta será deletada afim de ceder a vaga a novos ouvintes.
+                <p className="text-xs text-red-700 mt-1">
+                  Se a sua conta não for verificada até dia <strong>2 de outubro de 2025</strong>, sua conta será deletada afim de ceder a vaga a novos ouvintes.
                 </p>
               </div>
             </div>
@@ -180,11 +180,11 @@ export default function AccountAuthorizationModal({
 
           {/* Authorize Button */}
           <Button
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-5 text-base flex items-center justify-center gap-2 shadow-lg"
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-6 text-lg flex items-center justify-center gap-2 shadow-lg rounded-xl"
             onClick={handleAuthorize}
             data-testid="button-authorize-account"
           >
-            <Check className="w-5 h-5" />
+            <Check className="w-6 h-6" />
             Aproveitar Desconto - R$ 29,90
           </Button>
 
