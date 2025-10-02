@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Shield, Clock, Check, AlertCircle, Timer, ChevronLeft, Wallet } from "lucide-react";
+import { Shield, Clock, Check, AlertCircle, Timer, ChevronLeft, Wallet, X, Users, TrendingUp, Target, Calendar, UserCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AUTHORIZATION_AMOUNT_CENTS, formatBRL } from "@shared/constants";
 import { useState, useEffect } from "react";
@@ -61,6 +61,14 @@ export default function AccountAuthorization() {
     day: 'numeric', 
     month: 'long', 
     year: 'numeric' 
+  });
+
+  // Calculate deadline date (2 days from now)
+  const deadlineDate = new Date();
+  deadlineDate.setDate(deadlineDate.getDate() + 2);
+  const deadline = deadlineDate.toLocaleDateString('pt-BR', { 
+    day: 'numeric', 
+    month: 'long'
   });
 
   // Calculate user balance
@@ -171,6 +179,103 @@ export default function AccountAuthorization() {
                 <p className="text-xs md:text-sm text-amber-800 leading-relaxed">
                   Autorize até <strong className="text-amber-900">{today}</strong> para manter seu acesso completo.
                 </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Limited Slots Alert */}
+          <Card className="p-4 mb-4 bg-red-50 border border-red-200 shadow-sm">
+            <div className="flex gap-2.5">
+              <Calendar className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-bold text-red-900 mb-1">⚠️ VAGAS LIMITADAS</p>
+                <p className="text-xs text-red-800">
+                  As vagas encerram dia <strong className="text-red-900 uppercase">{deadline}</strong>
+                </p>
+                <p className="text-xs text-red-700 mt-1">Após esta data, novas vagas só abrirão em 2025.</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Who This App Is NOT For */}
+          <Card className="p-4 md:p-5 mb-4 bg-white border-0 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <X className="w-4 h-4 text-red-500" />
+              Nosso App NÃO é Para:
+            </h3>
+            <div className="space-y-2.5">
+              <div className="flex gap-2">
+                <span className="text-red-500 mt-1">•</span>
+                <p className="text-xs text-gray-700 flex-1">
+                  Quem acha que vai ficar rico da noite pro dia. É uma <strong>renda extra</strong> de R$ 500 a R$ 4.500/mês.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-red-500 mt-1">•</span>
+                <p className="text-xs text-gray-700 flex-1">
+                  Pessoas sem esforço mínimo para alcançar objetivos.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-red-500 mt-1">•</span>
+                <p className="text-xs text-gray-700 flex-1">
+                  Curiosos que vão tomar a vaga de quem realmente precisa.
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Who This App IS For */}
+          <Card className="p-4 md:p-5 mb-4 bg-gradient-to-br from-green-50 to-white border border-green-200 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-600" />
+              Nosso App É Para:
+            </h3>
+            <div className="space-y-2.5">
+              <div className="flex gap-2">
+                <UserCheck className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-900">Renda Mensal Confiável</p>
+                  <p className="text-[10px] text-gray-600">App ativo há anos com vagas limitadas</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <TrendingUp className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-900">Crescimento e Hierarquia</p>
+                  <p className="text-[10px] text-gray-600">Ganhe cargos e aumente seus ganhos</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Target className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-900">Apoiar Rádios Parceiras</p>
+                  <p className="text-[10px] text-gray-600">Ajude na visibilidade e seja pago</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Commitment Card */}
+          <Card className="p-4 mb-4 bg-gradient-to-br from-blue-50 to-white border border-blue-200 shadow-sm">
+            <div className="flex gap-2.5">
+              <Shield className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-xs font-bold text-blue-900 mb-1">Taxa Única de Comprometimento</p>
+                <p className="text-[11px] text-blue-800 leading-relaxed">
+                  <strong>Nenhuma outra taxa será cobrada.</strong> Este valor comprova que você é real e está comprometido com a plataforma, garantindo que não tomará a vaga de quem realmente precisa.
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Active Users Badge */}
+          <Card className="p-3 mb-4 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 shadow-sm">
+            <div className="flex items-center justify-center gap-3">
+              <Users className="w-5 h-5 text-primary" />
+              <div className="text-center">
+                <p className="text-sm font-bold text-primary">+8.000 Usuários Ativos</p>
+                <p className="text-[10px] text-gray-600">Fruto de anos de trabalho árduo</p>
               </div>
             </div>
           </Card>
