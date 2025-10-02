@@ -4,19 +4,21 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ChatProvider } from "@/contexts/ChatContext";
 import Home from "@/pages/home";
 import LoginPage from "@/pages/login";
 import RegisterPage from "@/pages/register";
 import DashboardComp from "@/pages/dashboard";
 import Resgatar from "@/pages/resgatar";
 import Perfil from "@/pages/perfil";
+import Chat from "@/pages/chat";
 import { AdminPage } from "@/pages/admin";
 import { AdminLoginPage } from "@/pages/admin-login";
 import NotFound from "@/pages/not-found";
 import PixTestPage from "@/pages/pix-test";
 import { useState, useEffect, createContext, useContext, useRef, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Radio, Volume2, VolumeX, Pause, Play, Gift, User } from "lucide-react";
+import { Radio, Volume2, VolumeX, Pause, Play, Gift, User, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 import { useUTMTracking } from "@/hooks/useUTMTracking";
@@ -691,6 +693,8 @@ function App({ user }: { user: any }) {
       setLocation("/resgatar");
     } else if (tab === "perfil") {
       setLocation("/perfil");
+    } else if (tab === "chat") {
+      setLocation("/chat");
     }
   };
   
@@ -728,7 +732,8 @@ function App({ user }: { user: any }) {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <PlayerContext.Provider value={{
+        <ChatProvider>
+          <PlayerContext.Provider value={{
           playingRadioId,
           setPlayingRadioId,
           isPlaying,
@@ -770,6 +775,9 @@ function App({ user }: { user: any }) {
                   totalListeningTime={totalListeningTime}
                   memberSince={memberSince}
                 />
+              </Route>
+              <Route path="/chat">
+                <Chat />
               </Route>
               <Route path="/adm/login">
                 <AdminLoginPage />
@@ -941,7 +949,7 @@ function App({ user }: { user: any }) {
 
 
             {/* Global Bottom Navigation */}
-            {(location === "/dashboard" || location === "/resgatar" || location === "/perfil") && (
+            {(location === "/dashboard" || location === "/resgatar" || location === "/perfil" || location === "/chat") && (
               <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-20">
                 <div className="container mx-auto px-4">
                   <div className="flex items-center justify-around py-3">
@@ -1001,6 +1009,25 @@ function App({ user }: { user: any }) {
                         <span className="text-xs font-medium">Perfil</span>
                       </Button>
                     </div>
+
+                    <div className="relative flex flex-col items-center gap-1">
+                      {activeTab === "chat" && (
+                        <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full"></div>
+                      )}
+                      <Button
+                        variant="ghost"
+                        className={`flex flex-col items-center gap-1 py-2 px-4 min-w-0 h-auto rounded-xl ${
+                          activeTab === "chat"
+                            ? "bg-green-100 text-green-700"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                        onClick={() => handleTabChange("chat")}
+                        data-testid="tab-chat"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                        <span className="text-xs font-medium">Chat</span>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </nav>
@@ -1010,6 +1037,7 @@ function App({ user }: { user: any }) {
             
           </div>
         </PlayerContext.Provider>
+        </ChatProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
@@ -1022,7 +1050,7 @@ function ProtectedApp() {
   
   // Redirect to login if not authenticated and trying to access protected routes
   useEffect(() => {
-    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil'];
+    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil', '/chat'];
     // Adicionar um pequeno delay para evitar redirecionamento durante o registro
     const timer = setTimeout(() => {
       if (!loading && !user && protectedRoutes.includes(location)) {
