@@ -12,7 +12,7 @@ export interface ChatMessage {
 
 interface ChatContextType {
   messages: ChatMessage[];
-  addMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'>) => void;
+  addMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'> & { timestamp?: string }) => void;
   clearMessages: () => void;
 }
 
@@ -50,14 +50,14 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [messages]);
 
-  const addMessage = (message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
+  const addMessage = (message: Omit<ChatMessage, 'id' | 'timestamp'> & { timestamp?: string }) => {
     const now = new Date();
-    const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const defaultTimestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     
     const newMessage: ChatMessage = {
       ...message,
       id: `msg-${Date.now()}-${Math.random()}`,
-      timestamp
+      timestamp: message.timestamp || defaultTimestamp
     };
 
     setMessages(prev => [...prev.slice(-99), newMessage]); // Keep last 100 messages

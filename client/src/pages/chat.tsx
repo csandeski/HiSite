@@ -573,20 +573,78 @@ export default function Chat() {
   useEffect(() => {
     // Generate initial messages if chat is empty
     if (messages.length === 0) {
-      // Add 5-8 initial messages
-      const initialCount = 5 + Math.floor(Math.random() * 4);
+      // Success/payment focused messages for initial chat
+      const successMessages = [
+        "Caiu R$150 aqui, confirmo!",
+        "Saque de R$200 caiu certinho",
+        "Recebi via Pix em 1 hora",
+        "Primeiro saque R$150, chegou",
+        "Pagamento em menos de 24h",
+        "R$180 entrou sem erro",
+        "Aprovado, saque feito via pix",
+        "R$200 caiu e entrou no extrato",
+        "Caiu R$150, comprovei",
+        "Entrou rápido no meu banco",
+        "R$150 creditado hoje",
+        "Confirmei saque e chegou",
+        "R$200 confirmado no extrato",
+        "Testei hoje e funcionou",
+        "Caiu, print aqui",
+        "To juntando pra R$300",
+        "Teste real: entrou certinho",
+        "Saque confirmado em 12h",
+        "Pra mim caiu no mesmo dia",
+        "R$150 garantido aqui",
+        "Recebi o pagamento na conta",
+        "Entrou R$200, comprovado",
+        "Pagamento sem burocracia",
+        "Caiu R$150 ontem à noite",
+        "Sim, pagou no mesmo dia",
+        "To com 3 saques esse mês",
+        "primeiro saque de 150 reais caiu em 2 minutos!",
+        "já fiz 3 saques essa semana, todos caíram certinho",
+        "meu primeiro saque de 200 caiu agora mesmo!",
+        "caiu 300 reais agora na minha conta",
+        "fiz 5 saques até agora, todos aprovados"
+      ];
+      
+      // Add 8-12 initial messages that appear to be from 2 minutes ago
+      const initialCount = 8 + Math.floor(Math.random() * 5);
+      
+      // Generate messages with timestamps from 2-5 minutes ago
+      const now = new Date();
+      
       for (let i = 0; i < initialCount; i++) {
-        setTimeout(() => {
+        // Calculate timestamp for this message (2-5 minutes ago, staggered)
+        const minutesAgo = 5 - (i * 0.3); // Messages get progressively more recent
+        const messageTime = new Date(now.getTime() - (minutesAgo * 60 * 1000));
+        const timestamp = `${messageTime.getHours().toString().padStart(2, '0')}:${messageTime.getMinutes().toString().padStart(2, '0')}`;
+        
+        // Add regular user messages focusing on success
+        if (i === 3 || i === 7) {
+          // Add admin message at position 3 and 7
+          addMessage({
+            name: "Administrador RádioPlay",
+            message: i === 3 ? 
+              "Sistema funcionando 100% sem instabilidades. Bons ganhos a todos!" : 
+              "Todos os saques foram concluídos com sucesso pessoal! Qualquer dúvida basta chamar no suporte WhatsApp!",
+            isVerified: false,
+            isOwnMessage: false,
+            isAdmin: true,
+            timestamp: timestamp
+          });
+        } else {
           const randomName = brazilianNames[Math.floor(Math.random() * brazilianNames.length)];
-          const randomMessage = allMessageTemplates[Math.floor(Math.random() * allMessageTemplates.length)];
+          const randomMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
           
           addMessage({
             name: randomName,
             message: randomMessage,
             isVerified: true,
-            isOwnMessage: false
+            isOwnMessage: false,
+            timestamp: timestamp
           });
-        }, i * 500); // Stagger initial messages
+        }
       }
     }
     
