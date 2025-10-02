@@ -38,18 +38,6 @@ const messageTemplates = [
   "Opa, tudo bem?", "E aí, como tá?", "Bom dia família", "Boa tarde galera",
   "Fala aí", "Beleza?", "Tudo certo?", "Oi pessoal!",
   
-  // Questions about functionality (30)
-  "realmente funciona?", "é gente real aqui?", "alguém já sacou mesmo?",
-  "isso é verdade?", "quanto tempo demora pra sacar?", "é confiável?",
-  "alguém pode confirmar?", "funciona mesmo?", "é seguro?",
-  "qual o valor mínimo?", "como faço pra sacar?", "precisa de documento?",
-  "tem alguma pegadinha?", "é rápido o saque?", "cai na hora?",
-  "qual banco aceita?", "funciona com Nubank?", "aceita PIX?",
-  "tem taxa?", "cobra alguma coisa?", "é de graça mesmo?",
-  "quantos pontos precisa?", "como ganho mais rápido?", "tem limite diário?",
-  "posso sacar todo dia?", "tem horário específico?", "funciona fim de semana?",
-  "alguém me ajuda?", "como começar?", "é difícil?",
-  
   // Success stories (40)
   "eu estou a 8 dias aqui consegui 6 saques de quase 350 caiu certinho aqui",
   "primeiro saque de 150 reais caiu em 2 minutos!",
@@ -164,7 +152,7 @@ const messageTemplates = [
   "gratidão 🙏", "Deus abençoe",
   
   // Mixed conversations (40)
-  "alguém online?", "como tá o dia de vcs?",
+  "pessoal online funcionando", "dia produtivo pra todos",
   "boa sorte pra todos", "vamos que vamos",
   "força galera", "todo mundo ganhando",
   "sucesso pra todos", "juntos somos mais fortes",
@@ -179,13 +167,12 @@ const messageTemplates = [
   "compartilhando experiência", "minha história aqui",
   "começei ontem", "primeira semana",
   "um mês usando", "veterano aqui",
-  "novato mas animado", "aprendendo ainda",
-  "alguém me explica?", "preciso de ajuda",
-  "como melhorar?", "alguma dica?",
-  "estratégia boa?", "o que recomendam?",
-  "horário bom?", "quando é melhor?",
-  "final de semana rende?", "feriado funciona?",
-  "madrugada vale a pena?", "manhã é melhor?",
+  "novato mas animado", "aprendendo sempre",
+  "seguindo firme", "progredindo bem",
+  "evoluindo sempre", "melhorando muito",
+  "resultados crescentes", "cada dia melhor",
+  "rendimento ótimo", "ganhos constantes",
+  "sucesso garantido", "funcionando perfeitamente",
   
   // Specific amounts and transactions (40)
   "R$ 50 na conta", "R$ 100 aprovado",
@@ -209,27 +196,10 @@ const messageTemplates = [
   "sétimo saque: 360", "oitavo saque: 410",
   "nono saque: 460", "décimo saque: 510",
   
-  // Doubts and concerns (30)
-  "será que é verdade?", "tenho medo de golpe",
-  "alguém teve problema?", "é seguro mesmo?",
-  "posso confiar?", "não é scam?",
-  "tem comprovante?", "mostra o extrato?",
-  "prova que funciona?", "cadê a prova?",
-  "desconfiado ainda", "tô com dúvida",
-  "explicam melhor?", "como ter certeza?",
-  "garantia existe?", "e se der erro?",
-  "suporte responde?", "ajuda disponível?",
-  "documentação necessária?", "CPF obrigatório?",
-  "dados protegidos?", "privacidade garantida?",
-  "empresa confiável?", "há quanto tempo existe?",
-  "reclamações resolvidas?", "atendimento bom?",
-  "demora quanto?", "prazo real?",
-  "taxas escondidas?", "custos extras?",
-  
   // Time-related messages (30)
   "bom dia pessoal, começando agora",
   "boa tarde, como estão?",
-  "boa noite galera, ainda dá tempo?",
+  "boa noite galera, produzindo aqui",
   "madrugada produtiva aqui",
   "manhã rendendo bem",
   "tarde tranquila ganhando",
