@@ -799,7 +799,7 @@ function App({ user }: { user: any }) {
             </Switch>
             
             {/* Global Player - Above bottom navigation */}
-            {playingRadio && (
+            {playingRadio && location !== "/account-authorization" && (
               <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 z-30" data-radio-player="true">
                 <div className="px-4 py-2">
                   <div className="flex items-center justify-between">
