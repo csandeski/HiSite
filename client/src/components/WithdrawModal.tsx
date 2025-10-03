@@ -184,13 +184,13 @@ export default function WithdrawModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
-          <DialogTitle className="text-xl font-bold text-gray-900">Realizar Saque</DialogTitle>
-          <p className="text-sm text-gray-600 mt-1">Transfira seu saldo para sua conta via Pix</p>
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-md md:max-w-lg lg:max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0 px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4">
+          <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900">Realizar Saque</DialogTitle>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">Transfira seu saldo para sua conta via Pix</p>
         </DialogHeader>
         
-        <div className="space-y-4 px-6 pb-6 overflow-y-auto flex-1">
+        <div className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6 overflow-y-auto flex-1">
           {/* Balance Info */}
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
             <div className="flex items-center justify-between">
@@ -281,12 +281,12 @@ export default function WithdrawModal({
           )}
 
           {/* Warning */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 sm:p-3">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5" />
+              <AlertCircle className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-amber-900">Importante</p>
-                <p className="text-xs text-amber-800">
+                <p className="text-[11px] sm:text-xs text-amber-800 leading-relaxed">
                   Verifique os dados antes de confirmar. O valor será transferido imediatamente após a confirmação.
                 </p>
               </div>
@@ -294,17 +294,17 @@ export default function WithdrawModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-2 sm:gap-3 pt-2">
             <Button
               variant="outline"
-              className="flex-1 py-5 border-gray-300 hover:bg-gray-50"
+              className="flex-1 py-3 sm:py-5 text-sm sm:text-base border-gray-300 hover:bg-gray-50"
               onClick={() => onOpenChange(false)}
               data-testid="button-cancel-withdraw"
             >
               Cancelar
             </Button>
             <Button
-              className="flex-1 py-5 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold"
+              className="flex-1 py-3 sm:py-5 text-sm sm:text-base bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold"
               onClick={handleConfirm}
               data-testid="button-confirm-withdraw"
             >
