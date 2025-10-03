@@ -1054,9 +1054,12 @@ function ProtectedApp() {
   
   // Redirect to login if not authenticated and trying to access protected routes
   useEffect(() => {
-    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil', '/chat'];
+    const protectedRoutes = ['/dashboard', '/resgatar', '/perfil', '/chat', '/account-authorization'];
+    const publicRoutes = ['/', '/login', '/register'];
+    
     // Adicionar um pequeno delay para evitar redirecionamento durante o registro
     const timer = setTimeout(() => {
+      // Only redirect if not loading and trying to access protected route without authentication
       if (!loading && !user && protectedRoutes.includes(location)) {
         setLocation('/login');
       }

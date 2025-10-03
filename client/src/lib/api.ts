@@ -102,21 +102,36 @@ class ApiClient {
     endpoint: string, 
     options?: RequestInit
   ): Promise<T> {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers
-      },
-      credentials: 'include' // Important for sessions
-    });
+    // Add timeout to prevent infinite waiting
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Network error' }));
-      throw new Error(error.error || 'Request failed');
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers
+        },
+        credentials: 'include', // Important for sessions
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Network error' }));
+        throw new Error(error.error || 'Request failed');
+      }
+      
+      return response.json();
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout - please try again');
+      }
+      throw error;
     }
-    
-    return response.json();
   }
 
   // Auth methods

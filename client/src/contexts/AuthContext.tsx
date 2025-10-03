@@ -42,12 +42,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuth = async () => {
     try {
+      setLoading(true);
       const { user } = await api.getCurrentUser();
       setUser(user);
+      setLoading(false);
     } catch (error) {
       // User is not logged in
+      console.log('Auth check - user not logged in');
       setUser(null);
-    } finally {
       setLoading(false);
     }
   };
