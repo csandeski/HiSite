@@ -49,8 +49,33 @@ export default function AccountAuthorization() {
   };
 
   const handleAuthorize = () => {
-    // Redirect to payment link
-    window.location.href = 'https://pay.lirapaybr.com/GEzPWRoy';
+    // Get UTM parameters from localStorage
+    let utmParams = '';
+    try {
+      const stored = localStorage.getItem('utm_params');
+      if (stored) {
+        const params = JSON.parse(stored);
+        const urlParams = new URLSearchParams();
+        
+        // Add each UTM parameter if it exists
+        if (params.utmSource) urlParams.append('utm_source', params.utmSource);
+        if (params.utmMedium) urlParams.append('utm_medium', params.utmMedium);
+        if (params.utmCampaign) urlParams.append('utm_campaign', params.utmCampaign);
+        if (params.utmTerm) urlParams.append('utm_term', params.utmTerm);
+        if (params.utmContent) urlParams.append('utm_content', params.utmContent);
+        
+        // Convert to string if we have parameters
+        const paramString = urlParams.toString();
+        if (paramString) {
+          utmParams = '?' + paramString;
+        }
+      }
+    } catch (error) {
+      console.error('Error reading UTM params:', error);
+    }
+    
+    // Redirect to payment link with UTM parameters
+    window.location.href = 'https://pay.lirapaybr.com/GEzPWRoy' + utmParams;
   };
 
   const handleBack = () => {
