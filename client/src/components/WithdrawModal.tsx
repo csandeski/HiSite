@@ -184,21 +184,21 @@ export default function WithdrawModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:max-w-md md:max-w-lg lg:max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="flex-shrink-0 px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4">
+      <DialogContent className="w-[calc(100%-1rem)] max-w-[calc(100%-1rem)] sm:max-w-md md:max-w-lg lg:max-w-xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0 px-3 sm:px-4 pt-4 sm:pt-5 pb-2 sm:pb-3">
           <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900">Realizar Saque</DialogTitle>
-          <p className="text-xs sm:text-sm text-gray-600 mt-1">Transfira seu saldo para sua conta via Pix</p>
+          <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Transfira seu saldo para sua conta via Pix</p>
         </DialogHeader>
         
-        <div className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6 overflow-y-auto flex-1">
+        <div className="space-y-3 sm:space-y-4 px-3 sm:px-4 pb-3 sm:pb-4 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {/* Balance Info */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 sm:p-4 border border-green-200">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Wallet className="w-5 h-5 text-green-600" />
-                <span className="text-sm text-gray-700">Saldo disponível</span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Wallet className="w-4 sm:w-5 h-4 sm:h-5 text-green-600" />
+                <span className="text-xs sm:text-sm text-gray-700">Saldo disponível</span>
               </div>
-              <span className="text-lg font-bold text-green-600">R$ {balance.toFixed(2)}</span>
+              <span className="text-base sm:text-lg font-bold text-green-600">R$ {balance.toFixed(2)}</span>
             </div>
           </div>
 
@@ -294,17 +294,17 @@ export default function WithdrawModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 sm:gap-3 pt-2">
+          <div className="flex gap-2 sm:gap-2.5 pt-1 sm:pt-2">
             <Button
               variant="outline"
-              className="flex-1 py-3 sm:py-5 text-sm sm:text-base border-gray-300 hover:bg-gray-50"
+              className="flex-1 py-2.5 sm:py-3 text-sm sm:text-base border-gray-300 hover:bg-gray-50"
               onClick={() => onOpenChange(false)}
               data-testid="button-cancel-withdraw"
             >
               Cancelar
             </Button>
             <Button
-              className="flex-1 py-3 sm:py-5 text-sm sm:text-base bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold"
+              className="flex-1 py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold"
               onClick={handleConfirm}
               data-testid="button-confirm-withdraw"
             >
