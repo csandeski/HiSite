@@ -27,6 +27,11 @@ export default function AccountAuthorization() {
     }
   }, [userData, setLocation]);
 
+  // Scroll to top when page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Timer countdown effect
   useEffect(() => {
     const interval = setInterval(() => {
