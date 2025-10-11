@@ -347,11 +347,18 @@ function App({ user }: { user: any }) {
         });
         
         // Update points and balance with fresh data
-        setSessionPoints(freshUserData.points || 0);
+        // FIX: Don't overwrite 600 points for unauthorized users
+        const newPoints = freshUserData.points || 0;
+        if (user && !user.accountAuthorized && sessionPoints >= 600 && newPoints < 600) {
+          // Keep displaying 600 points - don't let backend's recalculated value drop it
+          console.log('[SYNC] Keeping 600 points display (daily limit) instead of backend value:', newPoints);
+          setSessionPoints(600);
+          sessionInfoRef.current.sessionPoints = 600;
+        } else {
+          setSessionPoints(newPoints);
+          sessionInfoRef.current.sessionPoints = newPoints;
+        }
         setBalance(parseFloat(freshUserData.balance) || 0);
-        
-        // Update sessionInfoRef to match new server value
-        sessionInfoRef.current.sessionPoints = freshUserData.points || 0;
         
         // Refresh user in auth context
         refreshUser();
@@ -411,9 +418,16 @@ function App({ user }: { user: any }) {
         
         // Use the updated points from the server response
         if (result && result.updatedPoints !== undefined) {
-          setSessionPoints(result.updatedPoints);
-          // Update sessionInfoRef to match new server value
-          sessionInfoRef.current.sessionPoints = result.updatedPoints;
+          // FIX: Don't overwrite 600 points for unauthorized users
+          if (user && !user.accountAuthorized && sessionPoints >= 600 && result.updatedPoints < 600) {
+            // Keep displaying 600 points - don't let backend's recalculated value drop it
+            console.log('[SYNC] Keeping 600 points display (daily limit) instead of backend value:', result.updatedPoints);
+            setSessionPoints(600);
+            sessionInfoRef.current.sessionPoints = 600;
+          } else {
+            setSessionPoints(result.updatedPoints);
+            sessionInfoRef.current.sessionPoints = result.updatedPoints;
+          }
         }
         
         // Don't refresh points here - we already have the updated value
@@ -544,7 +558,14 @@ function App({ user }: { user: any }) {
             if (result && result.updatedPoints !== undefined) {
               // DO NOT update baseline - keep it as the initial session value
               // Just update the current points display
-              sessionInfoRef.current.sessionPoints = result.updatedPoints;
+              // FIX: Don't overwrite 600 points for unauthorized users
+              if (user && !user.accountAuthorized && sessionPoints >= 600 && result.updatedPoints < 600) {
+                // Keep displaying 600 points - don't let backend's recalculated value drop it
+                console.log('[POINT-SYNC] Keeping 600 points display (daily limit) instead of backend value:', result.updatedPoints);
+                sessionInfoRef.current.sessionPoints = 600;
+              } else {
+                sessionInfoRef.current.sessionPoints = result.updatedPoints;
+              }
             }
           } catch (error) {
             console.error('[POINT-SYNC] Failed to save point:', error);
@@ -585,8 +606,16 @@ function App({ user }: { user: any }) {
           });
           
           if (result && result.updatedPoints !== undefined) {
-            setSessionPoints(result.updatedPoints);
-            sessionInfoRef.current.sessionPoints = result.updatedPoints;
+            // FIX: Don't overwrite 600 points for unauthorized users
+            if (user && !user.accountAuthorized && sessionPoints >= 600 && result.updatedPoints < 600) {
+              // Keep displaying 600 points - don't let backend's recalculated value drop it
+              console.log('[SYNC-POINTS] Keeping 600 points display (daily limit) instead of backend value:', result.updatedPoints);
+              setSessionPoints(600);
+              sessionInfoRef.current.sessionPoints = 600;
+            } else {
+              setSessionPoints(result.updatedPoints);
+              sessionInfoRef.current.sessionPoints = result.updatedPoints;
+            }
           }
           
           return;
@@ -666,8 +695,16 @@ function App({ user }: { user: any }) {
             
             // Update points with server response to ensure consistency
             if (result && result.updatedPoints !== undefined) {
-              setSessionPoints(result.updatedPoints);
-              sessionInfoRef.current.sessionPoints = result.updatedPoints;
+              // FIX: Don't overwrite 600 points for unauthorized users
+              if (user && !user.accountAuthorized && sessionPoints >= 600 && result.updatedPoints < 600) {
+                // Keep displaying 600 points - don't let backend's recalculated value drop it
+                console.log('[AUTO-SYNC] Keeping 600 points display (daily limit) instead of backend value:', result.updatedPoints);
+                setSessionPoints(600);
+                sessionInfoRef.current.sessionPoints = 600;
+              } else {
+                setSessionPoints(result.updatedPoints);
+                sessionInfoRef.current.sessionPoints = result.updatedPoints;
+              }
               // DO NOT update baseline - it should remain the initial value from session start
               // This ensures the server always receives the total points earned in this session
             }
