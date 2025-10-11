@@ -19,6 +19,7 @@ import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import WelcomeModal from '@/components/WelcomeModal';
 import BannerCarousel from '@/components/BannerCarousel';
+import DailyLimitModal from '@/components/DailyLimitModal';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -68,6 +69,7 @@ export default function Dashboard({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [unreadMessages] = useState(34); // Número de mensagens novas
+  const [showDailyLimitModal, setShowDailyLimitModal] = useState(false);
   
   // Check if it's the first visit for new users
   useEffect(() => {
@@ -82,6 +84,20 @@ export default function Dashboard({
     localStorage.setItem('hasSeenWelcome', 'true');
     setShowWelcomeModal(false);
   };
+  
+  // Check if daily limit modal should be shown
+  useEffect(() => {
+    const dailyLimitModalShown = localStorage.getItem('dailyLimitModalShown');
+    
+    // Check conditions: 
+    // 1. User reached 600 points
+    // 2. User is not authorized
+    // 3. Modal hasn't been shown before
+    if (sessionPoints >= 600 && user && !user.accountAuthorized && !dailyLimitModalShown) {
+      setShowDailyLimitModal(true);
+      localStorage.setItem('dailyLimitModalShown', 'true');
+    }
+  }, [sessionPoints, user]);
   
   // Estado para rastrear ouvintes por rádio
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
@@ -471,6 +487,9 @@ export default function Dashboard({
         onOpenChange={setShowWelcomeModal}
         onComplete={handleWelcomeComplete}
       />
+      
+      {/* Daily Limit Modal */}
+      <DailyLimitModal isOpen={showDailyLimitModal} />
       
       {/* Floating Chat Button */}
       <button
