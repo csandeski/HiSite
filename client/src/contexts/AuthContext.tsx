@@ -87,13 +87,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const updateUser = (updatedUser: User) => {
+    // Clear daily limit modal flag if user becomes authorized
+    if (updatedUser.accountAuthorized && user && !user.accountAuthorized) {
+      localStorage.removeItem('dailyLimitModalShownDate');
+    }
     setUser(updatedUser);
   };
 
   const refreshUser = async () => {
     try {
-      const { user } = await api.getCurrentUser();
-      setUser(user);
+      const { user: freshUser } = await api.getCurrentUser();
+      // Clear daily limit modal flag if user becomes authorized
+      if (freshUser.accountAuthorized && user && !user.accountAuthorized) {
+        localStorage.removeItem('dailyLimitModalShownDate');
+      }
+      setUser(freshUser);
     } catch (error) {
       console.error('Failed to refresh user:', error);
     }

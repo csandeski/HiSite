@@ -586,7 +586,20 @@ function App({ user }: { user: any }) {
       
       // Increment points by 1 at calculated intervals
       pointsIntervalRef.current = setInterval(() => {
+        // Check if user has reached daily limit (600 points) without authorization
+        if (user && !user.accountAuthorized && sessionPoints >= 600) {
+          console.log('[POINTS] Daily limit reached (600 points) - blocking point accumulation');
+          // Don't increment points - user has reached the daily limit
+          return;
+        }
+        
         setSessionPoints((prev) => {
+          // Double-check inside the setter to prevent race conditions
+          if (user && !user.accountAuthorized && prev >= 600) {
+            console.log('[POINTS] Daily limit reached (600 points) - blocking point accumulation');
+            return prev; // Don't increment
+          }
+          
           const newPoints = prev + 1; // Always increment by 1
           sessionInfoRef.current.sessionPoints = newPoints;
           // Save immediately after each point gained
@@ -682,7 +695,7 @@ function App({ user }: { user: any }) {
         clearInterval(syncInterval);
       }
     };
-  }, [isPlaying, playingRadioId, isSyncing, endListeningSession, sessionPoints]); // Add sessionPoints for sessionInfoRef reset
+  }, [isPlaying, playingRadioId, isSyncing, endListeningSession, sessionPoints, user]); // Add sessionPoints for sessionInfoRef reset and user for authorization check
 
   const playingRadio = radios.find(r => r.id === playingRadioId);
 

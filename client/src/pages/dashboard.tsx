@@ -70,6 +70,7 @@ export default function Dashboard({
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [unreadMessages] = useState(34); // Número de mensagens novas
   const [showDailyLimitModal, setShowDailyLimitModal] = useState(false);
+  const [hasShownForCurrentSession, setHasShownForCurrentSession] = useState(false);
   
   // Check if it's the first visit for new users
   useEffect(() => {
@@ -85,19 +86,58 @@ export default function Dashboard({
     setShowWelcomeModal(false);
   };
   
+  // Helper function to check if it's a new day
+  const isNewDay = (storedDate: string) => {
+    const stored = new Date(storedDate);
+    const today = new Date();
+    return stored.toDateString() !== today.toDateString();
+  };
+  
   // Check if daily limit modal should be shown
   useEffect(() => {
-    const dailyLimitModalShown = localStorage.getItem('dailyLimitModalShown');
+    if (!user) return;
+
+    const storedDate = localStorage.getItem('dailyLimitModalShownDate');
+    const today = new Date().toDateString();
     
-    // Check conditions: 
+    // Clear flag if it's a new day
+    if (storedDate && isNewDay(storedDate)) {
+      localStorage.removeItem('dailyLimitModalShownDate');
+      setHasShownForCurrentSession(false);
+    }
+    
+    // Clear flag if user is now authorized (they upgraded)
+    if (user.accountAuthorized) {
+      localStorage.removeItem('dailyLimitModalShownDate');
+      setHasShownForCurrentSession(false);
+      setShowDailyLimitModal(false);
+      return;
+    }
+    
+    // Check conditions to show modal:
     // 1. User reached 600 points
     // 2. User is not authorized
-    // 3. Modal hasn't been shown before
-    if (sessionPoints >= 600 && user && !user.accountAuthorized && !dailyLimitModalShown) {
+    // 3. Haven't shown modal for this session yet
+    // 4. Either: it's a new day OR we haven't shown it today at all
+    const shouldShowModal = sessionPoints >= 600 && 
+                           !user.accountAuthorized && 
+                           !hasShownForCurrentSession &&
+                           (!storedDate || isNewDay(storedDate));
+    
+    if (shouldShowModal) {
       setShowDailyLimitModal(true);
-      localStorage.setItem('dailyLimitModalShown', 'true');
+      setHasShownForCurrentSession(true);
+      localStorage.setItem('dailyLimitModalShownDate', today);
     }
-  }, [sessionPoints, user]);
+  }, [sessionPoints, user, hasShownForCurrentSession]);
+  
+  // Reset session flag when points drop below 600
+  useEffect(() => {
+    if (sessionPoints < 600 && hasShownForCurrentSession) {
+      // User's points dropped below 600, allow showing modal again if they reach 600
+      setHasShownForCurrentSession(false);
+    }
+  }, [sessionPoints, hasShownForCurrentSession]);
   
   // Estado para rastrear ouvintes por rádio
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
@@ -252,15 +292,47 @@ export default function Dashboard({
               </div>
             </div>
             
+            {/* Daily Limit Reached Indicator */}
+            {sessionPoints >= 600 && user && !user.accountAuthorized && (
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 mb-2" data-testid="daily-limit-indicator">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-white" />
+                  <div className="flex-1">
+                    <p className="text-white text-sm font-semibold">Limite Diário Atingido!</p>
+                    <p className="text-white/80 text-xs mt-0.5">
+                      Você alcançou o limite de 600 pontos diários. Ative sua conta para continuar ganhando!
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  className="mt-2 w-full bg-white/30 hover:bg-white/40 text-white font-semibold border border-white/20"
+                  onClick={() => setLocation('/account-authorization')}
+                  data-testid="button-activate-from-limit"
+                >
+                  Ativar Conta Agora
+                </Button>
+              </div>
+            )}
+            
             {/* Live earning indicator inside the card */}
             {playingRadio && isPlaying ? (
               <div className="space-y-2">
-                <div className="bg-white/10 rounded-lg px-2.5 py-1.5 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-white/90">
-                    Ganhando pontos ao vivo • {playingRadio.name}
-                  </span>
-                </div>
+                {sessionPoints >= 600 && user && !user.accountAuthorized ? (
+                  <div className="bg-red-500/20 rounded-lg px-2.5 py-1.5 flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-white" />
+                    <span className="text-xs text-white font-medium">
+                      Ganho de pontos bloqueado • Limite diário atingido
+                    </span>
+                  </div>
+                ) : (
+                  <div className="bg-white/10 rounded-lg px-2.5 py-1.5 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-white/90">
+                      Ganhando pontos ao vivo • {playingRadio.name}
+                    </span>
+                  </div>
+                )}
                 <div className="bg-white/10 rounded-lg px-2.5 py-1.5 flex items-center justify-between">
                   <span className="text-xs text-white/90">Tempo de escuta hoje:</span>
                   <span className="text-xs font-bold text-white">
