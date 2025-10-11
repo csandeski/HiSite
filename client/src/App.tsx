@@ -171,8 +171,6 @@ function App({ user }: { user: any }) {
   const [location, setLocation] = useLocation();
   const [initialPointsLoaded, setInitialPointsLoaded] = useState(false);
   const [isRefreshingPoints, setIsRefreshingPoints] = useState(false);
-  const [navigationTrigger, setNavigationTrigger] = useState(0); // Trigger for modal on navigation
-  const [previousLocation, setPreviousLocation] = useState(location);
   
   const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -303,7 +301,7 @@ function App({ user }: { user: any }) {
     }
   }, [volume]);
 
-  // Sync active tab with current route and detect navigation changes
+  // Sync active tab with current route
   useEffect(() => {
     if (location === "/dashboard") {
       setActiveTab("radio");
@@ -312,20 +310,7 @@ function App({ user }: { user: any }) {
     } else if (location === "/perfil") {
       setActiveTab("perfil");
     }
-    
-    // Detect navigation change for daily limit modal
-    if (location !== previousLocation) {
-      console.log('[DailyLimitModal] Navigation detected from', previousLocation, 'to', location);
-      setPreviousLocation(location);
-      
-      // Check if user has hit limit and should see modal on navigation
-      const modalFirstShown = localStorage.getItem('dailyLimitModalFirstShown');
-      if (modalFirstShown && sessionPoints >= 600 && user && !user.accountAuthorized) {
-        console.log('[DailyLimitModal] Triggering modal on navigation - user has hit limit');
-        setNavigationTrigger(prev => prev + 1);
-      }
-    }
-  }, [location, previousLocation, sessionPoints, user]);
+  }, [location]);
 
 
   // Helper function to refresh points from backend
@@ -828,7 +813,7 @@ function App({ user }: { user: any }) {
                 <RegisterPage />
               </Route>
               <Route path="/dashboard">
-                <DashboardComp {...playerProps} totalListeningTime={totalListeningTime} navigationTrigger={navigationTrigger} />
+                <DashboardComp {...playerProps} totalListeningTime={totalListeningTime} />
               </Route>
               <Route path="/resgatar">
                 <Resgatar {...playerProps} />

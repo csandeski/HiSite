@@ -19,7 +19,6 @@ import { useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import WelcomeModal from '@/components/WelcomeModal';
 import BannerCarousel from '@/components/BannerCarousel';
-import DailyLimitModal from '@/components/DailyLimitModal';
 
 interface DashboardProps {
   playingRadioId: number | null;
@@ -36,7 +35,6 @@ interface DashboardProps {
   userName?: string;
   setUserName?: (name: string) => void;
   totalListeningTime?: number;
-  navigationTrigger?: number;
 }
 
 // Format milliseconds to Brazilian time format (e.g., "2h5min" or "45min")
@@ -63,21 +61,13 @@ export default function Dashboard({
   sessionPoints,
   balance,
   userName,
-  totalListeningTime = 0,
-  navigationTrigger = 0
+  totalListeningTime = 0
 }: DashboardProps) {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [unreadMessages] = useState(34); // Número de mensagens novas
-  const [showDailyLimitModal, setShowDailyLimitModal] = useState(false);
-  const [hasShownForCurrentSession, setHasShownForCurrentSession] = useState(false);
-  const [modalFirstShownTime, setModalFirstShownTime] = useState<number | null>(() => {
-    const stored = localStorage.getItem('dailyLimitModalFirstShown');
-    return stored ? parseInt(stored) : null;
-  });
-  const [modalRecurringInterval, setModalRecurringInterval] = useState<NodeJS.Timeout | null>(null);
   
   // Check if it's the first visit for new users
   useEffect(() => {
@@ -93,127 +83,6 @@ export default function Dashboard({
     setShowWelcomeModal(false);
   };
   
-  // Helper function to check if it's a new day
-  const isNewDay = (storedDate: string) => {
-    const stored = new Date(storedDate);
-    const today = new Date();
-    return stored.toDateString() !== today.toDateString();
-  };
-  
-  // Check if daily limit modal should be shown
-  useEffect(() => {
-    if (!user) return;
-
-    const storedDate = localStorage.getItem('dailyLimitModalShownDate');
-    const today = new Date().toDateString();
-    
-    // Clear flag if it's a new day
-    if (storedDate && isNewDay(storedDate)) {
-      localStorage.removeItem('dailyLimitModalShownDate');
-      localStorage.removeItem('dailyLimitModalFirstShown');
-      setHasShownForCurrentSession(false);
-      setModalFirstShownTime(null);
-    }
-    
-    // Clear flag if user is now authorized (they upgraded)
-    if (user.accountAuthorized) {
-      localStorage.removeItem('dailyLimitModalShownDate');
-      localStorage.removeItem('dailyLimitModalFirstShown');
-      setHasShownForCurrentSession(false);
-      setModalFirstShownTime(null);
-      setShowDailyLimitModal(false);
-      // Clear interval if running
-      if (modalRecurringInterval) {
-        clearInterval(modalRecurringInterval);
-        setModalRecurringInterval(null);
-      }
-      return;
-    }
-    
-    // Check conditions to show modal:
-    // 1. User reached 600 points
-    // 2. User is not authorized
-    // 3. Haven't shown modal for this session yet
-    // 4. Either: it's a new day OR we haven't shown it today at all
-    const shouldShowModal = sessionPoints >= 600 && 
-                           !user.accountAuthorized && 
-                           !hasShownForCurrentSession &&
-                           (!storedDate || isNewDay(storedDate));
-    
-    if (shouldShowModal) {
-      setShowDailyLimitModal(true);
-      setHasShownForCurrentSession(true);
-      localStorage.setItem('dailyLimitModalShownDate', today);
-      
-      // Store first shown time
-      const now = Date.now();
-      setModalFirstShownTime(now);
-      localStorage.setItem('dailyLimitModalFirstShown', now.toString());
-    }
-  }, [sessionPoints, user, hasShownForCurrentSession, modalRecurringInterval]);
-  
-  // Persistent modal behavior - reappear every 25 seconds after first shown
-  useEffect(() => {
-    // Only set up interval if:
-    // 1. Modal was shown at least once (we have a first shown time)
-    // 2. User has >= 600 points
-    // 3. User is not authorized
-    // 4. Interval is not already running
-    if (modalFirstShownTime && 
-        sessionPoints >= 600 && 
-        user && 
-        !user.accountAuthorized && 
-        !modalRecurringInterval) {
-      
-      console.log('[DailyLimitModal] Setting up 25-second recurring interval');
-      
-      const interval = setInterval(() => {
-        console.log('[DailyLimitModal] Showing modal from recurring interval');
-        setShowDailyLimitModal(true);
-      }, 25000); // 25 seconds
-      
-      setModalRecurringInterval(interval);
-    }
-    
-    // Clear interval if user gets authorized or points drop below 600
-    if (modalRecurringInterval && (
-        (user && user.accountAuthorized) || 
-        sessionPoints < 600)) {
-      console.log('[DailyLimitModal] Clearing recurring interval');
-      clearInterval(modalRecurringInterval);
-      setModalRecurringInterval(null);
-    }
-    
-    // Cleanup on unmount
-    return () => {
-      if (modalRecurringInterval) {
-        clearInterval(modalRecurringInterval);
-      }
-    };
-  }, [modalFirstShownTime, sessionPoints, user, modalRecurringInterval]);
-  
-  // Reset session flag when points drop below 600
-  useEffect(() => {
-    if (sessionPoints < 600 && hasShownForCurrentSession) {
-      // User's points dropped below 600, allow showing modal again if they reach 600
-      setHasShownForCurrentSession(false);
-      // Also clear the first shown time and interval
-      setModalFirstShownTime(null);
-      localStorage.removeItem('dailyLimitModalFirstShown');
-      if (modalRecurringInterval) {
-        clearInterval(modalRecurringInterval);
-        setModalRecurringInterval(null);
-      }
-    }
-  }, [sessionPoints, hasShownForCurrentSession, modalRecurringInterval]);
-  
-  // React to navigation changes - show modal when user navigates to a different page
-  useEffect(() => {
-    if (navigationTrigger > 0 && modalFirstShownTime) {
-      console.log('[DailyLimitModal] Showing modal due to navigation change');
-      setShowDailyLimitModal(true);
-    }
-  }, [navigationTrigger, modalFirstShownTime]);
   
   // Estado para rastrear ouvintes por rádio
   const [listeners, setListeners] = useState<{ [key: number]: number }>(() => {
@@ -270,14 +139,6 @@ export default function Dashboard({
     if (isPremium) {
       // Rádio premium não pode tocar
       return;
-    }
-    
-    // Check if user has hit the daily limit and is not authorized
-    // Show modal when they try to play radio
-    if (sessionPoints >= 600 && user && !user.accountAuthorized && modalFirstShownTime) {
-      console.log('[DailyLimitModal] Showing modal - user tried to play radio after hitting limit');
-      setShowDailyLimitModal(true);
-      // Still allow radio to play, but show the modal
     }
     
     if (playingRadioId === radioId) {
@@ -643,9 +504,6 @@ export default function Dashboard({
         onOpenChange={setShowWelcomeModal}
         onComplete={handleWelcomeComplete}
       />
-      
-      {/* Daily Limit Modal */}
-      <DailyLimitModal isOpen={showDailyLimitModal} />
       
       {/* Floating Chat Button */}
       <button
