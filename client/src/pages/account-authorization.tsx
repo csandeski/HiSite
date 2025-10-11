@@ -1,19 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Shield, Clock, Check, AlertCircle, Timer, ChevronLeft, Wallet, X, Users, TrendingUp, Target, Calendar, UserCheck } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Shield, Clock, Check, AlertCircle, ChevronLeft, X, Users, TrendingUp, Target, Calendar, UserCheck } from "lucide-react";
 import { AUTHORIZATION_AMOUNT_CENTS, formatBRL } from "@shared/constants";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import logoUrl from '@/assets/logo.png';
 
 export default function AccountAuthorization() {
-  const { toast } = useToast();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const [timeRemaining, setTimeRemaining] = useState(600); // 10 minutes in seconds
 
   // Get user data to check account status
   const { data: userData } = useQuery({ 
@@ -31,27 +28,6 @@ export default function AccountAuthorization() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  // Timer countdown effect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 0) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const handleAuthorize = () => {
     // Get UTM parameters from localStorage
@@ -154,26 +130,6 @@ export default function AccountAuthorization() {
               <div className="flex-1">
                 <h1 className="text-lg md:text-xl font-bold text-gray-900">Autorização de Conta</h1>
                 <p className="text-xs md:text-sm text-gray-600 mt-0.5">Ative sua conta com segurança</p>
-              </div>
-            </div>
-          </Card>
-
-          {/* Promotional Offer Card */}
-          <Card className="p-4 md:p-5 mb-4 bg-white border-0 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex-1">
-                <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-wider font-medium mb-1.5">Oferta Especial</p>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xl md:text-2xl font-bold text-primary">62% OFF</span>
-                  <span className="text-xs md:text-sm text-gray-400 line-through">R$ 79,90</span>
-                </div>
-                <p className="text-lg md:text-xl font-bold text-green-600 mt-1">{formatBRL(AUTHORIZATION_AMOUNT_CENTS)}</p>
-              </div>
-              <div className="bg-gray-50 rounded-xl px-3 py-2.5 md:px-4 md:py-3 border border-gray-200">
-                <div className="flex flex-col items-center">
-                  <Timer className="w-4 h-4 md:w-5 md:h-5 text-primary mb-1" />
-                  <span className="text-xs md:text-sm font-mono font-semibold text-gray-900">{formatTime(timeRemaining)}</span>
-                </div>
               </div>
             </div>
           </Card>
@@ -282,19 +238,6 @@ export default function AccountAuthorization() {
                   <p className="text-sm font-medium text-gray-900">Apoiar Rádios Parceiras</p>
                   <p className="text-xs text-gray-600">Ajude na visibilidade e seja pago</p>
                 </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Commitment Card */}
-          <Card className="p-4 mb-4 bg-gradient-to-br from-blue-50 to-white border border-blue-200 shadow-sm">
-            <div className="flex gap-2.5">
-              <Shield className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-bold text-blue-900 mb-1">Taxa Única de Comprometimento</p>
-                <p className="text-xs text-blue-800 leading-relaxed">
-                  <strong>Nenhuma outra taxa será cobrada.</strong> Este valor comprova que você é real e está comprometido com a plataforma, garantindo que não tomará a vaga de quem realmente precisa.
-                </p>
               </div>
             </div>
           </Card>
