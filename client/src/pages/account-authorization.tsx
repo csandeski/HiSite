@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Shield, Clock, Check, AlertCircle, ChevronLeft, X, Users, TrendingUp, Target, Calendar, UserCheck } from "lucide-react";
+import { Shield, Clock, Check, AlertCircle, ChevronLeft, Users, TrendingUp, Target, Calendar, UserCheck } from "lucide-react";
 import { AUTHORIZATION_AMOUNT_CENTS, formatBRL } from "@shared/constants";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
@@ -179,34 +179,6 @@ export default function AccountAuthorization() {
                   As vagas encerram dia <strong className="text-red-900 uppercase">{deadline}</strong>
                 </p>
                 <p className="text-sm text-red-700 mt-1">Após esta data, novas vagas só abrirão em 2026.</p>
-              </div>
-            </div>
-          </Card>
-
-          {/* Who This App Is NOT For */}
-          <Card className="p-4 md:p-5 mb-4 bg-white border-0 shadow-sm">
-            <h3 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <X className="w-4 h-4 text-red-500" />
-              Nosso App NÃO é Para:
-            </h3>
-            <div className="space-y-2.5">
-              <div className="flex gap-2">
-                <span className="text-red-500 mt-1">•</span>
-                <p className="text-sm text-gray-700 flex-1">
-                  Quem acha que vai ficar rico da noite pro dia. É uma <strong>renda extra</strong> de R$ 500 a R$ 4.500/mês.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <span className="text-red-500 mt-1">•</span>
-                <p className="text-sm text-gray-700 flex-1">
-                  Pessoas sem esforço mínimo para alcançar objetivos.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <span className="text-red-500 mt-1">•</span>
-                <p className="text-sm text-gray-700 flex-1">
-                  Curiosos que vão tomar a vaga de quem realmente precisa.
-                </p>
               </div>
             </div>
           </Card>
