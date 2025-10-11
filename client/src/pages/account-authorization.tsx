@@ -311,24 +311,22 @@ export default function AccountAuthorization() {
             </div>
           </Card>
 
+          {/* Action Button */}
+          <div className="mt-6 mb-6">
+            <Button
+              className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-6 md:py-7 text-lg md:text-xl rounded-xl shadow-md transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02]"
+              onClick={handleAuthorize}
+              data-testid="button-authorize-account"
+            >
+              Ativar Minha Conta!
+            </Button>
+            <p className="text-xs md:text-sm text-center text-gray-500 mt-3">
+              Pagamento seguro • Garantia de 30 dias
+            </p>
+          </div>
+
         </div>
       </main>
-
-      {/* Fixed Bottom Action Area */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 md:p-4 shadow-lg">
-        <div className="max-w-2xl mx-auto">
-          <Button
-            className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold py-4 md:py-5 text-base md:text-lg rounded-xl shadow-md transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02]"
-            onClick={handleAuthorize}
-            data-testid="button-authorize-account"
-          >
-            Autorizar por {formatBRL(AUTHORIZATION_AMOUNT_CENTS)}
-          </Button>
-          <p className="text-[10px] md:text-xs text-center text-gray-500 mt-1.5">
-            Pagamento seguro • Garantia de 30 dias
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
